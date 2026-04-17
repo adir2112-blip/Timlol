@@ -3,462 +3,748 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>מערכת ביקורת שיחות AI</title>
+<title>מערכת ביקורת שיחות</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700&display=swap');
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: 'Heebo', sans-serif; background: #0f0f13; color: #e8e6f0; min-height: 100vh; direction: rtl; }
-  .app { max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem; }
-  .header { margin-bottom: 2.5rem; }
-  .header-top { display: flex; align-items: center; gap: 14px; margin-bottom: 6px; }
-  .logo-dot { width: 10px; height: 10px; border-radius: 50%; background: #7c6af7; animation: pulse 2s infinite; }
-  @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
-  .header h1 { font-size: 22px; font-weight: 600; letter-spacing: -0.3px; }
-  .header p { font-size: 13px; color: #6b6880; margin-right: 24px; }
+@import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700&display=swap');
 
-  /* API Key setup */
-  .setup-card { background: #1a1825; border: 1px solid #2a1a60; border-radius: 14px; padding: 1.5rem; margin-bottom: 2rem; }
-  .setup-card h3 { font-size: 14px; font-weight: 600; color: #c4b5ff; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
-  .setup-card p { font-size: 12px; color: #6b6880; margin-bottom: 12px; line-height: 1.6; }
-  .setup-card a { color: #7c6af7; text-decoration: none; }
-  .setup-card a:hover { text-decoration: underline; }
-  .key-row { display: flex; gap: 8px; }
-  .key-input { flex: 1; padding: 10px 14px; border-radius: 8px; border: 1px solid #2a2835; background: #14131a; color: #e8e6f0; font-size: 13px; font-family: 'Heebo', sans-serif; outline: none; }
-  .key-input:focus { border-color: #7c6af7; }
-  .key-btn { padding: 10px 18px; border-radius: 8px; background: #2a2060; border: 1px solid #5b4dd4; color: #c4b5ff; font-family: 'Heebo', sans-serif; font-size: 13px; cursor: pointer; white-space: nowrap; }
-  .key-btn:hover { background: #3a2c80; }
-  .key-saved { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #4ade80; margin-top: 8px; }
+* { margin:0; padding:0; box-sizing:border-box; }
 
-  .type-selector { display: flex; gap: 8px; margin-bottom: 2rem; }
-  .type-btn { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #2a2835; background: #1a1825; color: #8b88a0; font-size: 13px; font-family: 'Heebo', sans-serif; cursor: pointer; transition: all 0.2s; font-weight: 500; }
-  .type-btn:hover { border-color: #7c6af7; color: #c4c0e0; }
-  .type-btn.active { background: #2a2060; border-color: #7c6af7; color: #c4b5ff; }
+body {
+  font-family: 'Heebo', sans-serif;
+  background: #f5f6fa;
+  color: #1a1d2e;
+  direction: rtl;
+  display: flex;
+  min-height: 100vh;
+}
 
-  .agent-row { display: flex; gap: 10px; margin-bottom: 1.5rem; }
-  .input-wrap { flex: 1; }
-  .input-wrap label { display: block; font-size: 12px; color: #6b6880; margin-bottom: 6px; }
-  .input-wrap input { width: 100%; padding: 10px 14px; border-radius: 8px; border: 1px solid #2a2835; background: #1a1825; color: #e8e6f0; font-size: 14px; font-family: 'Heebo', sans-serif; outline: none; transition: border-color 0.2s; }
-  .input-wrap input:focus { border-color: #7c6af7; }
+/* ─── SIDEBAR ─────────────────────────────── */
+.sidebar {
+  width: 220px;
+  min-height: 100vh;
+  background: #fff;
+  border-left: 1px solid #e8eaf0;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  right: 0;
+  top: 0;
+  z-index: 100;
+  padding: 0;
+}
 
-  .upload-section { margin-bottom: 1.5rem; }
-  .upload-area { border: 1.5px dashed #2a2835; border-radius: 12px; padding: 2.5rem; text-align: center; cursor: pointer; transition: all 0.25s; background: #14131a; position: relative; }
-  .upload-area:hover { border-color: #7c6af7; background: #1a1825; }
-  .upload-area input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
-  .upload-icon { font-size: 32px; margin-bottom: 10px; }
-  .upload-area h3 { font-size: 15px; font-weight: 500; margin-bottom: 6px; color: #c4c0e0; }
-  .upload-area p { font-size: 12px; color: #5a5770; }
-  .file-ready { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: #0f2a1a; border: 1px solid #1a5c35; border-radius: 8px; margin-top: 10px; }
-  .file-ready span { font-size: 13px; color: #4ade80; }
-  .file-ready .fname { color: #a8a4c0; font-size: 12px; }
+.sidebar-logo {
+  padding: 22px 20px 18px;
+  border-bottom: 1px solid #f0f1f5;
+}
+.sidebar-logo .logo-row { display:flex; align-items:center; gap:10px; }
+.logo-icon {
+  width: 34px; height: 34px; border-radius: 10px;
+  background: linear-gradient(135deg, #6c63ff, #4f46e5);
+  display:flex; align-items:center; justify-content:center;
+  font-size: 16px;
+}
+.sidebar-logo h2 { font-size: 14px; font-weight: 600; color: #1a1d2e; line-height: 1.3; }
+.sidebar-logo p  { font-size: 11px; color: #9098b1; margin-top: 1px; }
 
-  /* Text input option */
-  .or-divider { text-align: center; color: #3a3555; font-size: 12px; margin: 12px 0; }
-  .text-input-area { width: 100%; min-height: 120px; padding: 12px 14px; border-radius: 10px; border: 1px solid #2a2835; background: #14131a; color: #e8e6f0; font-size: 13px; font-family: 'Heebo', sans-serif; resize: vertical; outline: none; direction: rtl; }
-  .text-input-area:focus { border-color: #7c6af7; }
-  .text-input-area::placeholder { color: #3a3555; }
+.sidebar-nav { padding: 12px 10px; flex: 1; }
+.nav-label { font-size: 10px; font-weight: 600; color: #b0b8cc; letter-spacing: 0.8px; text-transform: uppercase; padding: 8px 10px 6px; }
 
-  .analyze-btn { width: 100%; padding: 13px; border-radius: 10px; background: linear-gradient(135deg, #7c6af7, #5b4dd4); border: none; color: white; font-size: 15px; font-weight: 600; font-family: 'Heebo', sans-serif; cursor: pointer; transition: all 0.2s; margin-top: 1.5rem; margin-bottom: 2rem; }
-  .analyze-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(124,106,247,0.35); }
-  .analyze-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border-radius: 10px;
+  font-size: 13px; font-weight: 500; color: #5a6282;
+  cursor: pointer; transition: all 0.18s; margin-bottom: 2px;
+  border: none; background: none; width: 100%; text-align: right;
+}
+.nav-item:hover { background: #f5f6fa; color: #1a1d2e; }
+.nav-item.active { background: #eeeeff; color: #4f46e5; }
+.nav-item .icon { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
 
-  .loading { text-align: center; padding: 3rem; display: none; }
-  .loading-spinner { width: 40px; height: 40px; border: 3px solid #2a2835; border-top-color: #7c6af7; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .loading p { color: #6b6880; font-size: 14px; }
+.sidebar-bottom { padding: 12px 10px; border-top: 1px solid #f0f1f5; }
 
-  .results { display: none; animation: fadeIn 0.4s ease; }
-  @keyframes fadeIn { from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:translateY(0);} }
-  .results-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
-  .results-header h2 { font-size: 16px; font-weight: 600; }
-  .agent-badge { background: #2a2060; border: 1px solid #5b4dd4; color: #c4b5ff; font-size: 12px; padding: 4px 12px; border-radius: 20px; }
+/* ─── MAIN CONTENT ─────────────────────────── */
+.main {
+  margin-right: 220px;
+  flex: 1;
+  padding: 32px 36px;
+  max-width: calc(100vw - 220px);
+}
 
-  .score-overview { background: #1a1825; border: 1px solid #2a2835; border-radius: 14px; padding: 1.5rem; margin-bottom: 1.5rem; display: grid; grid-template-columns: auto 1fr; gap: 1.5rem; align-items: center; }
-  .total-score-circle { width: 90px; height: 90px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 3px solid #7c6af7; background: #2a2060; flex-shrink: 0; }
-  .total-score-circle .num { font-size: 28px; font-weight: 700; color: #c4b5ff; line-height: 1; }
-  .total-score-circle .denom { font-size: 11px; color: #7c6af7; }
-  .mood-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; padding: 6px 14px; border-radius: 20px; margin-top: 8px; }
-  .mood-positive { background: #0f2a1a; border: 1px solid #1a5c35; color: #4ade80; }
-  .mood-neutral  { background: #1a1825; border: 1px solid #4a4560; color: #9b98c0; }
-  .mood-negative { background: #2a0f0f; border: 1px solid #7c1c1c; color: #f87171; }
+.page { display: none; }
+.page.active { display: block; }
 
-  .categories { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1.5rem; }
-  @media(max-width:600px){ .categories { grid-template-columns: 1fr; } }
-  .cat-card { background: #1a1825; border: 1px solid #2a2835; border-radius: 12px; padding: 1rem 1.2rem; }
-  .cat-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-  .cat-name { font-size: 13px; font-weight: 500; color: #c4c0e0; }
-  .cat-score { font-size: 16px; font-weight: 700; }
-  .score-high { color: #4ade80; }
-  .score-mid  { color: #facc15; }
-  .score-low  { color: #f87171; }
-  .score-bar-bg { height: 4px; background: #2a2835; border-radius: 2px; }
-  .score-bar { height: 4px; border-radius: 2px; transition: width 1s ease; }
-  .bar-high { background: #4ade80; }
-  .bar-mid  { background: #facc15; }
-  .bar-low  { background: #f87171; }
-  .cat-comment { font-size: 12px; color: #6b6880; margin-top: 8px; line-height: 1.5; }
+/* ─── PAGE HEADER ─────────────────────────── */
+.page-header { margin-bottom: 28px; }
+.page-header h1 { font-size: 22px; font-weight: 700; color: #1a1d2e; margin-bottom: 4px; }
+.page-header p  { font-size: 13px; color: #9098b1; }
 
-  .section-card { background: #1a1825; border: 1px solid #2a2835; border-radius: 12px; padding: 1.2rem 1.4rem; margin-bottom: 10px; }
-  .section-title { font-size: 13px; font-weight: 600; color: #7c6af7; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
-  .section-title .dot { width: 6px; height: 6px; border-radius: 50%; background: #7c6af7; flex-shrink: 0; }
-  .section-text { font-size: 13px; color: #a8a4c0; line-height: 1.65; }
+/* ─── CARDS ───────────────────────────────── */
+.card {
+  background: #fff;
+  border-radius: 16px;
+  border: 1px solid #e8eaf0;
+  padding: 24px;
+  margin-bottom: 16px;
+}
+.card-title {
+  font-size: 13px; font-weight: 600; color: #1a1d2e;
+  margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
+}
+.card-title .ct-icon { font-size: 16px; }
 
-  .recs { background: #14131a; border: 1px solid #2a1a60; border-radius: 12px; padding: 1.2rem 1.4rem; margin-bottom: 1.5rem; }
-  .recs h3 { font-size: 13px; font-weight: 600; color: #c4b5ff; margin-bottom: 10px; }
-  .rec-item { display: flex; gap: 10px; margin-bottom: 8px; align-items: flex-start; }
-  .rec-num { width: 20px; height: 20px; border-radius: 50%; background: #2a2060; border: 1px solid #5b4dd4; color: #c4b5ff; font-size: 11px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
-  .rec-text { font-size: 13px; color: #a8a4c0; line-height: 1.55; }
+/* ─── TYPE SELECTOR ───────────────────────── */
+.type-selector { display: flex; gap: 8px; margin-bottom: 0; }
+.type-btn {
+  flex: 1; padding: 11px 16px; border-radius: 10px;
+  border: 1.5px solid #e8eaf0; background: #fff;
+  color: #9098b1; font-size: 13px; font-family: 'Heebo', sans-serif;
+  cursor: pointer; transition: all 0.18s; font-weight: 500;
+}
+.type-btn:hover { border-color: #a5a0f5; color: #4f46e5; }
+.type-btn.active { background: #eeeeff; border-color: #6c63ff; color: #4f46e5; font-weight: 600; }
 
-  .history-section { margin-top: 2rem; }
-  .history-section h2 { font-size: 15px; font-weight: 600; margin-bottom: 1rem; }
-  .history-list { display: flex; flex-direction: column; gap: 8px; }
-  .history-empty { text-align: center; padding: 2rem; color: #4a4760; font-size: 13px; background: #1a1825; border-radius: 10px; border: 1px dashed #2a2835; }
-  .history-item { background: #1a1825; border: 1px solid #2a2835; border-radius: 10px; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: border-color 0.2s; }
-  .history-item:hover { border-color: #5b4dd4; }
-  .hi-left { display: flex; flex-direction: column; gap: 3px; }
-  .hi-agent { font-size: 13px; font-weight: 500; color: #c4c0e0; }
-  .hi-meta { font-size: 11px; color: #5a5770; }
-  .hi-score { font-size: 18px; font-weight: 700; }
+/* ─── FORM ELEMENTS ───────────────────────── */
+.field-row { display: flex; gap: 12px; margin-bottom: 14px; }
+.field { flex: 1; }
+.field label { display: block; font-size: 12px; font-weight: 500; color: #5a6282; margin-bottom: 6px; }
+.field input, .field select {
+  width: 100%; padding: 10px 14px; border-radius: 10px;
+  border: 1.5px solid #e8eaf0; background: #fafbff;
+  color: #1a1d2e; font-size: 13px; font-family: 'Heebo', sans-serif;
+  outline: none; transition: border-color 0.2s;
+}
+.field input:focus, .field select:focus { border-color: #6c63ff; background: #fff; }
 
-  .new-btn { background: #2a2060; border: 1px solid #5b4dd4; color: #c4b5ff; padding: 8px 18px; border-radius: 8px; font-family: 'Heebo', sans-serif; font-size: 13px; cursor: pointer; transition: all 0.2s; }
-  .new-btn:hover { background: #3a2c80; }
-  .divider { border: none; border-top: 1px solid #2a2835; margin: 2rem 0; }
-  .error-msg { background: #2a0f0f; border: 1px solid #7c1c1c; color: #f87171; border-radius: 8px; padding: 12px 16px; font-size: 13px; margin-bottom: 1rem; display: none; }
+/* ─── UPLOAD ──────────────────────────────── */
+.upload-area {
+  border: 2px dashed #dde0ea; border-radius: 12px;
+  padding: 28px; text-align: center; cursor: pointer;
+  transition: all 0.2s; background: #fafbff;
+  position: relative; margin-bottom: 12px;
+}
+.upload-area:hover { border-color: #6c63ff; background: #f5f4ff; }
+.upload-area input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+.upload-area .uicon { font-size: 28px; margin-bottom: 8px; }
+.upload-area h3 { font-size: 14px; font-weight: 500; color: #3d4466; margin-bottom: 4px; }
+.upload-area p  { font-size: 12px; color: #9098b1; }
+
+.file-chip {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: #edfbf3; border: 1px solid #86efac; border-radius: 8px;
+  padding: 7px 14px; font-size: 12px; color: #166534; margin-bottom: 12px;
+}
+
+.or-line {
+  display: flex; align-items: center; gap: 12px;
+  font-size: 12px; color: #c0c6d9; margin: 12px 0;
+}
+.or-line::before, .or-line::after {
+  content: ''; flex: 1; height: 1px; background: #e8eaf0;
+}
+
+textarea.text-area {
+  width: 100%; min-height: 110px; padding: 12px 14px;
+  border-radius: 10px; border: 1.5px solid #e8eaf0; background: #fafbff;
+  color: #1a1d2e; font-size: 13px; font-family: 'Heebo', sans-serif;
+  resize: vertical; outline: none; direction: rtl;
+}
+textarea.text-area:focus { border-color: #6c63ff; background: #fff; }
+textarea.text-area::placeholder { color: #c0c6d9; }
+
+/* ─── BUTTON ──────────────────────────────── */
+.btn-primary {
+  width: 100%; padding: 13px; border-radius: 12px;
+  background: linear-gradient(135deg, #6c63ff, #4f46e5);
+  border: none; color: #fff; font-size: 14px; font-weight: 600;
+  font-family: 'Heebo', sans-serif; cursor: pointer;
+  transition: all 0.2s; margin-top: 4px;
+  box-shadow: 0 4px 14px rgba(79,70,229,0.25);
+}
+.btn-primary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(79,70,229,0.35); }
+.btn-primary:disabled { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
+
+.btn-secondary {
+  padding: 9px 18px; border-radius: 9px;
+  background: #fff; border: 1.5px solid #e8eaf0; color: #5a6282;
+  font-size: 13px; font-family: 'Heebo', sans-serif; cursor: pointer;
+  transition: all 0.18s; font-weight: 500;
+}
+.btn-secondary:hover { border-color: #a5a0f5; color: #4f46e5; }
+
+/* ─── LOADING ─────────────────────────────── */
+.loading-overlay {
+  display: none; text-align: center; padding: 60px 20px;
+}
+.spinner {
+  width: 44px; height: 44px; border: 3px solid #e8eaf0;
+  border-top-color: #6c63ff; border-radius: 50%;
+  animation: spin 0.8s linear infinite; margin: 0 auto 16px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-overlay p { font-size: 14px; color: #9098b1; }
+
+/* ─── RESULTS ─────────────────────────────── */
+.result-topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 20px;
+}
+.result-topbar h2 { font-size: 18px; font-weight: 700; }
+.agent-pill {
+  background: #eeeeff; border: 1px solid #c7c4f8;
+  color: #4f46e5; font-size: 12px; padding: 5px 14px; border-radius: 20px; font-weight: 500;
+}
+
+.score-banner {
+  background: linear-gradient(135deg, #6c63ff 0%, #4f46e5 100%);
+  border-radius: 16px; padding: 24px 28px; color: #fff;
+  display: flex; align-items: center; gap: 24px; margin-bottom: 16px;
+}
+.score-circle {
+  width: 80px; height: 80px; border-radius: 50%;
+  background: rgba(255,255,255,0.18);
+  border: 3px solid rgba(255,255,255,0.5);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.score-circle .snum { font-size: 28px; font-weight: 700; line-height: 1; }
+.score-circle .sdenom { font-size: 11px; opacity: 0.75; }
+.score-info h3 { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+.score-info p  { font-size: 13px; opacity: 0.8; margin-bottom: 10px; }
+.mood-tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(255,255,255,0.2); border-radius: 20px;
+  padding: 5px 14px; font-size: 13px;
+}
+
+.cats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+@media(max-width:640px){ .cats-grid { grid-template-columns: 1fr; } }
+.cat-card {
+  background: #fff; border: 1px solid #e8eaf0; border-radius: 12px; padding: 14px 16px;
+}
+.cat-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.cat-name { font-size: 13px; font-weight: 500; color: #3d4466; }
+.cat-score { font-size: 16px; font-weight: 700; }
+.sc-hi { color: #16a34a; } .sc-md { color: #d97706; } .sc-lo { color: #dc2626; }
+.bar-bg { height: 5px; background: #f0f1f5; border-radius: 3px; margin-bottom: 8px; }
+.bar-fill { height: 5px; border-radius: 3px; transition: width 1s ease; }
+.bhi { background: #22c55e; } .bmd { background: #f59e0b; } .blo { background: #ef4444; }
+.cat-comment { font-size: 12px; color: #9098b1; line-height: 1.55; }
+
+.section-card {
+  background: #fff; border: 1px solid #e8eaf0; border-radius: 12px;
+  padding: 16px 18px; margin-bottom: 10px;
+}
+.sec-title {
+  font-size: 12px; font-weight: 600; color: #6c63ff;
+  margin-bottom: 8px; display: flex; align-items: center; gap: 7px;
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.sec-dot { width: 6px; height: 6px; border-radius: 50%; background: #6c63ff; flex-shrink: 0; }
+.sec-text { font-size: 13px; color: #5a6282; line-height: 1.7; }
+
+.recs-card {
+  background: #f8f7ff; border: 1.5px solid #ddd8ff; border-radius: 14px;
+  padding: 18px 20px; margin-bottom: 16px;
+}
+.recs-card h3 { font-size: 13px; font-weight: 600; color: #4f46e5; margin-bottom: 12px; }
+.rec-row { display: flex; gap: 10px; margin-bottom: 8px; align-items: flex-start; }
+.rec-n {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: #6c63ff; color: #fff; font-size: 11px; font-weight: 600;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px;
+}
+.rec-text { font-size: 13px; color: #5a6282; line-height: 1.6; }
+
+/* ─── ERROR ───────────────────────────────── */
+.error-box {
+  background: #fff5f5; border: 1.5px solid #fecaca; border-radius: 10px;
+  padding: 12px 16px; font-size: 13px; color: #dc2626;
+  margin-bottom: 14px; display: none; line-height: 1.6;
+}
+
+/* ─── HISTORY ─────────────────────────────── */
+.history-empty {
+  text-align: center; padding: 40px 20px;
+  color: #c0c6d9; font-size: 13px;
+  background: #fff; border-radius: 14px; border: 1.5px dashed #e8eaf0;
+}
+.history-item {
+  background: #fff; border: 1px solid #e8eaf0; border-radius: 12px;
+  padding: 14px 18px; display: flex; align-items: center;
+  justify-content: space-between; cursor: pointer; transition: border-color 0.18s;
+  margin-bottom: 8px;
+}
+.history-item:hover { border-color: #a5a0f5; }
+.hi-name { font-size: 14px; font-weight: 500; color: #1a1d2e; }
+.hi-meta { font-size: 12px; color: #9098b1; margin-top: 2px; }
+.hi-score { font-size: 20px; font-weight: 700; }
+
+/* ─── SETTINGS ────────────────────────────── */
+.settings-section { margin-bottom: 20px; }
+.settings-section h3 { font-size: 14px; font-weight: 600; color: #1a1d2e; margin-bottom: 14px; }
+.setting-row { display: flex; gap: 10px; align-items: flex-end; }
+.setting-row .field { flex: 1; }
+.btn-save {
+  padding: 10px 20px; border-radius: 10px;
+  background: linear-gradient(135deg, #6c63ff, #4f46e5);
+  border: none; color: #fff; font-family: 'Heebo', sans-serif;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  white-space: nowrap; height: 42px;
+  box-shadow: 0 3px 10px rgba(79,70,229,0.2);
+}
+.btn-save:hover { transform: translateY(-1px); }
+.saved-note {
+  display: none; align-items: center; gap: 6px;
+  font-size: 12px; color: #16a34a; margin-top: 8px;
+  background: #f0fdf4; border: 1px solid #86efac;
+  border-radius: 8px; padding: 6px 12px; width: fit-content;
+}
+.info-box {
+  background: #eff6ff; border: 1px solid #bfdbfe;
+  border-radius: 10px; padding: 14px 16px;
+  font-size: 13px; color: #1d4ed8; line-height: 1.7;
+}
+.info-box a { color: #4f46e5; }
+.info-box strong { font-weight: 600; }
+
+/* ─── STATS CARDS ─────────────────────────── */
+.stats-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 20px; }
+.stat-card {
+  background: #fff; border: 1px solid #e8eaf0; border-radius: 14px;
+  padding: 18px 20px;
+}
+.stat-label { font-size: 12px; color: #9098b1; margin-bottom: 6px; }
+.stat-val { font-size: 26px; font-weight: 700; color: #1a1d2e; }
+.stat-sub { font-size: 12px; color: #9098b1; margin-top: 2px; }
 </style>
 </head>
 <body>
-<div class="app">
 
-  <div class="header">
-    <div class="header-top">
-      <div class="logo-dot"></div>
-      <h1>מערכת ביקורת שיחות AI</h1>
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-row">
+      <div class="logo-icon">🎧</div>
+      <div>
+        <h2>מוקד AI</h2>
+        <p>ביקורת שיחות</p>
+      </div>
     </div>
-    <p>מופעל על ידי Google Gemini · ניתוח איכות שיחות מכירה ושירות</p>
   </div>
 
-  <div id="inputPanel">
+  <div class="sidebar-nav">
+    <div class="nav-label">ניתוח</div>
+    <button class="nav-item active" onclick="goTo('analyze')">
+      <span class="icon">🎙️</span> תמלול וניתוח
+    </button>
+    <button class="nav-item" onclick="goTo('history')">
+      <span class="icon">📋</span> היסטוריה
+    </button>
 
-    <!-- API Key setup -->
-    <div class="setup-card">
-      <h3>🔑 מפתח Gemini API</h3>
-      <p>הזן מפתח API חינמי של Google Gemini. לקבלת מפתח: <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com/app/apikey</a> — חינמי לחלוטין, ללא כרטיס אשראי.</p>
-      <div class="key-row">
-        <input type="password" class="key-input" id="apiKeyInput" placeholder="הדבק כאן את המפתח שלך..." />
-        <button class="key-btn" onclick="saveKey()">שמור</button>
-      </div>
-      <div class="key-saved" id="keySaved" style="display:none">✓ מפתח שמור ומוכן לשימוש</div>
-    </div>
-
-    <div class="type-selector">
-      <button class="type-btn active" id="btnSales" onclick="setType('sales')">📈 שיחת מכירה</button>
-      <button class="type-btn" id="btnService" onclick="setType('service')">🎧 שיחת שירות</button>
-    </div>
-
-    <div class="agent-row">
-      <div class="input-wrap">
-        <label>שם הנציג</label>
-        <input type="text" id="agentName" placeholder="לדוגמה: יוסי כהן" />
-      </div>
-      <div class="input-wrap" style="flex:0.6">
-        <label>מזהה שיחה (אופציונלי)</label>
-        <input type="text" id="callId" placeholder="לדוגמה: #4521" />
-      </div>
-    </div>
-
-    <div class="upload-section">
-      <div class="upload-area" id="uploadArea">
-        <input type="file" id="textFile" accept=".txt,.doc,.docx" onchange="handleFile(event)" />
-        <div class="upload-icon">📄</div>
-        <h3>העלה קובץ טקסט של השיחה</h3>
-        <p>קובץ TXT עם תמלול השיחה</p>
-      </div>
-      <div id="fileReady" class="file-ready" style="display:none">
-        <span>✓</span>
-        <div>
-          <div id="fileName" class="fname"></div>
-          <div style="font-size:11px;color:#1a5c35;">קובץ נטען בהצלחה</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="or-divider">— או הדבק טקסט ישירות —</div>
-    <textarea class="text-input-area" id="manualText" placeholder="הדבק כאן את תמלול השיחה...&#10;&#10;לדוגמה:&#10;נציג: שלום, מדבר דני מחברת X&#10;לקוח: שלום, יש לי בעיה עם ההזמנה שלי..."></textarea>
-
-    <div class="error-msg" id="errorMsg"></div>
-
-    <button class="analyze-btn" id="analyzeBtn" onclick="runAnalysis()">
-      נתח שיחה עם AI ✦
+    <div class="nav-label" style="margin-top:10px;">מערכת</div>
+    <button class="nav-item" onclick="goTo('settings')">
+      <span class="icon">⚙️</span> הגדרות
     </button>
   </div>
 
-  <!-- Loading -->
-  <div class="loading" id="loading">
-    <div class="loading-spinner"></div>
-    <p id="loadingMsg">שולח לניתוח...</p>
+  <div class="sidebar-bottom">
+    <div style="font-size:11px;color:#c0c6d9;text-align:center;line-height:1.6;">
+      מופעל על ידי<br>Google Gemini 1.5 Flash
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- ── PAGE: ANALYZE ── -->
+  <div class="page active" id="page-analyze">
+    <div class="page-header">
+      <h1>ניתוח שיחה</h1>
+      <p>העלה תמלול וקבל דוח איכות מלא תוך שניות</p>
+    </div>
+
+    <div id="analyzeForm">
+      <!-- Type -->
+      <div class="card">
+        <div class="card-title"><span class="ct-icon">📊</span> סוג השיחה</div>
+        <div class="type-selector">
+          <button class="type-btn active" id="btnSales" onclick="setType('sales')">📈 שיחת מכירה</button>
+          <button class="type-btn" id="btnService" onclick="setType('service')">🎧 שיחת שירות לקוחות</button>
+        </div>
+      </div>
+
+      <!-- Agent -->
+      <div class="card">
+        <div class="card-title"><span class="ct-icon">👤</span> פרטי השיחה</div>
+        <div class="field-row">
+          <div class="field">
+            <label>שם הנציג</label>
+            <input type="text" id="agentName" placeholder="לדוגמה: יוסי כהן" />
+          </div>
+          <div class="field" style="flex:0.6">
+            <label>מזהה שיחה</label>
+            <input type="text" id="callId" placeholder="#4521" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Content -->
+      <div class="card">
+        <div class="card-title"><span class="ct-icon">📝</span> תוכן השיחה</div>
+
+        <div class="upload-area" id="uploadArea">
+          <input type="file" id="textFile" accept=".txt" onchange="handleFile(event)" />
+          <div class="uicon">📄</div>
+          <h3>גרור קובץ TXT לכאן</h3>
+          <p>או לחץ לבחירת קובץ</p>
+        </div>
+        <div id="fileChip" style="display:none" class="file-chip">
+          <span>✓</span> <span id="fileName"></span>
+        </div>
+
+        <div class="or-line">או הדבק טקסט ישירות</div>
+        <textarea class="text-area" id="manualText"
+          placeholder="נציג: שלום, מדבר דני מחברת X...&#10;לקוח: שלום, יש לי שאלה לגבי..."></textarea>
+      </div>
+
+      <div class="error-box" id="errorBox"></div>
+      <button class="btn-primary" id="analyzeBtn" onclick="runAnalysis()">נתח שיחה ✦</button>
+    </div>
+
+    <!-- Loading -->
+    <div class="loading-overlay" id="loading">
+      <div class="spinner"></div>
+      <p id="loadingMsg">מנתח את השיחה...</p>
+    </div>
+
+    <!-- Results -->
+    <div id="resultsPanel" style="display:none">
+      <div class="result-topbar">
+        <h2>תוצאות ניתוח</h2>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span class="agent-pill" id="agentPill"></span>
+          <button class="btn-secondary" onclick="resetForm()">+ שיחה חדשה</button>
+        </div>
+      </div>
+
+      <div class="score-banner">
+        <div class="score-circle">
+          <div class="snum" id="totalScore">-</div>
+          <div class="sdenom">/ 100</div>
+        </div>
+        <div class="score-info">
+          <h3 id="gradeLabel"></h3>
+          <p id="gradeText"></p>
+          <div class="mood-tag" id="moodTag"></div>
+        </div>
+      </div>
+
+      <div class="cats-grid" id="catsGrid"></div>
+      <div id="sectionsWrap"></div>
+      <div class="recs-card" id="recsWrap"></div>
+    </div>
   </div>
 
-  <!-- Results -->
-  <div class="results" id="results">
-    <div class="results-header">
-      <h2>תוצאות ניתוח</h2>
-      <div style="display:flex;gap:8px;align-items:center;">
-        <span class="agent-badge" id="agentBadge"></span>
-        <button class="new-btn" onclick="resetForm()">+ שיחה חדשה</button>
+  <!-- ── PAGE: HISTORY ── -->
+  <div class="page" id="page-history">
+    <div class="page-header">
+      <h1>היסטוריית שיחות</h1>
+      <p>כל השיחות שנותחו עד כה</p>
+    </div>
+
+    <div class="stats-row" id="statsRow"></div>
+    <div id="historyList"></div>
+    <div style="margin-top:12px;text-align:left">
+      <button class="btn-secondary" onclick="clearHistory()" style="font-size:12px;color:#dc2626;border-color:#fecaca;">🗑 נקה היסטוריה</button>
+    </div>
+  </div>
+
+  <!-- ── PAGE: SETTINGS ── -->
+  <div class="page" id="page-settings">
+    <div class="page-header">
+      <h1>הגדרות</h1>
+      <p>ניהול מפתח API וקישוריות</p>
+    </div>
+
+    <div class="card">
+      <div class="settings-section">
+        <h3>🔑 מפתח Gemini API</h3>
+        <div class="setting-row">
+          <div class="field">
+            <label>המפתח שלך</label>
+            <input type="password" id="apiKeyInput" placeholder="AIza..." />
+          </div>
+          <button class="btn-save" onclick="saveKey()">שמור</button>
+        </div>
+        <div class="saved-note" id="savedNote">✓ מפתח נשמר בהצלחה</div>
+      </div>
+
+      <div class="info-box">
+        <strong>איך מקבלים מפתח חינמי?</strong><br>
+        1. כנס ל: <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com/app/apikey</a><br>
+        2. התחבר עם חשבון Google<br>
+        3. לחץ <strong>"Create API Key"</strong><br>
+        4. העתק והדבק כאן<br><br>
+        <strong>עלות:</strong> חינם לחלוטין · 1,500 ניתוחים ביום · ללא כרטיס אשראי<br>
+        <strong>חשוב:</strong> המפתח נשמר בדפדפן שלך בלבד ולא נשלח לשום מקום.
       </div>
     </div>
 
-    <div class="score-overview">
-      <div class="total-score-circle">
-        <div class="num" id="totalScore">-</div>
-        <div class="denom">/ 100</div>
-      </div>
-      <div>
-        <div id="scoreGrade" style="font-size:15px;font-weight:600;color:#c4c0e0;margin-bottom:4px;"></div>
-        <div id="scoreGradeText" style="font-size:13px;color:#6b6880;margin-bottom:10px;"></div>
-        <div id="moodBadge" class="mood-badge"></div>
+    <div class="card">
+      <div class="settings-section">
+        <h3>🤖 מודל AI</h3>
+        <div class="field">
+          <label>מודל פעיל</label>
+          <select id="modelSelect">
+            <option value="gemini-1.5-flash">Gemini 1.5 Flash — חינמי (מומלץ)</option>
+            <option value="gemini-1.5-pro">Gemini 1.5 Pro — מדויק יותר (ייתכן עלות)</option>
+          </select>
+        </div>
+        <button class="btn-save" style="margin-top:12px;padding:9px 20px;" onclick="saveModel()">שמור</button>
       </div>
     </div>
-
-    <div class="categories" id="categoriesGrid"></div>
-    <div id="sectionsContainer"></div>
-    <div class="recs" id="recsContainer"></div>
   </div>
 
-  <hr class="divider">
-
-  <div class="history-section">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
-      <h2>היסטוריית שיחות</h2>
-      <button class="new-btn" onclick="clearHistory()" style="font-size:11px;padding:5px 12px;background:#1a1825;border-color:#3a3555;color:#5a5770;">נקה היסטוריה</button>
-    </div>
-    <div id="historyContainer"></div>
-  </div>
-
-</div>
+</main>
 
 <script>
+// ── STATE ────────────────────────────────────
 let callType = 'sales';
 let fileContent = '';
-let history = JSON.parse(localStorage.getItem('callQualityHistory') || '[]');
+let history = JSON.parse(localStorage.getItem('cqHistory') || '[]');
 
-// Load saved key
+// ── INIT ─────────────────────────────────────
 window.onload = () => {
-  const saved = localStorage.getItem('geminiKey');
-  if (saved) {
-    document.getElementById('apiKeyInput').value = saved;
-    document.getElementById('keySaved').style.display = 'flex';
+  const key = localStorage.getItem('geminiKey');
+  if (key) {
+    document.getElementById('apiKeyInput').value = key;
+    document.getElementById('savedNote').style.display = 'flex';
   }
+  const model = localStorage.getItem('geminiModel') || 'gemini-1.5-flash';
+  document.getElementById('modelSelect').value = model;
   renderHistory();
 };
 
-function saveKey() {
-  const key = document.getElementById('apiKeyInput').value.trim();
-  if (!key) return;
-  localStorage.setItem('geminiKey', key);
-  document.getElementById('keySaved').style.display = 'flex';
+// ── NAVIGATION ────────────────────────────────
+function goTo(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  event.currentTarget.classList.add('active');
+  if (page === 'history') renderHistory();
 }
 
+// ── SETTINGS ──────────────────────────────────
+function saveKey() {
+  const k = document.getElementById('apiKeyInput').value.trim();
+  if (!k) return;
+  localStorage.setItem('geminiKey', k);
+  const note = document.getElementById('savedNote');
+  note.style.display = 'flex';
+  setTimeout(() => note.style.display = 'none', 3000);
+}
+function saveModel() {
+  localStorage.setItem('geminiModel', document.getElementById('modelSelect').value);
+  alert('מודל עודכן!');
+}
+
+// ── ANALYZE ───────────────────────────────────
 function setType(t) {
   callType = t;
-  document.getElementById('btnSales').classList.toggle('active', t === 'sales');
-  document.getElementById('btnService').classList.toggle('active', t === 'service');
+  document.getElementById('btnSales').classList.toggle('active', t==='sales');
+  document.getElementById('btnService').classList.toggle('active', t==='service');
 }
 
 function handleFile(e) {
   const file = e.target.files[0];
   if (!file) return;
   document.getElementById('fileName').textContent = file.name;
-  document.getElementById('fileReady').style.display = 'flex';
+  document.getElementById('fileChip').style.display = 'inline-flex';
   const reader = new FileReader();
   reader.onload = ev => { fileContent = ev.target.result; };
   reader.readAsText(file, 'UTF-8');
 }
 
-const loadingMessages = ['שולח לניתוח...','מנתח את הפתיח...','בודק טיפול בהתנגדויות...','מחשב ציונים...','מגבש המלצות...'];
+const loadMsgs = ['מנתח את הפתיח...','בודק גוף השיחה...','מעריך טיפול בהתנגדויות...','מחשב ציונים...','מגבש המלצות...'];
 
 async function runAnalysis() {
-  const apiKey = localStorage.getItem('geminiKey') || document.getElementById('apiKeyInput').value.trim();
-  if (!apiKey) { showError('נא להזין מפתח Gemini API תחילה'); return; }
-
-  const manualText = document.getElementById('manualText').value.trim();
-  const callText = fileContent || manualText;
-  if (!callText) { showError('נא להעלות קובץ או להדביק טקסט של השיחה'); return; }
+  const apiKey = localStorage.getItem('geminiKey');
+  if (!apiKey) { showError('נא לשמור מפתח Gemini בהגדרות תחילה'); return; }
+  const manual = document.getElementById('manualText').value.trim();
+  const text = fileContent || manual;
+  if (!text) { showError('נא להעלות קובץ או להדביק טקסט של השיחה'); return; }
 
   const agentName = document.getElementById('agentName').value || 'נציג לא ידוע';
-  const callId = document.getElementById('callId').value || `#${Date.now().toString().slice(-4)}`;
+  const callId = document.getElementById('callId').value || '#' + Date.now().toString().slice(-4);
   const typeLabel = callType === 'sales' ? 'מכירה' : 'שירות לקוחות';
+  const model = localStorage.getItem('geminiModel') || 'gemini-1.5-flash';
 
-  document.getElementById('inputPanel').style.display = 'none';
-  document.getElementById('errorMsg').style.display = 'none';
-  const loading = document.getElementById('loading');
-  loading.style.display = 'block';
+  document.getElementById('analyzeForm').style.display = 'none';
+  document.getElementById('errorBox').style.display = 'none';
+  document.getElementById('loading').style.display = 'block';
 
-  let msgIdx = 0;
-  const msgInterval = setInterval(() => {
-    msgIdx = (msgIdx + 1) % loadingMessages.length;
-    document.getElementById('loadingMsg').textContent = loadingMessages[msgIdx];
+  let mi = 0;
+  const iv = setInterval(() => {
+    mi = (mi+1) % loadMsgs.length;
+    document.getElementById('loadingMsg').textContent = loadMsgs[mi];
   }, 1800);
 
-  const prompt = `אתה מומחה לביקורת ואיכות שיחות במוקד ${typeLabel}.
-נתח את השיחה הבאה לפי הקריטריונים.
-החזר JSON בלבד, ללא markdown, ללא הסברים, רק JSON תקני.
+  const prompt = `אתה מומחה לביקורת איכות שיחות במוקד ${typeLabel}.
+נתח את השיחה. החזר JSON בלבד, ללא markdown, ללא הסברים.
 
-מבנה הJSON:
 {
-  "totalScore": number (0-100),
-  "grade": string ("מצוין"|"טוב"|"בינוני"|"טעון שיפור"),
-  "gradeText": string (משפט קצר),
-  "mood": string ("חיובי"|"ניטרלי"|"שלילי"|"לקוח כועס"|"לקוח מרוצה מאוד"),
-  "moodEmoji": string (אמוג'י אחד),
+  "totalScore": number,
+  "grade": "מצוין"|"טוב"|"בינוני"|"טעון שיפור",
+  "gradeText": string,
+  "mood": "חיובי"|"ניטרלי"|"שלילי"|"לקוח כועס"|"לקוח מרוצה מאוד",
+  "moodEmoji": string,
   "categories": [
-    {"name": "פתיח", "score": number (0-100), "comment": string},
-    {"name": "גוף השיחה", "score": number (0-100), "comment": string},
-    {"name": "פתרון ללקוח", "score": number (0-100), "comment": string},
-    {"name": "שביעות רצון", "score": number (0-100), "comment": string},
-    {"name": "סיום שיחה", "score": number (0-100), "comment": string},
-    {"name": "אווירה כללית", "score": number (0-100), "comment": string}
+    {"name":"פתיח","score":number,"comment":string},
+    {"name":"גוף השיחה","score":number,"comment":string},
+    {"name":"פתרון ללקוח","score":number,"comment":string},
+    {"name":"שביעות רצון","score":number,"comment":string},
+    {"name":"סיום שיחה","score":number,"comment":string},
+    {"name":"אווירה כללית","score":number,"comment":string}
   ],
-  "sections": {
-    "opening": {"title": "פתיח", "text": string},
-    "body": {"title": "גוף השיחה", "text": string},
-    "solution": {"title": "פתרון ללקוח", "text": string},
-    "satisfaction": {"title": "שביעות רצון הלקוח", "text": string},
-    "closing": {"title": "סיום שיחה", "text": string},
-    "atmosphere": {"title": "תחושה כללית", "text": string}
+  "sections":{
+    "opening":{"title":"פתיח","text":string},
+    "body":{"title":"גוף השיחה","text":string},
+    "solution":{"title":"פתרון ללקוח","text":string},
+    "satisfaction":{"title":"שביעות רצון הלקוח","text":string},
+    "closing":{"title":"סיום שיחה","text":string},
+    "atmosphere":{"title":"תחושה כללית","text":string}
   },
-  "recommendations": [string, string, string]
+  "recommendations":[string,string,string]
 }
 
-${callType === 'sales' ? 'שים דגש על: זיהוי צרכים, הצגת מוצר, טיפול בהתנגדויות, סגירת עסקה.' : 'שים דגש על: הבנת הבעיה, אמפתיה, פתרון מלא, וידוא שביעות רצון.'}
+${callType==='sales'?'דגש: זיהוי צרכים, הצגת מוצר, טיפול בהתנגדויות, סגירה.':'דגש: הבנת הבעיה, אמפתיה, פתרון מלא, שביעות רצון.'}
 
-תוכן השיחה לניתוח:
-${callText}`;
+תוכן השיחה:
+${text}`;
 
   try {
-    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { temperature: 0.3, maxOutputTokens: 2048 }
-      })
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ contents:[{parts:[{text:prompt}]}], generationConfig:{temperature:0.3,maxOutputTokens:2048} })
     });
-
     const data = await res.json();
     if (data.error) throw new Error(data.error.message);
-
     const raw = data.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
-    const clean = raw.replace(/```json|```/g, '').trim();
-    const result = JSON.parse(clean);
+    const result = JSON.parse(raw.replace(/```json|```/g,'').trim());
 
-    clearInterval(msgInterval);
-    loading.style.display = 'none';
+    clearInterval(iv);
+    document.getElementById('loading').style.display = 'none';
     renderResults(result, agentName, callId);
-    saveToHistory(result, agentName, callId);
-    renderHistory();
+    saveHistory(result, agentName, callId);
 
-  } catch (err) {
-    clearInterval(msgInterval);
-    loading.style.display = 'none';
-    document.getElementById('inputPanel').style.display = 'block';
-    showError('שגיאה: ' + (err.message || 'בדוק שהמפתח תקין ונסה שוב'));
-    console.error(err);
+  } catch(err) {
+    clearInterval(iv);
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('analyzeForm').style.display = 'block';
+    showError('שגיאה: ' + (err.message || 'נסה שוב'));
   }
 }
 
 function showError(msg) {
-  const el = document.getElementById('errorMsg');
-  el.textContent = msg;
-  el.style.display = 'block';
+  const el = document.getElementById('errorBox');
+  el.textContent = msg; el.style.display = 'block';
 }
 
-function renderResults(r, agentName, callId) {
-  document.getElementById('results').style.display = 'block';
-  document.getElementById('agentBadge').textContent = `${agentName} · ${callId}`;
-  const score = r.totalScore || 0;
-  document.getElementById('totalScore').textContent = score;
-  document.getElementById('scoreGrade').textContent = r.grade || '';
-  document.getElementById('scoreGradeText').textContent = r.gradeText || '';
-  const moodEl = document.getElementById('moodBadge');
-  moodEl.textContent = `${r.moodEmoji || ''} ${r.mood || ''}`;
-  if (r.mood?.includes('כועס') || r.mood === 'שלילי') moodEl.className = 'mood-badge mood-negative';
-  else if (r.mood === 'ניטרלי') moodEl.className = 'mood-badge mood-neutral';
-  else moodEl.className = 'mood-badge mood-positive';
+function renderResults(r, agent, id) {
+  document.getElementById('resultsPanel').style.display = 'block';
+  document.getElementById('agentPill').textContent = agent + ' · ' + id;
+  document.getElementById('totalScore').textContent = r.totalScore;
+  document.getElementById('gradeLabel').textContent = r.grade;
+  document.getElementById('gradeText').textContent = r.gradeText;
+  const mt = document.getElementById('moodTag');
+  mt.textContent = (r.moodEmoji||'') + ' ' + (r.mood||'');
 
-  const grid = document.getElementById('categoriesGrid');
+  const grid = document.getElementById('catsGrid');
   grid.innerHTML = '';
-  (r.categories || []).forEach(cat => {
-    const cls = cat.score >= 80 ? 'high' : cat.score >= 55 ? 'mid' : 'low';
+  (r.categories||[]).forEach(c => {
+    const lv = c.score>=80?'hi':c.score>=55?'md':'lo';
     grid.innerHTML += `<div class="cat-card">
-      <div class="cat-header"><span class="cat-name">${cat.name}</span><span class="cat-score score-${cls}">${cat.score}</span></div>
-      <div class="score-bar-bg"><div class="score-bar bar-${cls}" style="width:${cat.score}%"></div></div>
-      <div class="cat-comment">${cat.comment}</div>
+      <div class="cat-head"><span class="cat-name">${c.name}</span><span class="cat-score sc-${lv}">${c.score}</span></div>
+      <div class="bar-bg"><div class="bar-fill b${lv}" style="width:${c.score}%"></div></div>
+      <div class="cat-comment">${c.comment}</div>
     </div>`;
   });
 
-  const sec = document.getElementById('sectionsContainer');
-  sec.innerHTML = '';
-  if (r.sections) {
-    Object.values(r.sections).forEach(s => {
-      sec.innerHTML += `<div class="section-card">
-        <div class="section-title"><span class="dot"></span>${s.title}</div>
-        <div class="section-text">${s.text}</div>
-      </div>`;
-    });
-  }
+  const sw = document.getElementById('sectionsWrap');
+  sw.innerHTML = '';
+  Object.values(r.sections||{}).forEach(s => {
+    sw.innerHTML += `<div class="section-card">
+      <div class="sec-title"><span class="sec-dot"></span>${s.title}</div>
+      <div class="sec-text">${s.text}</div>
+    </div>`;
+  });
 
-  const recs = document.getElementById('recsContainer');
-  recs.innerHTML = `<h3>✦ המלצות לשיפור</h3>`;
-  (r.recommendations || []).forEach((rec, i) => {
-    recs.innerHTML += `<div class="rec-item"><div class="rec-num">${i+1}</div><div class="rec-text">${rec}</div></div>`;
+  const rw = document.getElementById('recsWrap');
+  rw.innerHTML = '<h3>✦ המלצות לשיפור</h3>';
+  (r.recommendations||[]).forEach((rec,i) => {
+    rw.innerHTML += `<div class="rec-row"><div class="rec-n">${i+1}</div><div class="rec-text">${rec}</div></div>`;
   });
 }
 
-function saveToHistory(r, agentName, callId) {
-  const entry = { id: callId, agent: agentName, type: callType, score: r.totalScore, grade: r.grade, mood: r.mood, moodEmoji: r.moodEmoji, date: new Date().toLocaleDateString('he-IL'), data: r };
-  history.unshift(entry);
-  if (history.length > 50) history = history.slice(0, 50);
-  localStorage.setItem('callQualityHistory', JSON.stringify(history));
+// ── HISTORY ───────────────────────────────────
+function saveHistory(r, agent, id) {
+  history.unshift({ id, agent, type:callType, score:r.totalScore, grade:r.grade, mood:r.mood, moodEmoji:r.moodEmoji, date:new Date().toLocaleDateString('he-IL'), data:r });
+  if (history.length>50) history = history.slice(0,50);
+  localStorage.setItem('cqHistory', JSON.stringify(history));
 }
 
 function renderHistory() {
-  const c = document.getElementById('historyContainer');
-  if (!history.length) { c.innerHTML = '<div class="history-empty">עדיין אין שיחות בהיסטוריה</div>'; return; }
-  c.innerHTML = `<div class="history-list">${history.map((h, i) => {
-    const cls = h.score >= 80 ? 'score-high' : h.score >= 55 ? 'score-mid' : 'score-low';
+  const avg = history.length ? Math.round(history.reduce((s,h)=>s+h.score,0)/history.length) : 0;
+  const best = history.length ? Math.max(...history.map(h=>h.score)) : 0;
+  document.getElementById('statsRow').innerHTML = `
+    <div class="stat-card"><div class="stat-label">סה"כ שיחות</div><div class="stat-val">${history.length}</div></div>
+    <div class="stat-card"><div class="stat-label">ממוצע ציון</div><div class="stat-val" style="color:#4f46e5">${avg}</div></div>
+    <div class="stat-card"><div class="stat-label">ציון שיא</div><div class="stat-val" style="color:#16a34a">${best}</div></div>`;
+
+  const el = document.getElementById('historyList');
+  if (!history.length) { el.innerHTML = '<div class="history-empty">עדיין אין שיחות בהיסטוריה</div>'; return; }
+  el.innerHTML = history.map((h,i) => {
+    const cls = h.score>=80?'sc-hi':h.score>=55?'sc-md':'sc-lo';
     return `<div class="history-item" onclick="viewHistory(${i})">
-      <div class="hi-left">
-        <div class="hi-agent">${h.agent} <span style="color:#5a5770;font-weight:400;">· ${h.id}</span></div>
-        <div class="hi-meta">${h.type === 'sales' ? 'מכירה' : 'שירות'} · ${h.date} · ${h.moodEmoji || ''} ${h.mood}</div>
+      <div>
+        <div class="hi-name">${h.agent} <span style="color:#c0c6d9;font-weight:400">· ${h.id}</span></div>
+        <div class="hi-meta">${h.type==='sales'?'מכירה':'שירות'} · ${h.date} · ${h.moodEmoji||''} ${h.mood||''}</div>
       </div>
       <div class="hi-score ${cls}">${h.score}</div>
     </div>`;
-  }).join('')}</div>`;
+  }).join('');
 }
 
-function viewHistory(idx) {
-  const entry = history[idx];
-  document.getElementById('inputPanel').style.display = 'none';
-  document.getElementById('results').style.display = 'none';
-  document.getElementById('results').style.display = 'block';
-  renderResults(entry.data, entry.agent, entry.id);
-  window.scrollTo(0, 0);
+function viewHistory(i) {
+  const e = history[i];
+  goToAnalyzePage();
+  document.getElementById('analyzeForm').style.display = 'none';
+  renderResults(e.data, e.agent, e.id);
+  window.scrollTo(0,0);
+}
+
+function goToAnalyzePage() {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-analyze').classList.add('active');
+  document.querySelector('.nav-item').classList.add('active');
 }
 
 function clearHistory() {
   if (!confirm('למחוק את כל ההיסטוריה?')) return;
-  history = [];
-  localStorage.removeItem('callQualityHistory');
-  renderHistory();
+  history = []; localStorage.removeItem('cqHistory'); renderHistory();
 }
 
 function resetForm() {
-  document.getElementById('results').style.display = 'none';
-  document.getElementById('inputPanel').style.display = 'block';
+  document.getElementById('resultsPanel').style.display = 'none';
+  document.getElementById('analyzeForm').style.display = 'block';
   document.getElementById('textFile').value = '';
   document.getElementById('manualText').value = '';
-  document.getElementById('fileReady').style.display = 'none';
-  document.getElementById('errorMsg').style.display = 'none';
+  document.getElementById('fileChip').style.display = 'none';
+  document.getElementById('errorBox').style.display = 'none';
   fileContent = '';
 }
 </script>
