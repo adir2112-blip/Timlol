@@ -318,6 +318,24 @@ textarea.text-area::placeholder { color: #c0c6d9; }
 .stat-val { font-size: 26px; font-weight: 700; color: #1a1d2e; }
 .stat-sub { font-size: 12px; color: #9098b1; margin-top: 2px; }
 </style>
+<script>
+// Lazy-load FFmpeg only when needed
+window._ffmpegLoaded = false;
+async function ensureFFmpegScripts() {
+  if (window._ffmpegLoaded) return;
+  await new Promise((res,rej)=>{
+    const s=document.createElement('script');
+    s.src='https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.6/dist/umd/ffmpeg.js';
+    s.onload=res; s.onerror=rej; document.head.appendChild(s);
+  });
+  await new Promise((res,rej)=>{
+    const s=document.createElement('script');
+    s.src='https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.1/dist/umd/index.js';
+    s.onload=res; s.onerror=rej; document.head.appendChild(s);
+  });
+  window._ffmpegLoaded = true;
+}
+</script>
 </head>
 <body>
 
@@ -395,7 +413,7 @@ textarea.text-area::placeholder { color: #c0c6d9; }
         <div class="card-title"><span class="ct-icon">📝</span> תוכן השיחה</div>
 
         <div class="upload-area" id="uploadArea">
-          <input type="file" id="textFile" accept=".txt" onchange="handleFile(event)" />
+          <input type="file" id="textFile" accept="audio/*,video/*,.mp3,.mp4,.wav,.wmv,.m4a,.ogg,.webm,.aac" onchange="handleFile(event)" />
           <div class="uicon">📄</div>
           <h3>גרור קובץ TXT לכאן</h3>
           <p>או לחץ לבחירת קובץ</p>
@@ -522,7 +540,7 @@ window.onload = () => {
     document.getElementById('apiKeyInput').value = key;
     document.getElementById('savedNote').style.display = 'flex';
   }
-  const model = localStorage.getItem('geminiModel') || 'gemini-2.5-flash';
+  const model = localStorage.getItem('geminiModel') || 'gemini-2.5-flash-lite-preview-06-17';
   document.getElementById('modelSelect').value = model;
   renderHistory();
 };
@@ -557,14 +575,69 @@ function setType(t) {
   document.getElementById('btnService').classList.toggle('active', t==='service');
 }
 
+let audioFile = null;
+
 function handleFile(e) {
   const file = e.target.files[0];
   if (!file) return;
-  document.getElementById('fileName').textContent = file.name;
+  audioFile = file;
+  fileContent = '[AUDIO]';
+  document.getElementById('fileName').textContent = file.name + ' (' + (file.size/1024/1024).toFixed(1) + ' MB)';
   document.getElementById('fileChip').style.display = 'inline-flex';
-  const reader = new FileReader();
-  reader.onload = ev => { fileContent = ev.target.result; };
-  reader.readAsText(file, 'UTF-8');
+}
+
+function toBase64(file) {
+  return new Promise((res, rej) => {
+    const reader = new FileReader();
+    reader.onload = e => res(e.target.result.split(',')[1]);
+    reader.onerror = rej;
+    reader.readAsDataURL(file);
+  });
+}
+
+function getMimeType(file) {
+  if (file.type) return file.type;
+  const ext = file.name.split('.').pop().toLowerCase();
+  const map = {mp3:'audio/mpeg',wav:'audio/wav',m4a:'audio/mp4',aac:'audio/aac',ogg:'audio/ogg',
+               mp4:'video/mp4',wmv:'video/x-ms-wmv',webm:'video/webm',avi:'video/x-msvideo'};
+  return map[ext] || 'audio/mpeg';
+}
+
+// Convert any file to MP3 using FFmpeg.wasm
+let ffmpegInstance = null;
+
+async function loadFFmpeg() {
+  if (ffmpegInstance) return ffmpegInstance;
+  await ensureFFmpegScripts();
+  document.getElementById('loadingMsg').textContent = 'טוען מנוע המרה (פעם ראשונה בלבד)...';
+  const { FFmpeg } = window.FFmpegWASM;
+  const { fetchFile, toBlobURL } = window.FFmpegUtil;
+  const ff = new FFmpeg();
+  const baseURL = 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/umd';
+  await ff.load({
+    coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
+    wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
+  });
+  ffmpegInstance = { ff, fetchFile };
+  return ffmpegInstance;
+}
+
+async function convertToMp3(file) {
+  document.getElementById('loadingMsg').textContent = 'ממיר קובץ ל-MP3...';
+  const { ff, fetchFile } = await loadFFmpeg();
+  const ext = file.name.split('.').pop().toLowerCase();
+  const inputName = 'input.' + ext;
+  const outputName = 'output.mp3';
+  ff.writeFile(inputName, await fetchFile(file));
+  await ff.exec(['-i', inputName, '-ar', '16000', '-ac', '1', '-b:a', '64k', outputName]);
+  const data = ff.readFile(outputName);
+  const blob = new Blob([data.buffer], { type: 'audio/mpeg' });
+  return new Promise((res, rej) => {
+    const reader = new FileReader();
+    reader.onload = e => res(e.target.result.split(',')[1]);
+    reader.onerror = rej;
+    reader.readAsDataURL(blob);
+  });
 }
 
 const loadMsgs = ['מנתח את הפתיח...','בודק גוף השיחה...','מעריך טיפול בהתנגדויות...','מחשב ציונים...','מגבש המלצות...'];
@@ -574,12 +647,12 @@ async function runAnalysis() {
   if (!apiKey) { showError('נא לשמור מפתח Gemini בהגדרות תחילה'); return; }
   const manual = document.getElementById('manualText').value.trim();
   const text = fileContent || manual;
-  if (!text) { showError('נא להעלות קובץ או להדביק טקסט של השיחה'); return; }
+  if (!text && !audioFile) { showError('נא להעלות קובץ שמע או להדביק טקסט של השיחה'); return; }
 
   const agentName = document.getElementById('agentName').value || 'נציג לא ידוע';
   const callId = document.getElementById('callId').value || '#' + Date.now().toString().slice(-4);
   const typeLabel = callType === 'sales' ? 'מכירה' : 'שירות לקוחות';
-  const model = localStorage.getItem('geminiModel') || 'gemini-2.5-flash';
+  const model = localStorage.getItem('geminiModel') || 'gemini-2.5-flash-lite-preview-06-17';
 
   document.getElementById('analyzeForm').style.display = 'none';
   document.getElementById('errorBox').style.display = 'none';
@@ -591,49 +664,69 @@ async function runAnalysis() {
     document.getElementById('loadingMsg').textContent = loadMsgs[mi];
   }, 1800);
 
-  const prompt = `אתה מומחה לביקורת איכות שיחות במוקד ${typeLabel}.
-נתח את השיחה. החזר JSON בלבד, ללא markdown, ללא הסברים.
+  const trimmedText = (!audioFile && text.length > 3000) ? text.slice(0, 3000) + '\n...[קוצר]' : text;
 
-{
-  "totalScore": number,
-  "grade": "מצוין"|"טוב"|"בינוני"|"טעון שיפור",
-  "gradeText": string,
-  "mood": "חיובי"|"ניטרלי"|"שלילי"|"לקוח כועס"|"לקוח מרוצה מאוד",
-  "moodEmoji": string,
-  "categories": [
-    {"name":"פתיח","score":number,"comment":string},
-    {"name":"גוף השיחה","score":number,"comment":string},
-    {"name":"פתרון ללקוח","score":number,"comment":string},
-    {"name":"שביעות רצון","score":number,"comment":string},
-    {"name":"סיום שיחה","score":number,"comment":string},
-    {"name":"אווירה כללית","score":number,"comment":string}
-  ],
-  "sections":{
-    "opening":{"title":"פתיח","text":string},
-    "body":{"title":"גוף השיחה","text":string},
-    "solution":{"title":"פתרון ללקוח","text":string},
-    "satisfaction":{"title":"שביעות רצון הלקוח","text":string},
-    "closing":{"title":"סיום שיחה","text":string},
-    "atmosphere":{"title":"תחושה כללית","text":string}
-  },
-  "recommendations":[string,string,string]
-}
+  const prompt = `${audioFile ? 'תמלל את קובץ השמע המצורף ונתח את השיחה.' : ''} נתח שיחת ${typeLabel}. החזר JSON בלבד ללא markdown.
+{"totalScore":0-100,"grade":"מצוין/טוב/בינוני/טעון שיפור","gradeText":"משפט קצר","mood":"חיובי/ניטרלי/שלילי/לקוח כועס/לקוח מרוצה מאוד","moodEmoji":"אמוג'י","categories":[{"name":"פתיח","score":0-100,"comment":""},{"name":"גוף השיחה","score":0-100,"comment":""},{"name":"פתרון ללקוח","score":0-100,"comment":""},{"name":"שביעות רצון","score":0-100,"comment":""},{"name":"סיום שיחה","score":0-100,"comment":""},{"name":"אווירה כללית","score":0-100,"comment":""}],"sections":{"opening":{"title":"פתיח","text":""},"body":{"title":"גוף השיחה","text":""},"solution":{"title":"פתרון ללקוח","text":""},"satisfaction":{"title":"שביעות רצון הלקוח","text":""},"closing":{"title":"סיום שיחה","text":""},"atmosphere":{"title":"תחושה כללית","text":""}},"recommendations":["","",""]}
+שיחה:
+${trimmedText}`;
 
-${callType==='sales'?'דגש: זיהוי צרכים, הצגת מוצר, טיפול בהתנגדויות, סגירה.':'דגש: הבנת הבעיה, אמפתיה, פתרון מלא, שביעות רצון.'}
+  const buildRequest = async (prompt, model) => {
+    if (audioFile) {
+      const ext = audioFile.name.split('.').pop().toLowerCase();
+      const nativeFormats = ['mp3','wav','m4a','aac','ogg','flac','mp4','webm'];
+      let b64, mime;
+      if (!nativeFormats.includes(ext)) {
+        // Convert unsupported formats (wmv, avi, etc.) to MP3 via FFmpeg.wasm
+        b64 = await convertToMp3(audioFile);
+        mime = 'audio/mpeg';
+      } else {
+        document.getElementById('loadingMsg').textContent = 'מכין קובץ שמע...';
+        b64 = await toBase64(audioFile);
+        mime = getMimeType(audioFile);
+      }
+      return {
+        contents:[{parts:[
+          {inline_data:{mime_type:mime, data:b64}},
+          {text: prompt}
+        ]}],
+        generationConfig:{temperature:0.3, maxOutputTokens:2048}
+      };
+    }
+    return {
+      contents:[{parts:[{text:prompt}]}],
+      generationConfig:{temperature:0.3, maxOutputTokens:2048}
+    };
+  };
 
-תוכן השיחה:
-${text}`;
-
+  const callGemini = async (retries=3) => {
+    for (let i=0; i<retries; i++) {
+      if (i>0) {
+        document.getElementById('loadingMsg').textContent = `ניסיון ${i+1} מתוך ${retries}...`;
+        await new Promise(r => setTimeout(r, 3000 * i));
+      }
+      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify(await buildRequest(prompt, model))
+      });
+      const data = await res.json();
+      if (data.error) {
+        const msg = data.error.message || '';
+        if (i < retries-1 && (msg.includes('high demand') || msg.includes('503') || msg.includes('overloaded'))) continue;
+        throw new Error(msg);
+      }
+      return data;
+    }
+  };
   try {
-    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ contents:[{parts:[{text:prompt}]}], generationConfig:{temperature:0.3,maxOutputTokens:2048} })
-    });
-    const data = await res.json();
-    if (data.error) throw new Error(data.error.message);
+    const data = await callGemini();
+    if (!data) throw new Error('לא התקבלה תשובה מהשרת');
     const raw = data.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
-    const result = JSON.parse(raw.replace(/```json|```/g,'').trim());
+    let clean = raw.replace(/```json|```/g,'').trim();
+    const s = clean.indexOf('{'), e = clean.lastIndexOf('}');
+    if (s !== -1 && e !== -1) clean = clean.slice(s, e+1);
+    clean = clean.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
+    const result = JSON.parse(clean);
 
     clearInterval(iv);
     document.getElementById('loading').style.display = 'none';
@@ -746,6 +839,7 @@ function resetForm() {
   document.getElementById('fileChip').style.display = 'none';
   document.getElementById('errorBox').style.display = 'none';
   fileContent = '';
+  audioFile = null;
 }
 </script>
 </body>
