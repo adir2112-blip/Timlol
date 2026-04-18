@@ -420,8 +420,20 @@ function setType(t, btn) {
 }
 
 // KEYS
+// הכנס כאן את המפתחות שלך — יהיו זמינים לכולם
+var DEFAULT_KEYS = [
+  'AIzaSyA--noH9mNmjupOrUyB9haT1Mfhii0ePbo',
+  'AIzaSyD9Mkt73OsnVSDQWCRMbvIBEf8XD6funVM',
+  'AIzaSyDC78-q9ThKYrgbidMP-IOGY4uR6HznaMg',
+  'AIzaSyA7P8_7ldr8Yj5nXH9bhnMbf88wTbPra3c'
+];
+
 function getKeys() {
-  try { return JSON.parse(localStorage.getItem('geminiKeys') || '[]').filter(function(k) { return k.trim(); }); }
+  try {
+    var saved = JSON.parse(localStorage.getItem('geminiKeys') || '[]').filter(function(k) { return k.trim(); });
+    if (saved.length) return saved; // מפתחות שהמשתמש הזין בהגדרות — עדיפות
+    return DEFAULT_KEYS.filter(function(k) { return k && k !== 'מפתח_1' && k !== 'מפתח_2' && k !== 'מפתח_3' && k !== 'מפתח_4'; });
+  }
   catch(e) { return []; }
 }
 
