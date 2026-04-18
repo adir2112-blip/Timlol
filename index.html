@@ -9,12 +9,12 @@
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:'Heebo',sans-serif;background:#f5f6fa;color:#1a1d2e;direction:rtl;display:flex;min-height:100vh;}
 
+/* SIDEBAR */
 .sidebar{width:220px;min-height:100vh;background:#fff;border-left:1px solid #e8eaf0;display:flex;flex-direction:column;position:fixed;right:0;top:0;z-index:100;}
 .sidebar-logo{padding:20px;border-bottom:1px solid #f0f1f5;}
 .logo-row{display:flex;align-items:center;gap:10px;}
 .logo-icon{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#6c63ff,#4f46e5);display:flex;align-items:center;justify-content:center;font-size:18px;}
-.logo-title{font-size:14px;font-weight:600;}
-.logo-sub{font-size:11px;color:#9098b1;}
+.logo-title{font-size:14px;font-weight:600;}.logo-sub{font-size:11px;color:#9098b1;}
 .sidebar-nav{padding:12px 10px;flex:1;}
 .nav-label{font-size:10px;font-weight:600;color:#b0b8cc;letter-spacing:.8px;padding:8px 10px 4px;text-transform:uppercase;}
 .nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;font-size:13px;font-weight:500;color:#5a6282;cursor:pointer;transition:all .18s;border:none;background:none;width:100%;text-align:right;margin-bottom:2px;}
@@ -23,26 +23,31 @@ body{font-family:'Heebo',sans-serif;background:#f5f6fa;color:#1a1d2e;direction:r
 .nav-item .icon{font-size:16px;width:20px;text-align:center;}
 .sidebar-footer{padding:14px;border-top:1px solid #f0f1f5;font-size:11px;color:#c0c6d9;text-align:center;line-height:1.6;}
 
+/* MAIN */
 .main{margin-right:220px;flex:1;padding:32px 36px;max-width:calc(100vw - 220px);}
 .page{display:none;}.page.active{display:block;}
 .page-header{margin-bottom:28px;}
 .page-header h1{font-size:22px;font-weight:700;margin-bottom:4px;}
 .page-header p{font-size:13px;color:#9098b1;}
 
+/* CARDS */
 .card{background:#fff;border-radius:16px;border:1px solid #e8eaf0;padding:24px;margin-bottom:16px;}
 .card-title{font-size:13px;font-weight:600;color:#1a1d2e;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
 
+/* TYPE BUTTONS */
 .type-btns{display:flex;gap:8px;}
 .type-btn{flex:1;padding:11px;border-radius:10px;border:1.5px solid #e8eaf0;background:#fff;color:#9098b1;font-size:13px;font-family:'Heebo',sans-serif;cursor:pointer;transition:all .18s;font-weight:500;}
 .type-btn:hover{border-color:#a5a0f5;color:#4f46e5;}
 .type-btn.active{background:#eeeeff;border-color:#6c63ff;color:#4f46e5;font-weight:600;}
 
+/* FIELDS */
 .field-row{display:flex;gap:12px;margin-bottom:14px;}
 .field{flex:1;}
 .field label{display:block;font-size:12px;font-weight:500;color:#5a6282;margin-bottom:6px;}
 .field input,.field select{width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid #e8eaf0;background:#fafbff;color:#1a1d2e;font-size:13px;font-family:'Heebo',sans-serif;outline:none;transition:border-color .2s;}
 .field input:focus,.field select:focus{border-color:#6c63ff;background:#fff;}
 
+/* UPLOAD */
 .upload-zone{border:2px dashed #dde0ea;border-radius:12px;padding:30px;text-align:center;cursor:pointer;transition:all .2s;background:#fafbff;position:relative;}
 .upload-zone:hover{border-color:#6c63ff;background:#f5f4ff;}
 .upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
@@ -50,40 +55,57 @@ body{font-family:'Heebo',sans-serif;background:#f5f6fa;color:#1a1d2e;direction:r
 .upload-zone h3{font-size:14px;font-weight:500;color:#3d4466;margin-bottom:4px;}
 .upload-zone p{font-size:12px;color:#9098b1;}
 .file-chip{display:inline-flex;align-items:center;gap:8px;background:#edfbf3;border:1px solid #86efac;border-radius:8px;padding:7px 14px;font-size:12px;color:#166534;margin-top:10px;}
-
 .or-line{display:flex;align-items:center;gap:12px;font-size:12px;color:#c0c6d9;margin:14px 0;}
 .or-line::before,.or-line::after{content:'';flex:1;height:1px;background:#e8eaf0;}
 textarea.tarea{width:100%;min-height:110px;padding:12px 14px;border-radius:10px;border:1.5px solid #e8eaf0;background:#fafbff;color:#1a1d2e;font-size:13px;font-family:'Heebo',sans-serif;resize:vertical;outline:none;direction:rtl;}
 textarea.tarea:focus{border-color:#6c63ff;background:#fff;}
 textarea.tarea::placeholder{color:#c0c6d9;}
 
+/* BUTTONS */
 .btn-primary{width:100%;padding:13px;border-radius:12px;background:linear-gradient(135deg,#6c63ff,#4f46e5);border:none;color:#fff;font-size:14px;font-weight:600;font-family:'Heebo',sans-serif;cursor:pointer;transition:all .2s;margin-top:4px;box-shadow:0 4px 14px rgba(79,70,229,.25);}
 .btn-primary:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 20px rgba(79,70,229,.35);}
 .btn-primary:disabled{opacity:.45;cursor:not-allowed;}
 .btn-sec{padding:9px 18px;border-radius:9px;background:#fff;border:1.5px solid #e8eaf0;color:#5a6282;font-size:13px;font-family:'Heebo',sans-serif;cursor:pointer;transition:all .18s;font-weight:500;}
 .btn-sec:hover{border-color:#a5a0f5;color:#4f46e5;}
 
+/* LOADING */
 .loading{display:none;text-align:center;padding:60px 20px;}
 .spinner{width:44px;height:44px;border:3px solid #e8eaf0;border-top-color:#6c63ff;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 16px;}
 @keyframes spin{to{transform:rotate(360deg);}}
 .loading p{font-size:14px;color:#9098b1;}
-
 .err-box{background:#fff5f5;border:1.5px solid #fecaca;border-radius:10px;padding:12px 16px;font-size:13px;color:#dc2626;margin-bottom:14px;display:none;line-height:1.6;}
 
-.res-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+/* RESULTS */
+.res-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px;}
 .res-topbar h2{font-size:18px;font-weight:700;}
 .agent-pill{background:#eeeeff;border:1px solid #c7c4f8;color:#4f46e5;font-size:12px;padding:5px 14px;border-radius:20px;font-weight:500;}
 
+/* SCORE BANNER */
 .score-banner{background:linear-gradient(135deg,#6c63ff,#4f46e5);border-radius:16px;padding:24px 28px;color:#fff;display:flex;align-items:center;gap:24px;margin-bottom:16px;}
 .score-circle{width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.18);border:3px solid rgba(255,255,255,.5);display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;}
-.snum{font-size:28px;font-weight:700;line-height:1;}
-.sdenom{font-size:11px;opacity:.75;}
+.snum{font-size:28px;font-weight:700;line-height:1;}.sdenom{font-size:11px;opacity:.75;}
 .score-info h3{font-size:18px;font-weight:600;margin-bottom:4px;}
 .score-info p{font-size:13px;opacity:.8;margin-bottom:10px;}
 .mood-tag{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.2);border-radius:20px;padding:5px 14px;font-size:13px;}
 
+/* SIDES */
+.sides-header{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+.side-card{border-radius:14px;padding:18px 20px;}
+.side-agent{background:#f0fdf4;border:1.5px solid #86efac;}
+.side-customer{background:#eff6ff;border:1.5px solid #93c5fd;}
+.side-title{font-size:12px;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.side-agent .side-title{color:#166534;}
+.side-customer .side-title{color:#1e40af;}
+.side-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.side-label{font-size:12px;color:#6b7280;}
+.side-score{font-size:14px;font-weight:600;}
+.side-mini-bar{height:4px;background:#e5e7eb;border-radius:2px;margin-top:3px;}
+.side-mini-fill{height:4px;border-radius:2px;}
+.sa-fill{background:#22c55e;}.sc-fill{background:#3b82f6;}
+
+/* CATS */
 .cats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
-@media(max-width:640px){.cats-grid{grid-template-columns:1fr;}}
+@media(max-width:640px){.cats-grid{grid-template-columns:1fr;}.sides-header{grid-template-columns:1fr;}}
 .cat-card{background:#fff;border:1px solid #e8eaf0;border-radius:12px;padding:14px 16px;}
 .cat-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
 .cat-name{font-size:13px;font-weight:500;color:#3d4466;}
@@ -94,22 +116,42 @@ textarea.tarea::placeholder{color:#c0c6d9;}
 .bhi{background:#22c55e;}.bmd{background:#f59e0b;}.blo{background:#ef4444;}
 .cat-comment{font-size:12px;color:#9098b1;line-height:1.55;}
 
+/* SECTIONS */
 .sec-card{background:#fff;border:1px solid #e8eaf0;border-radius:12px;padding:16px 18px;margin-bottom:10px;}
 .sec-title{font-size:12px;font-weight:600;color:#6c63ff;margin-bottom:8px;display:flex;align-items:center;gap:7px;text-transform:uppercase;letter-spacing:.5px;}
 .sec-dot{width:6px;height:6px;border-radius:50%;background:#6c63ff;flex-shrink:0;}
 .sec-text{font-size:13px;color:#5a6282;line-height:1.7;}
 
+/* RECS */
 .recs-box{background:#f8f7ff;border:1.5px solid #ddd8ff;border-radius:14px;padding:18px 20px;margin-bottom:16px;}
 .recs-box h3{font-size:13px;font-weight:600;color:#4f46e5;margin-bottom:12px;}
 .rec-row{display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;}
 .rec-n{width:22px;height:22px;border-radius:50%;background:#6c63ff;color:#fff;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
 .rec-text{font-size:13px;color:#5a6282;line-height:1.6;}
 
+/* AI CHAT */
+.ai-chat-box{background:#fff;border:1.5px solid #ddd8ff;border-radius:16px;overflow:hidden;margin-bottom:16px;}
+.ai-chat-header{background:linear-gradient(135deg,#6c63ff,#4f46e5);padding:14px 18px;display:flex;align-items:center;gap:10px;}
+.ai-chat-header h3{color:#fff;font-size:14px;font-weight:600;}
+.ai-chat-header p{color:rgba(255,255,255,.75);font-size:12px;}
+.ai-dot{width:8px;height:8px;border-radius:50%;background:#4ade80;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+.chat-messages{padding:16px;max-height:320px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;}
+.chat-msg{max-width:80%;padding:10px 14px;border-radius:12px;font-size:13px;line-height:1.6;}
+.msg-ai{background:#f5f4ff;color:#3d4466;border-radius:12px 12px 12px 2px;align-self:flex-end;}
+.msg-user{background:#eeeeff;color:#1a1d2e;border-radius:12px 12px 2px 12px;align-self:flex-start;}
+.msg-loading{background:#f5f4ff;color:#9098b1;font-style:italic;align-self:flex-end;}
+.chat-input-row{display:flex;gap:8px;padding:12px 16px;border-top:1px solid #f0f1f5;background:#fafbff;}
+.chat-input{flex:1;padding:10px 14px;border-radius:10px;border:1.5px solid #e8eaf0;background:#fff;font-size:13px;font-family:'Heebo',sans-serif;outline:none;direction:rtl;}
+.chat-input:focus{border-color:#6c63ff;}
+.chat-send{padding:10px 16px;border-radius:10px;background:linear-gradient(135deg,#6c63ff,#4f46e5);border:none;color:#fff;font-size:13px;font-family:'Heebo',sans-serif;cursor:pointer;white-space:nowrap;}
+.chat-send:disabled{opacity:.5;cursor:not-allowed;}
+
+/* HISTORY */
 .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;}
 .stat-card{background:#fff;border:1px solid #e8eaf0;border-radius:14px;padding:18px 20px;}
 .stat-label{font-size:12px;color:#9098b1;margin-bottom:6px;}
 .stat-val{font-size:26px;font-weight:700;color:#1a1d2e;}
-
 .hist-item{background:#fff;border:1px solid #e8eaf0;border-radius:12px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:border-color .18s;margin-bottom:8px;}
 .hist-item:hover{border-color:#a5a0f5;}
 .hi-name{font-size:14px;font-weight:500;color:#1a1d2e;}
@@ -117,6 +159,7 @@ textarea.tarea::placeholder{color:#c0c6d9;}
 .hi-score{font-size:20px;font-weight:700;}
 .hist-empty{text-align:center;padding:40px;color:#c0c6d9;font-size:13px;background:#fff;border-radius:14px;border:1.5px dashed #e8eaf0;}
 
+/* SETTINGS */
 .set-label{font-size:14px;font-weight:600;color:#1a1d2e;margin-bottom:12px;}
 .key-row{display:flex;gap:10px;}
 .key-row .field{flex:1;}
@@ -151,7 +194,7 @@ textarea.tarea::placeholder{color:#c0c6d9;}
   <div class="page active" id="page-analyze">
     <div class="page-header">
       <h1>ניתוח שיחה</h1>
-      <p>העלה קובץ שמע וקבל דוח איכות מלא תוך שניות</p>
+      <p>העלה קובץ שמע וקבל דוח איכות מלא + שיחה עם סוכן AI</p>
     </div>
 
     <div id="analyzeForm">
@@ -173,16 +216,15 @@ textarea.tarea::placeholder{color:#c0c6d9;}
 
       <div class="card">
         <div class="card-title">📁 קובץ השיחה</div>
-        <div class="upload-zone" id="uploadZone">
+        <div class="upload-zone">
           <input type="file" id="audioInput" accept="audio/*,video/*,.mp3,.wav,.m4a,.mp4,.wmv,.aac,.ogg,.flac,.wma">
           <div class="uz-icon">🎙️</div>
           <h3>גרור קובץ שמע לכאן</h3>
           <p>MP3, WAV, WMV, MP4, M4A, AAC ועוד</p>
         </div>
         <div id="fileChip" style="display:none" class="file-chip">✓ <span id="fileName"></span></div>
-
-        <div class="or-line">או הדבק טקסט ישירות</div>
-        <textarea class="tarea" id="manualText" placeholder="הדבק כאן תמלול של השיחה..."></textarea>
+        <div class="or-line">או הדבק תמלול ישירות</div>
+        <textarea class="tarea" id="manualText" placeholder="נציג: שלום, מדבר יוסי...&#10;לקוח: שלום, יש לי בעיה עם..."></textarea>
       </div>
 
       <div class="err-box" id="errBox"></div>
@@ -197,21 +239,52 @@ textarea.tarea::placeholder{color:#c0c6d9;}
     <div id="resultsDiv" style="display:none">
       <div class="res-topbar">
         <h2>תוצאות ניתוח</h2>
-        <div style="display:flex;gap:8px;align-items:center">
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
           <span class="agent-pill" id="agentPill"></span>
           <button class="btn-sec" onclick="resetForm()">+ שיחה חדשה</button>
         </div>
       </div>
+
+      <!-- Score Banner -->
       <div class="score-banner">
         <div class="score-circle"><div class="snum" id="rScore">-</div><div class="sdenom">/ 100</div></div>
         <div class="score-info">
-          <h3 id="rGrade"></h3><p id="rGradeText"></p>
+          <h3 id="rGrade"></h3>
+          <p id="rGradeText"></p>
           <div class="mood-tag" id="rMood"></div>
         </div>
       </div>
+
+      <!-- Agent vs Customer -->
+      <div class="sides-header" id="rSides"></div>
+
+      <!-- Categories -->
       <div class="cats-grid" id="rCats"></div>
+
+      <!-- Sections -->
       <div id="rSections"></div>
+
+      <!-- Recommendations -->
       <div class="recs-box" id="rRecs"></div>
+
+      <!-- AI Agent Chat -->
+      <div class="ai-chat-box">
+        <div class="ai-chat-header">
+          <div class="ai-dot"></div>
+          <div>
+            <h3>סוכן AI — שאל שאלות על השיחה</h3>
+            <p>שאל כל שאלה על השיחה שנותחה</p>
+          </div>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+          <div class="chat-msg msg-ai">שלום! אני סוכן AI ואני מכיר את השיחה שנותחה. תוכל לשאול אותי כל שאלה — על ביצועי הנציג, על תגובות הלקוח, על מה ניתן לשפר ועוד. 💬</div>
+        </div>
+        <div class="chat-input-row">
+          <input type="text" class="chat-input" id="chatInput" placeholder="לדוגמה: איפה הנציג איבד את הלקוח?" onkeydown="if(event.key==='Enter')sendChat()">
+          <button class="chat-send" id="chatSendBtn" onclick="sendChat()">שלח ↑</button>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -238,7 +311,7 @@ textarea.tarea::placeholder{color:#c0c6d9;}
       <div class="info-box">
         <strong>קבלת מפתח חינמי:</strong><br>
         1. כנס ל: <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com/app/apikey</a><br>
-        2. התחבר עם Google → לחץ <strong>Create API Key</strong><br>
+        2. התחבר עם Google ← לחץ <strong>Create API Key</strong><br>
         3. העתק והדבק כאן<br><br>
         <strong>חינמי לחלוטין · ללא כרטיס אשראי</strong>
       </div>
@@ -259,288 +332,351 @@ textarea.tarea::placeholder{color:#c0c6d9;}
 </main>
 
 <script>
-// ─── STATE ────────────────────────────────────────
+// ─── STATE ──────────────────────────────────
 let callType = 'sales';
 let selectedFile = null;
+let currentAnalysis = null; // stores full analysis + transcript for chat
 let history = [];
-
 try { history = JSON.parse(localStorage.getItem('cqHistory') || '[]'); } catch(e) { history = []; }
 
-// ─── INIT ──────────────────────────────────────────
+// ─── INIT ────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
   const key = localStorage.getItem('geminiKey') || '';
-  if (key) { document.getElementById('apiKeyInput').value = key; document.getElementById('savedNote').style.display = 'flex'; }
-  const model = localStorage.getItem('geminiModel') || 'gemini-2.5-flash';
-  document.getElementById('modelSel').value = model;
-  document.getElementById('audioInput').addEventListener('change', onFileSelected);
+  if (key) { document.getElementById('apiKeyInput').value = key; document.getElementById('savedNote').style.display='flex'; }
+  document.getElementById('modelSel').value = localStorage.getItem('geminiModel') || 'gemini-2.5-flash';
+  document.getElementById('audioInput').addEventListener('change', e => {
+    const f = e.target.files[0];
+    if (!f) return;
+    selectedFile = f;
+    document.getElementById('fileName').textContent = f.name + ' (' + (f.size/1024/1024).toFixed(1) + ' MB)';
+    document.getElementById('fileChip').style.display = 'inline-flex';
+  });
   renderHistory();
 });
 
-// ─── NAVIGATION ────────────────────────────────────
+// ─── NAV ─────────────────────────────────────
 function navTo(page, btn) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById('page-' + page).classList.add('active');
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
   btn.classList.add('active');
-  if (page === 'history') renderHistory();
+  if (page==='history') renderHistory();
 }
 
-// ─── SETTINGS ──────────────────────────────────────
+// ─── SETTINGS ────────────────────────────────
 function saveKey() {
   const k = document.getElementById('apiKeyInput').value.trim();
   if (!k) return;
   localStorage.setItem('geminiKey', k);
   const n = document.getElementById('savedNote');
-  n.style.display = 'flex';
-  setTimeout(() => n.style.display = 'none', 3000);
+  n.style.display='flex';
+  setTimeout(()=>n.style.display='none', 3000);
 }
-function saveModel() {
-  localStorage.setItem('geminiModel', document.getElementById('modelSel').value);
-}
-
-// ─── FILE SELECTION ────────────────────────────────
-function onFileSelected(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  selectedFile = file;
-  document.getElementById('fileName').textContent = file.name + ' (' + (file.size/1024/1024).toFixed(1) + ' MB)';
-  document.getElementById('fileChip').style.display = 'inline-flex';
-}
-
+function saveModel() { localStorage.setItem('geminiModel', document.getElementById('modelSel').value); }
 function setType(t, btn) {
   callType = t;
-  document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.type-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
 }
 
-// ─── FILE TO BASE64 ────────────────────────────────
-function fileToBase64(file) {
-  return new Promise((res, rej) => {
-    const reader = new FileReader();
-    reader.onload = e => res(e.target.result.split(',')[1]);
-    reader.onerror = rej;
-    reader.readAsDataURL(file);
-  });
-}
-
-function getAudioMime(file) {
-  const ext = file.name.split('.').pop().toLowerCase();
-  const map = {
-    mp3:'audio/mpeg', wav:'audio/wav', m4a:'audio/mp4', aac:'audio/aac',
-    ogg:'audio/ogg', flac:'audio/flac', wma:'audio/x-ms-wma', opus:'audio/opus',
-    mp4:'video/mp4', wmv:'video/x-ms-wmv', avi:'video/x-msvideo',
-    mov:'video/quicktime', webm:'video/webm'
-  };
-  if (file.type && file.type !== 'application/octet-stream') return file.type;
-  return map[ext] || 'audio/mpeg';
-}
-
-// ─── UPLOAD VIA FILES API ──────────────────────────
+// ─── UPLOAD ───────────────────────────────────
 async function uploadFile(file, apiKey) {
   setMsg('מעלה קובץ לשרת...');
   const mime = getAudioMime(file);
-
-  // Initiate upload
-  const initRes = await fetch(
-    'https://generativelanguage.googleapis.com/upload/v1beta/files?key=' + apiKey,
-    {
-      method: 'POST',
-      headers: {
-        'X-Goog-Upload-Protocol': 'resumable',
-        'X-Goog-Upload-Command': 'start',
-        'X-Goog-Upload-Header-Content-Length': String(file.size),
-        'X-Goog-Upload-Header-Content-Type': mime,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ file: { display_name: file.name } })
-    }
-  );
-  if (!initRes.ok) throw new Error('שגיאה בהתחלת העלאה (' + initRes.status + ')');
+  const initRes = await fetch('https://generativelanguage.googleapis.com/upload/v1beta/files?key='+apiKey, {
+    method:'POST',
+    headers:{
+      'X-Goog-Upload-Protocol':'resumable','X-Goog-Upload-Command':'start',
+      'X-Goog-Upload-Header-Content-Length':String(file.size),
+      'X-Goog-Upload-Header-Content-Type':mime,'Content-Type':'application/json'
+    },
+    body: JSON.stringify({file:{display_name:file.name}})
+  });
+  if (!initRes.ok) throw new Error('שגיאה בהתחלת העלאה ('+initRes.status+')');
   const uploadUrl = initRes.headers.get('X-Goog-Upload-URL');
   if (!uploadUrl) throw new Error('לא התקבל URL להעלאה');
 
-  // Upload bytes
-  setMsg('מעלה... (' + (file.size/1024/1024).toFixed(1) + ' MB)');
+  setMsg('מעלה קובץ... ('+( file.size/1024/1024).toFixed(1)+' MB)');
   const upRes = await fetch(uploadUrl, {
-    method: 'POST',
-    headers: {
-      'Content-Length': String(file.size),
-      'X-Goog-Upload-Offset': '0',
-      'X-Goog-Upload-Command': 'upload, finalize',
-      'Content-Type': mime
-    },
+    method:'POST',
+    headers:{'Content-Length':String(file.size),'X-Goog-Upload-Offset':'0','X-Goog-Upload-Command':'upload, finalize','Content-Type':mime},
     body: file
   });
-  if (!upRes.ok) throw new Error('שגיאה בהעלאה (' + upRes.status + ')');
+  if (!upRes.ok) throw new Error('שגיאה בהעלאה ('+upRes.status+')');
   const upData = await upRes.json();
   const fileUri = upData?.file?.uri;
   const fileName = upData?.file?.name;
   if (!fileUri) throw new Error('לא התקבל URI מהשרת');
 
-  // Wait for processing
   setMsg('מעבד קובץ שמע...');
   let state = upData?.file?.state || 'PROCESSING';
   let tries = 0;
-  while (state === 'PROCESSING' && tries < 30) {
-    await new Promise(r => setTimeout(r, 2000));
-    tries++;
-    const stRes = await fetch(
-      'https://generativelanguage.googleapis.com/v1beta/' + fileName + '?key=' + apiKey
-    );
+  while (state==='PROCESSING' && tries<30) {
+    await new Promise(r=>setTimeout(r,2000)); tries++;
+    const stRes = await fetch('https://generativelanguage.googleapis.com/v1beta/'+fileName+'?key='+apiKey);
     const stData = await stRes.json();
     state = stData?.file?.state || stData?.state || 'ACTIVE';
   }
-  if (state === 'FAILED') throw new Error('עיבוד הקובץ נכשל בשרת');
-
+  if (state==='FAILED') throw new Error('עיבוד הקובץ נכשל בשרת');
   return { uri: fileUri, mimeType: mime };
 }
 
-// ─── MAIN ANALYSIS ─────────────────────────────────
+function getAudioMime(file) {
+  const ext = file.name.split('.').pop().toLowerCase();
+  const map = {mp3:'audio/mpeg',wav:'audio/wav',m4a:'audio/mp4',aac:'audio/aac',ogg:'audio/ogg',flac:'audio/flac',wma:'audio/x-ms-wma',opus:'audio/opus',mp4:'video/mp4',wmv:'video/x-ms-wmv',avi:'video/x-msvideo',mov:'video/quicktime',webm:'video/webm'};
+  if (file.type && file.type!=='application/octet-stream') return file.type;
+  return map[ext] || 'audio/mpeg';
+}
+
+// ─── GEMINI CALL ──────────────────────────────
+async function callGemini(parts, model, apiKey, maxTokens=8192) {
+  for (let attempt=0; attempt<3; attempt++) {
+    if (attempt>0) { setMsg('ניסיון '+(attempt+1)+' מתוך 3...'); await new Promise(r=>setTimeout(r,3000)); }
+    const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+model+':generateContent?key='+apiKey, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ contents:[{parts}], generationConfig:{temperature:0.3, maxOutputTokens:maxTokens} })
+    });
+    const d = await res.json();
+    if (d.error) {
+      const msg = d.error.message || '';
+      if (attempt<2 && (msg.includes('high demand')||msg.includes('overloaded')||msg.includes('503'))) continue;
+      throw new Error(msg);
+    }
+    return d;
+  }
+  throw new Error('השרת עמוס, נסה שוב בעוד דקה');
+}
+
+function parseJSON(raw) {
+  let clean = raw.replace(/```json|```/g,'').trim();
+  const si = clean.indexOf('{'), ei = clean.lastIndexOf('}');
+  if (si===-1||ei===-1) throw new Error('פורמט תשובה שגוי');
+  clean = clean.slice(si,ei+1)
+    .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g,'')
+    .replace(/,\s*([}\]])/g,'$1');
+  return JSON.parse(clean);
+}
+
+// ─── MAIN ANALYSIS ────────────────────────────
 async function runAnalysis() {
   const apiKey = localStorage.getItem('geminiKey');
   if (!apiKey) { showErr('נא לשמור מפתח Gemini בהגדרות תחילה'); return; }
-
   const manualText = document.getElementById('manualText').value.trim();
-  if (!selectedFile && !manualText) { showErr('נא להעלות קובץ שמע או להדביק טקסט'); return; }
+  if (!selectedFile && !manualText) { showErr('נא להעלות קובץ שמע או להדביק תמלול'); return; }
 
-  const agentName = document.getElementById('agentName').value.trim() || 'נציג לא ידוע';
-  const callId = document.getElementById('callId').value.trim() || '#' + Date.now().toString().slice(-4);
+  const agentName = document.getElementById('agentName').value.trim() || 'הנציג';
+  const callId = document.getElementById('callId').value.trim() || '#'+Date.now().toString().slice(-4);
   const model = localStorage.getItem('geminiModel') || 'gemini-2.5-flash';
-  const typeLabel = callType === 'sales' ? 'מכירה' : 'שירות לקוחות';
+  const typeLabel = callType==='sales' ? 'מכירה' : 'שירות לקוחות';
+  const agentRole = callType==='sales' ? 'נציג מכירות' : 'נציג שירות';
 
-  document.getElementById('analyzeForm').style.display = 'none';
-  document.getElementById('errBox').style.display = 'none';
-  document.getElementById('loadingDiv').style.display = 'block';
-  document.getElementById('resultsDiv').style.display = 'none';
+  document.getElementById('analyzeForm').style.display='none';
+  document.getElementById('errBox').style.display='none';
+  document.getElementById('loadingDiv').style.display='block';
+  document.getElementById('resultsDiv').style.display='none';
 
   try {
-    // Build request parts
     let parts = [];
+    let transcriptText = manualText;
 
     if (selectedFile) {
       const { uri, mimeType } = await uploadFile(selectedFile, apiKey);
-      parts.push({ file_data: { mime_type: mimeType, file_uri: uri } });
+
+      // Step 1: Get full transcript first
+      setMsg('מתמלל את השיחה...');
+      const transcriptParts = [
+        { file_data:{ mime_type:mimeType, file_uri:uri } },
+        { text: 'תמלל את כל השיחה בעברית. כתוב כל פסקה בפורמט: "נציג: [מה נאמר]" או "לקוח: [מה נאמר]". החזר רק את התמלול, ללא הסברים נוספים.' }
+      ];
+      const transcriptData = await callGemini(transcriptParts, model, apiKey, 4096);
+      transcriptText = transcriptData.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+      // Step 2: Now analyze with the transcript text (no need to re-upload file)
+      parts = [{ text: transcriptText ? 'תמלול השיחה:\n' + transcriptText : '' }];
+    } else {
+      parts = [{ text: 'תמלול השיחה:\n' + manualText }];
     }
 
-    const prompt = `נתח שיחת ${typeLabel} בעברית. החזר JSON בלבד ללא markdown.
-{"totalScore":75,"grade":"טוב","gradeText":"משפט קצר על השיחה","mood":"חיובי","moodEmoji":"😊","categories":[{"name":"פתיח","score":80,"comment":"תיאור קצר"},{"name":"גוף השיחה","score":75,"comment":"תיאור קצר"},{"name":"פתרון ללקוח","score":70,"comment":"תיאור קצר"},{"name":"שביעות רצון","score":75,"comment":"תיאור קצר"},{"name":"סיום שיחה","score":80,"comment":"תיאור קצר"},{"name":"אווירה כללית","score":75,"comment":"תיאור קצר"}],"sections":{"opening":{"title":"פתיח","text":"ניתוח"},"body":{"title":"גוף השיחה","text":"ניתוח"},"solution":{"title":"פתרון ללקוח","text":"ניתוח"},"satisfaction":{"title":"שביעות רצון","text":"ניתוח"},"closing":{"title":"סיום שיחה","text":"ניתוח"},"atmosphere":{"title":"תחושה כללית","text":"ניתוח"}},"recommendations":["המלצה 1","המלצה 2","המלצה 3"]}
-${callType === 'sales' ? 'דגש: זיהוי צרכים, הצגת מוצר, סגירה.' : 'דגש: הבנת בעיה, אמפתיה, פתרון מלא.'}
-${manualText ? 'תוכן השיחה:\n' + manualText.slice(0, 3000) : 'האזן לקובץ השמע ונתח.'}`;
+    const prompt = `אתה מנתח שיחות מוקד מקצועי.
+השיחה היא בין ${agentRole} (בשם: ${agentName}) לבין לקוח.
+${selectedFile ? 'האזן לקובץ השמע ונתח את השיחה.' : 'נתח את תמלול השיחה הבא.'}
+
+חשוב: השיחה תמיד מורכבת משני צדדים — הנציג והלקוח. נתח כל צד בנפרד.
+
+החזר אובייקט JSON תקני בלבד. ללא markdown. ללא טקסט לפני או אחרי.
+
+שדות נדרשים:
+- totalScore: מספר 0-100 (ציון כולל לשיחה)
+- grade: מצוין / טוב / בינוני / טעון שיפור
+- gradeText: משפט אחד קצר על השיחה
+- mood: חיובי / ניטרלי / שלילי / לקוח כועס / לקוח מרוצה מאוד
+- moodEmoji: אמוג'י אחד
+- agentScore: מספר 0-100 (ציון לנציג)
+- agentSummary: משפט קצר על ביצועי הנציג
+- customerScore: מספר 0-100 (מדד שביעות רצון הלקוח)
+- customerSummary: משפט קצר על תגובת הלקוח
+- categories: מערך של 6 קטגוריות, כל אחת עם name, score (0-100), agentNote (מה עשה הנציג), customerNote (איך הגיב הלקוח):
+  פתיח, גוף השיחה, פתרון ללקוח, שביעות רצון, סיום שיחה, אווירה כללית
+- sections: אובייקט עם המפתחות opening, body, solution, satisfaction, closing, atmosphere — כל אחד עם title ו-text
+- recommendations: מערך של 3 המלצות ספציפיות לנציג
+${callType==='sales' ? '- closing: האם הסתיימה בעסקה? (true/false)\n- closingNote: הסבר קצר על הסגירה' : '- resolved: האם הבעיה נפתרה? (true/false)\n- resolvedNote: הסבר קצר'}
+${manualText ? '\nתמלול השיחה:\n'+manualText.slice(0,4000) : ''}`;
 
     parts.push({ text: prompt });
-
     setMsg('מנתח שיחה...');
 
-    // Retry loop
-    let data = null;
-    for (let attempt = 0; attempt < 3; attempt++) {
-      if (attempt > 0) {
-        setMsg('ניסיון ' + (attempt+1) + ' מתוך 3...');
-        await new Promise(r => setTimeout(r, 3000));
-      }
-      const res = await fetch(
-        'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + apiKey,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts }],
-            generationConfig: { temperature: 0.3, maxOutputTokens: 8192 }
-          })
-        }
-      );
-      const d = await res.json();
-      if (d.error) {
-        const msg = d.error.message || '';
-        if (attempt < 2 && (msg.includes('high demand') || msg.includes('overloaded') || msg.includes('503'))) continue;
-        throw new Error(msg);
-      }
-      data = d;
-      break;
-    }
-    if (!data) throw new Error('השרת עמוס, נסה שוב בעוד דקה');
-
-    // Parse response
+    const data = await callGemini(parts, model, apiKey);
     const candidate = data.candidates?.[0];
-    if (!candidate) throw new Error('לא התקבלה תשובה. סיבה: ' + (data.promptFeedback?.blockReason || 'לא ידוע'));
-    if (candidate.finishReason && !['STOP','MAX_TOKENS'].includes(candidate.finishReason)) {
-      throw new Error('הניתוח הופסק: ' + candidate.finishReason);
-    }
+    if (!candidate) throw new Error('לא התקבלה תשובה: '+(data.promptFeedback?.blockReason||'לא ידוע'));
 
     const raw = candidate?.content?.parts?.[0]?.text || '';
-    if (!raw.trim()) throw new Error('תשובה ריקה מהמודל. נסה שוב.');
+    if (!raw.trim()) throw new Error('תשובה ריקה. נסה שוב.');
 
-    let clean = raw.replace(/```json|```/g, '').trim();
-    const si = clean.indexOf('{'), ei = clean.lastIndexOf('}');
-    if (si === -1 || ei === -1) throw new Error('פורמט תשובה שגוי. נסה שוב.');
-    clean = clean.slice(si, ei+1).replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
+    const result = parseJSON(raw);
 
-    const result = JSON.parse(clean);
+    // Store for chat
+    // Use transcript from AI result if we uploaded audio (no manual text)
+    const finalTranscript = manualText || result.transcript || '';
+    currentAnalysis = { result, agentName, callId, typeLabel, agentRole, transcriptText: finalTranscript, raw };
 
-    document.getElementById('loadingDiv').style.display = 'none';
+    document.getElementById('loadingDiv').style.display='none';
     renderResults(result, agentName, callId);
     saveToHistory(result, agentName, callId);
 
+    // Reset chat
+    document.getElementById('chatMessages').innerHTML = '<div class="chat-msg msg-ai">שלום! אני מכיר את השיחה של <strong>'+agentName+'</strong> שנותחה. שאל אותי כל שאלה — על הנציג, על הלקוח, על מה שעבד ומה לא. 💬</div>';
+
   } catch(err) {
-    document.getElementById('loadingDiv').style.display = 'none';
-    document.getElementById('analyzeForm').style.display = 'block';
+    document.getElementById('loadingDiv').style.display='none';
+    document.getElementById('analyzeForm').style.display='block';
     showErr(err.message || 'שגיאה לא ידועה');
   }
 }
 
-function setMsg(t) { document.getElementById('loadingMsg').textContent = t; }
-function showErr(msg) { const e = document.getElementById('errBox'); e.textContent = msg; e.style.display = 'block'; }
-
-// ─── RENDER RESULTS ────────────────────────────────
+// ─── RENDER RESULTS ───────────────────────────
 function renderResults(r, agent, id) {
-  document.getElementById('resultsDiv').style.display = 'block';
-  document.getElementById('agentPill').textContent = agent + ' · ' + id;
-  document.getElementById('rScore').textContent = r.totalScore || '-';
-  document.getElementById('rGrade').textContent = r.grade || '';
-  document.getElementById('rGradeText').textContent = r.gradeText || '';
-  const m = document.getElementById('rMood');
-  m.textContent = (r.moodEmoji||'') + ' ' + (r.mood||'');
+  document.getElementById('resultsDiv').style.display='block';
+  document.getElementById('agentPill').textContent = agent+' · '+id;
+  document.getElementById('rScore').textContent = r.totalScore||'-';
+  document.getElementById('rGrade').textContent = r.grade||'';
+  document.getElementById('rGradeText').textContent = r.gradeText||'';
+  document.getElementById('rMood').textContent = (r.moodEmoji||'')+ ' '+(r.mood||'');
 
-  const cg = document.getElementById('rCats');
-  cg.innerHTML = (r.categories||[]).map(c => {
-    const lv = c.score>=80?'hi':c.score>=55?'md':'lo';
+  // Agent vs Customer
+  const aScore = r.agentScore||0, cScore = r.customerScore||0;
+  const alv = aScore>=80?'#16a34a':aScore>=55?'#d97706':'#dc2626';
+  const clv = cScore>=80?'#16a34a':cScore>=55?'#d97706':'#dc2626';
+  document.getElementById('rSides').innerHTML = `
+    <div class="side-card side-agent">
+      <div class="side-title">👤 ${agent} — נציג</div>
+      <div class="side-row"><span class="side-label">ציון ביצועים</span><span class="side-score" style="color:${alv}">${aScore}</span></div>
+      <div class="side-mini-bar"><div class="side-mini-fill sa-fill" style="width:${aScore}%"></div></div>
+      <div style="font-size:12px;color:#4b5563;margin-top:8px">${r.agentSummary||''}</div>
+    </div>
+    <div class="side-card side-customer">
+      <div class="side-title">🙋 הלקוח</div>
+      <div class="side-row"><span class="side-label">שביעות רצון</span><span class="side-score" style="color:${clv}">${cScore}</span></div>
+      <div class="side-mini-bar"><div class="side-mini-fill sc-fill" style="width:${cScore}%"></div></div>
+      <div style="font-size:12px;color:#4b5563;margin-top:8px">${r.customerSummary||''}</div>
+      ${r.resolved!==undefined ? '<div style="margin-top:8px;font-size:12px;font-weight:600;color:'+(r.resolved?'#16a34a':'#dc2626')+'">'+(r.resolved?'✓ הבעיה נפתרה':'✗ הבעיה לא נפתרה')+'</div>' : ''}
+      ${r.closingNote!==undefined ? '<div style="margin-top:8px;font-size:12px;font-weight:600;color:'+(r.closing?'#16a34a':'#dc2626')+'">'+(r.closing?'✓ נסגרה עסקה':'✗ לא נסגרה עסקה')+'</div>' : ''}
+    </div>`;
+
+  // Categories
+  document.getElementById('rCats').innerHTML = (r.categories||[]).map(c=>{
+    const lv=c.score>=80?'hi':c.score>=55?'md':'lo';
     return `<div class="cat-card">
       <div class="cat-head"><span class="cat-name">${c.name}</span><span class="cat-score sc-${lv}">${c.score}</span></div>
       <div class="bar-bg"><div class="bar-fill b${lv}" style="width:${c.score}%"></div></div>
-      <div class="cat-comment">${c.comment}</div>
+      <div style="font-size:11px;color:#4f46e5;margin-bottom:3px">👤 ${c.agentNote||''}</div>
+      <div style="font-size:11px;color:#1e40af">🙋 ${c.customerNote||''}</div>
     </div>`;
   }).join('');
 
-  const sw = document.getElementById('rSections');
-  sw.innerHTML = Object.values(r.sections||{}).map(s =>
+  // Sections
+  document.getElementById('rSections').innerHTML = Object.values(r.sections||{}).map(s=>
     `<div class="sec-card"><div class="sec-title"><span class="sec-dot"></span>${s.title}</div><div class="sec-text">${s.text}</div></div>`
   ).join('');
 
-  const rw = document.getElementById('rRecs');
-  rw.innerHTML = '<h3>✦ המלצות לשיפור</h3>' + (r.recommendations||[]).map((rec,i) =>
+  // Recs
+  document.getElementById('rRecs').innerHTML = '<h3>✦ המלצות לנציג</h3>'+(r.recommendations||[]).map((rec,i)=>
     `<div class="rec-row"><div class="rec-n">${i+1}</div><div class="rec-text">${rec}</div></div>`
   ).join('');
 }
 
-// ─── HISTORY ───────────────────────────────────────
+// ─── AI CHAT ──────────────────────────────────
+async function sendChat() {
+  const input = document.getElementById('chatInput');
+  const q = input.value.trim();
+  if (!q || !currentAnalysis) return;
+
+  const apiKey = localStorage.getItem('geminiKey');
+  if (!apiKey) return;
+
+  const messages = document.getElementById('chatMessages');
+  input.value = '';
+  document.getElementById('chatSendBtn').disabled = true;
+
+  // Add user message
+  messages.innerHTML += `<div class="chat-msg msg-user">${q}</div>`;
+  messages.innerHTML += `<div class="chat-msg msg-loading" id="chatLoading">חושב...</div>`;
+  messages.scrollTop = messages.scrollHeight;
+
+  try {
+    const model = localStorage.getItem('geminiModel') || 'gemini-2.5-flash';
+    const { result, agentName, typeLabel, agentRole, transcriptText } = currentAnalysis;
+
+    const fullTranscript = transcriptText || result.transcript || '';
+    const systemContext = `אתה סוכן AI שמנתח שיחות מוקד. יש לך גישה מלאה לשיחה שנותחה.
+
+=== פרטי השיחה ===
+סוג: ${typeLabel}
+נציג: ${agentName} (${agentRole})
+ציון כולל: ${result.totalScore}/100 (${result.grade})
+ציון נציג: ${result.agentScore}/100 | ציון לקוח: ${result.customerScore}/100
+מצב רוח: ${result.mood} ${result.moodEmoji||''}
+סיכום נציג: ${result.agentSummary}
+סיכום לקוח: ${result.customerSummary}
+המלצות: ${(result.recommendations||[]).join(' | ')}
+
+=== תמלול מלא של השיחה ===
+${fullTranscript || '(תמלול לא זמין)'}
+
+ענה בעברית בתשובה ממוקדת. אם שואלים על פרט ספציפי מהשיחה (שם, מה נאמר, מתי) — השתמש בתמלול המלא.`;
+
+    const parts = [{ text: systemContext+'\n\nשאלה: '+q }];
+    const data = await callGemini(parts, model, apiKey, 1024);
+    const answer = data.candidates?.[0]?.content?.parts?.[0]?.text || 'לא הצלחתי לענות, נסה שוב.';
+
+    document.getElementById('chatLoading').remove();
+    messages.innerHTML += `<div class="chat-msg msg-ai">${answer}</div>`;
+  } catch(err) {
+    document.getElementById('chatLoading').remove();
+    messages.innerHTML += `<div class="chat-msg msg-ai" style="color:#dc2626">שגיאה: ${err.message}</div>`;
+  }
+
+  document.getElementById('chatSendBtn').disabled = false;
+  messages.scrollTop = messages.scrollHeight;
+}
+
+// ─── HISTORY ──────────────────────────────────
 function saveToHistory(r, agent, id) {
-  history.unshift({ id, agent, type: callType, score: r.totalScore, grade: r.grade, mood: r.mood, moodEmoji: r.moodEmoji, date: new Date().toLocaleDateString('he-IL'), data: r });
-  if (history.length > 50) history = history.slice(0, 50);
+  history.unshift({id,agent,type:callType,score:r.totalScore,grade:r.grade,mood:r.mood,moodEmoji:r.moodEmoji,date:new Date().toLocaleDateString('he-IL'),data:r});
+  if (history.length>50) history=history.slice(0,50);
   localStorage.setItem('cqHistory', JSON.stringify(history));
 }
 
 function renderHistory() {
-  const avg = history.length ? Math.round(history.reduce((s,h) => s+h.score, 0)/history.length) : 0;
-  const best = history.length ? Math.max(...history.map(h => h.score)) : 0;
+  const avg = history.length ? Math.round(history.reduce((s,h)=>s+h.score,0)/history.length) : 0;
+  const best = history.length ? Math.max(...history.map(h=>h.score)) : 0;
   document.getElementById('statsRow').innerHTML = `
     <div class="stat-card"><div class="stat-label">סה"כ שיחות</div><div class="stat-val">${history.length}</div></div>
     <div class="stat-card"><div class="stat-label">ממוצע ציון</div><div class="stat-val" style="color:#4f46e5">${avg}</div></div>
     <div class="stat-card"><div class="stat-label">ציון שיא</div><div class="stat-val" style="color:#16a34a">${best}</div></div>`;
-
   const el = document.getElementById('histList');
-  if (!history.length) { el.innerHTML = '<div class="hist-empty">עדיין אין שיחות בהיסטוריה</div>'; return; }
-  el.innerHTML = history.map((h,i) => {
-    const cls = h.score>=80?'sc-hi':h.score>=55?'sc-md':'sc-lo';
+  if (!history.length) { el.innerHTML='<div class="hist-empty">עדיין אין שיחות בהיסטוריה</div>'; return; }
+  el.innerHTML = history.map((h,i)=>{
+    const cls=h.score>=80?'sc-hi':h.score>=55?'sc-md':'sc-lo';
     return `<div class="hist-item" onclick="viewHistory(${i})">
       <div><div class="hi-name">${h.agent} <span style="color:#c0c6d9;font-weight:400">· ${h.id}</span></div>
       <div class="hi-meta">${h.type==='sales'?'מכירה':'שירות'} · ${h.date} · ${h.moodEmoji||''} ${h.mood||''}</div></div>
@@ -550,30 +686,35 @@ function renderHistory() {
 }
 
 function viewHistory(i) {
-  const e = history[i];
+  const e=history[i];
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('page-analyze').classList.add('active');
   document.getElementById('nav-analyze').classList.add('active');
-  document.getElementById('analyzeForm').style.display = 'none';
+  document.getElementById('analyzeForm').style.display='none';
+  currentAnalysis={ result:e.data, agentName:e.agent, callId:e.id, typeLabel:e.type==='sales'?'מכירה':'שירות', agentRole:e.type==='sales'?'נציג מכירות':'נציג שירות', transcriptText:'', raw:'' };
   renderResults(e.data, e.agent, e.id);
+  document.getElementById('chatMessages').innerHTML='<div class="chat-msg msg-ai">שלום! שאל אותי שאלות על השיחה של <strong>'+e.agent+'</strong>. 💬</div>';
   window.scrollTo(0,0);
 }
 
 function clearHistory() {
   if (!confirm('למחוק את כל ההיסטוריה?')) return;
-  history = []; localStorage.removeItem('cqHistory'); renderHistory();
+  history=[]; localStorage.removeItem('cqHistory'); renderHistory();
 }
 
 function resetForm() {
-  document.getElementById('resultsDiv').style.display = 'none';
-  document.getElementById('analyzeForm').style.display = 'block';
-  document.getElementById('audioInput').value = '';
-  document.getElementById('manualText').value = '';
-  document.getElementById('fileChip').style.display = 'none';
-  document.getElementById('errBox').style.display = 'none';
-  selectedFile = null;
+  document.getElementById('resultsDiv').style.display='none';
+  document.getElementById('analyzeForm').style.display='block';
+  document.getElementById('audioInput').value='';
+  document.getElementById('manualText').value='';
+  document.getElementById('fileChip').style.display='none';
+  document.getElementById('errBox').style.display='none';
+  selectedFile=null; currentAnalysis=null;
 }
+
+function setMsg(t) { document.getElementById('loadingMsg').textContent=t; }
+function showErr(msg) { const e=document.getElementById('errBox'); e.textContent=msg; e.style.display='block'; }
 </script>
 </body>
 </html>
