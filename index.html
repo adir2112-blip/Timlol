@@ -643,6 +643,79 @@ function getMime(file) {
   return map[ext] || 'audio/mpeg';
 }
 
+// UPLOAD FILE TO GEMINI FILES API
+async function uploadToFiles(file, apiKey) {
+  setMsg('מעלה קובץ לשרת...');
+  var mime = getMime(file);
+
+  // Step 1: initiate upload
+  var initRes = await fetch(
+    'https://generativelanguage.googleapis.com/upload/v1beta/files?key=' + apiKey,
+    {
+      method: 'POST',
+      headers: {
+        'X-Goog-Upload-Protocol': 'resumable',
+        'X-Goog-Upload-Command': 'start',
+        'X-Goog-Upload-Header-Content-Length': String(file.size),
+        'X-Goog-Upload-Header-Content-Type': mime,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({file: {display_name: file.name}})
+    }
+  );
+  if (!initRes.ok) {
+    // Files API failed (CORS on localhost) - fallback to base64
+    setMsg('עובר לשיטת גיבוי...');
+    var b64 = await fileToB64(file);
+    return {fallback: true, b64: b64, mime: mime};
+  }
+
+  var uploadUrl = initRes.headers.get('X-Goog-Upload-URL');
+  if (!uploadUrl) {
+    var b64 = await fileToB64(file);
+    return {fallback: true, b64: b64, mime: mime};
+  }
+
+  // Step 2: upload bytes
+  setMsg('מעלה קובץ... (' + (file.size/1024/1024).toFixed(1) + ' MB)');
+  var upRes = await fetch(uploadUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Length': String(file.size),
+      'X-Goog-Upload-Offset': '0',
+      'X-Goog-Upload-Command': 'upload, finalize',
+      'Content-Type': mime
+    },
+    body: file
+  });
+  if (!upRes.ok) {
+    var b64 = await fileToB64(file);
+    return {fallback: true, b64: b64, mime: mime};
+  }
+  var upData = await upRes.json();
+  var uri = upData && upData.file && upData.file.uri;
+  if (!uri) {
+    var b64 = await fileToB64(file);
+    return {fallback: true, b64: b64, mime: mime};
+  }
+
+  // Step 3: wait for processing
+  var fname = upData.file.name;
+  var state = upData.file.state || 'PROCESSING';
+  var tries = 0;
+  while (state === 'PROCESSING' && tries < 20) {
+    await new Promise(function(r) { setTimeout(r, 2000); });
+    tries++;
+    setMsg('מעבד קובץ שמע...');
+    try {
+      var stRes = await fetch('https://generativelanguage.googleapis.com/v1beta/' + fname + '?key=' + apiKey);
+      var stData = await stRes.json();
+      state = (stData.file && stData.file.state) || stData.state || 'ACTIVE';
+    } catch(e) { state = 'ACTIVE'; }
+  }
+  return {uri: uri, mime: mime, fallback: false};
+}
+
 // GEMINI API
 async function callGemini(parts, maxTok, jsonMode) {
   maxTok = maxTok || 8192;
@@ -801,11 +874,12 @@ async function runAnalysis() {
     var parts = [];
     var transcriptText = manual;
 
+    var fileUri = null;
     if (selFile) {
-      setMsg('ממיר קובץ שמע...');
-      var b64 = await fileToB64(selFile);
-      var mime = getMime(selFile);
-      parts.push({inline_data: {mime_type: mime, data: b64}});
+      var uploadKeys = getKeys();
+      if (!uploadKeys.length) throw new Error('נא לשמור מפתח Gemini בהגדרות');
+      var uploadKey = uploadKeys[parseInt(localStorage.getItem('geminiKeyIdx')||'0') % uploadKeys.length];
+      fileUri = await uploadToFiles(selFile, uploadKey);
     }
 
     var result, raw;
@@ -830,6 +904,12 @@ async function runAnalysis() {
         'transcript: התמלול המלא כמחרוזת טקסט';
       if (!selFile) gPrompt += '\n\nתמלול:\n' + manual;
       parts.push({text: gPrompt});
+      if (fileUri) {
+        var audioPart = fileUri.fallback
+          ? {inline_data: {mime_type: fileUri.mime, data: fileUri.b64}}
+          : {file_data: {mime_type: fileUri.mime, file_uri: fileUri.uri}};
+        parts = [audioPart, {text: parts[parts.length-1] && parts[parts.length-1].text || ''}];
+      }
       var gData = await callGemini(parts, 8192, true);
       var gCand = gData.candidates[0];
       raw = gCand.content.parts[0].text || '';
@@ -852,8 +932,16 @@ async function runAnalysis() {
         'recommendations (מערך 3), ' +
         (callType === 'sales' ? 'closing (בוליאן), closingNote' : 'resolved (בוליאן), resolvedNote') + '.';
 
-      if (!selFile) parts = [{text: 'תמלול:\n' + manual + '\n\n' + sPrompt}];
-      else parts.push({text: sPrompt});
+      if (!selFile) {
+        parts = [{text: 'תמלול:\n' + manual + '\n\n' + sPrompt}];
+      } else if (fileUri) {
+        var sp = fileUri.fallback
+          ? {inline_data: {mime_type: fileUri.mime, data: fileUri.b64}}
+          : {file_data: {mime_type: fileUri.mime, file_uri: fileUri.uri}};
+        parts = [sp, {text: sPrompt}];
+      } else {
+        parts.push({text: sPrompt});
+      }
 
       setMsg('מנתח שיחה...');
       var sData = await callGemini(parts, 8192, false);
