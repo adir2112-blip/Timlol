@@ -3,1038 +3,837 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>מערכת ביקורת שיחות</title>
+<title>מערכת ביקורת שיחות AI</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700&display=swap');
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:'Heebo',sans-serif;background:#f5f6fa;color:#1a1d2e;direction:rtl;display:flex;min-height:100vh;}
 
-/* SIDEBAR */
 .sidebar{width:220px;min-height:100vh;background:#fff;border-left:1px solid #e8eaf0;display:flex;flex-direction:column;position:fixed;right:0;top:0;z-index:100;}
-.sidebar-logo{padding:20px;border-bottom:1px solid #f0f1f5;}
-.logo-row{display:flex;align-items:center;gap:10px;}
-.logo-icon{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#6c63ff,#4f46e5);display:flex;align-items:center;justify-content:center;font-size:18px;}
+.logo{padding:20px;border-bottom:1px solid #f0f1f5;display:flex;align-items:center;gap:10px;}
+.logo-icon{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#6c63ff,#4f46e5);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
 .logo-title{font-size:14px;font-weight:600;}.logo-sub{font-size:11px;color:#9098b1;}
-.sidebar-nav{padding:12px 10px;flex:1;}
-.nav-label{font-size:10px;font-weight:600;color:#b0b8cc;letter-spacing:.8px;padding:8px 10px 4px;text-transform:uppercase;}
-.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;font-size:13px;font-weight:500;color:#5a6282;cursor:pointer;transition:all .18s;border:none;background:none;width:100%;text-align:right;margin-bottom:2px;}
-.nav-item:hover{background:#f5f6fa;color:#1a1d2e;}
-.nav-item.active{background:#eeeeff;color:#4f46e5;}
-.nav-item .icon{font-size:16px;width:20px;text-align:center;}
-.sidebar-footer{padding:14px;border-top:1px solid #f0f1f5;font-size:11px;color:#c0c6d9;text-align:center;line-height:1.6;}
+.nav{padding:12px 10px;flex:1;}
+.nav-lbl{font-size:10px;font-weight:600;color:#b0b8cc;letter-spacing:.8px;padding:8px 10px 4px;text-transform:uppercase;}
+.nav-btn{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;font-size:13px;font-weight:500;color:#5a6282;cursor:pointer;transition:all .15s;border:none;background:none;width:100%;text-align:right;margin-bottom:2px;}
+.nav-btn:hover{background:#f5f6fa;color:#1a1d2e;}
+.nav-btn.active{background:#eeeeff;color:#4f46e5;}
+.nav-btn .ic{font-size:16px;width:20px;text-align:center;}
+.side-footer{padding:14px;border-top:1px solid #f0f1f5;font-size:11px;color:#c0c6d9;text-align:center;line-height:1.6;}
 
-/* MAIN */
 .main{margin-right:220px;flex:1;padding:32px 36px;max-width:calc(100vw - 220px);}
-.page{display:none;}.page.active{display:block;}
-.page-header{margin-bottom:28px;}
-.page-header h1{font-size:22px;font-weight:700;margin-bottom:4px;}
-.page-header p{font-size:13px;color:#9098b1;}
+.pg{display:none;}.pg.active{display:block;}
+.ph{margin-bottom:28px;}.ph h1{font-size:22px;font-weight:700;margin-bottom:4px;}.ph p{font-size:13px;color:#9098b1;}
 
-/* CARDS */
 .card{background:#fff;border-radius:16px;border:1px solid #e8eaf0;padding:24px;margin-bottom:16px;}
-.card-title{font-size:13px;font-weight:600;color:#1a1d2e;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.ctitle{font-size:13px;font-weight:600;margin-bottom:14px;}
 
-/* TYPE BUTTONS */
-.type-btns{display:flex;gap:8px;}
-.type-btn{flex:1;padding:11px;border-radius:10px;border:1.5px solid #e8eaf0;background:#fff;color:#9098b1;font-size:13px;font-family:'Heebo',sans-serif;cursor:pointer;transition:all .18s;font-weight:500;}
-.type-btn:hover{border-color:#a5a0f5;color:#4f46e5;}
-.type-btn.active{background:#eeeeff;border-color:#6c63ff;color:#4f46e5;font-weight:600;}
+.type-row{display:flex;gap:8px;}
+.tbtn{flex:1;padding:11px;border-radius:10px;border:1.5px solid #e8eaf0;background:#fff;color:#9098b1;font-size:13px;font-family:'Heebo',sans-serif;cursor:pointer;transition:all .15s;font-weight:500;}
+.tbtn:hover{border-color:#a5a0f5;color:#4f46e5;}
+.tbtn.on{background:#eeeeff;border-color:#6c63ff;color:#4f46e5;font-weight:600;}
 
-/* FIELDS */
-.field-row{display:flex;gap:12px;margin-bottom:14px;}
-.field{flex:1;}
-.field label{display:block;font-size:12px;font-weight:500;color:#5a6282;margin-bottom:6px;}
-.field input,.field select{width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid #e8eaf0;background:#fafbff;color:#1a1d2e;font-size:13px;font-family:'Heebo',sans-serif;outline:none;transition:border-color .2s;}
-.field input:focus,.field select:focus{border-color:#6c63ff;background:#fff;}
+.frow{display:flex;gap:12px;margin-bottom:14px;}
+.fi{flex:1;}
+.fi label{display:block;font-size:12px;font-weight:500;color:#5a6282;margin-bottom:6px;}
+.fi input,.fi select{width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid #e8eaf0;background:#fafbff;color:#1a1d2e;font-size:13px;font-family:'Heebo',sans-serif;outline:none;transition:border-color .2s;}
+.fi input:focus,.fi select:focus{border-color:#6c63ff;background:#fff;}
 
-/* UPLOAD */
-.upload-zone{border:2px dashed #dde0ea;border-radius:12px;padding:30px;text-align:center;cursor:pointer;transition:all .2s;background:#fafbff;position:relative;}
-.upload-zone:hover{border-color:#6c63ff;background:#f5f4ff;}
-.upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
-.upload-zone .uz-icon{font-size:30px;margin-bottom:8px;}
-.upload-zone h3{font-size:14px;font-weight:500;color:#3d4466;margin-bottom:4px;}
-.upload-zone p{font-size:12px;color:#9098b1;}
-.file-chip{display:inline-flex;align-items:center;gap:8px;background:#edfbf3;border:1px solid #86efac;border-radius:8px;padding:7px 14px;font-size:12px;color:#166534;margin-top:10px;}
-.or-line{display:flex;align-items:center;gap:12px;font-size:12px;color:#c0c6d9;margin:14px 0;}
-.or-line::before,.or-line::after{content:'';flex:1;height:1px;background:#e8eaf0;}
-textarea.tarea{width:100%;min-height:110px;padding:12px 14px;border-radius:10px;border:1.5px solid #e8eaf0;background:#fafbff;color:#1a1d2e;font-size:13px;font-family:'Heebo',sans-serif;resize:vertical;outline:none;direction:rtl;}
-textarea.tarea:focus{border-color:#6c63ff;background:#fff;}
-textarea.tarea::placeholder{color:#c0c6d9;}
+.upzone{border:2px dashed #dde0ea;border-radius:12px;padding:28px;text-align:center;cursor:pointer;transition:all .2s;background:#fafbff;position:relative;}
+.upzone:hover{border-color:#6c63ff;background:#f5f4ff;}
+.upzone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.upzone .uic{font-size:28px;margin-bottom:8px;}
+.upzone h3{font-size:14px;font-weight:500;color:#3d4466;margin-bottom:4px;}
+.upzone p{font-size:12px;color:#9098b1;}
+.fchip{display:none;align-items:center;gap:8px;background:#edfbf3;border:1px solid #86efac;border-radius:8px;padding:7px 14px;font-size:12px;color:#166534;margin-top:10px;}
+.orline{display:flex;align-items:center;gap:12px;font-size:12px;color:#c0c6d9;margin:12px 0;}
+.orline::before,.orline::after{content:'';flex:1;height:1px;background:#e8eaf0;}
+textarea.ta{width:100%;min-height:100px;padding:12px 14px;border-radius:10px;border:1.5px solid #e8eaf0;background:#fafbff;color:#1a1d2e;font-size:13px;font-family:'Heebo',sans-serif;resize:vertical;outline:none;direction:rtl;}
+textarea.ta:focus{border-color:#6c63ff;background:#fff;}
+textarea.ta::placeholder{color:#c0c6d9;}
 
-/* BUTTONS */
-.btn-primary{width:100%;padding:13px;border-radius:12px;background:linear-gradient(135deg,#6c63ff,#4f46e5);border:none;color:#fff;font-size:14px;font-weight:600;font-family:'Heebo',sans-serif;cursor:pointer;transition:all .2s;margin-top:4px;box-shadow:0 4px 14px rgba(79,70,229,.25);}
-.btn-primary:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 20px rgba(79,70,229,.35);}
-.btn-primary:disabled{opacity:.45;cursor:not-allowed;}
-.btn-sec{padding:9px 18px;border-radius:9px;background:#fff;border:1.5px solid #e8eaf0;color:#5a6282;font-size:13px;font-family:'Heebo',sans-serif;cursor:pointer;transition:all .18s;font-weight:500;}
-.btn-sec:hover{border-color:#a5a0f5;color:#4f46e5;}
+.btn-p{width:100%;padding:13px;border-radius:12px;background:linear-gradient(135deg,#6c63ff,#4f46e5);border:none;color:#fff;font-size:14px;font-weight:600;font-family:'Heebo',sans-serif;cursor:pointer;transition:all .2s;margin-top:4px;box-shadow:0 4px 14px rgba(79,70,229,.25);}
+.btn-p:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(79,70,229,.35);}
+.btn-s{padding:9px 18px;border-radius:9px;background:#fff;border:1.5px solid #e8eaf0;color:#5a6282;font-size:13px;font-family:'Heebo',sans-serif;cursor:pointer;transition:all .15s;font-weight:500;}
+.btn-s:hover{border-color:#a5a0f5;color:#4f46e5;}
+.btn-save{padding:10px 20px;border-radius:10px;background:linear-gradient(135deg,#6c63ff,#4f46e5);border:none;color:#fff;font-family:'Heebo',sans-serif;font-size:13px;font-weight:600;cursor:pointer;height:42px;}
 
-/* LOADING */
 .loading{display:none;text-align:center;padding:60px 20px;}
-.spinner{width:44px;height:44px;border:3px solid #e8eaf0;border-top-color:#6c63ff;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 16px;}
+.spin{width:44px;height:44px;border:3px solid #e8eaf0;border-top-color:#6c63ff;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 16px;}
 @keyframes spin{to{transform:rotate(360deg);}}
 .loading p{font-size:14px;color:#9098b1;}
-.err-box{background:#fff5f5;border:1.5px solid #fecaca;border-radius:10px;padding:12px 16px;font-size:13px;color:#dc2626;margin-bottom:14px;display:none;line-height:1.6;}
+.err{background:#fff5f5;border:1.5px solid #fecaca;border-radius:10px;padding:12px 16px;font-size:13px;color:#dc2626;margin-bottom:14px;display:none;line-height:1.6;}
 
-/* RESULTS */
-.res-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px;}
-.res-topbar h2{font-size:18px;font-weight:700;}
-.agent-pill{background:#eeeeff;border:1px solid #c7c4f8;color:#4f46e5;font-size:12px;padding:5px 14px;border-radius:20px;font-weight:500;}
-
-/* SCORE BANNER */
-.score-banner{background:linear-gradient(135deg,#6c63ff,#4f46e5);border-radius:16px;padding:24px 28px;color:#fff;display:flex;align-items:center;gap:24px;margin-bottom:16px;}
-.score-circle{width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.18);border:3px solid rgba(255,255,255,.5);display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;}
+/* Results */
+.rtop{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px;}
+.rtop h2{font-size:18px;font-weight:700;}
+.pill{background:#eeeeff;border:1px solid #c7c4f8;color:#4f46e5;font-size:12px;padding:5px 14px;border-radius:20px;font-weight:500;}
+.banner{background:linear-gradient(135deg,#6c63ff,#4f46e5);border-radius:16px;padding:24px 28px;color:#fff;display:flex;align-items:center;gap:24px;margin-bottom:16px;}
+.scircle{width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.18);border:3px solid rgba(255,255,255,.5);display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;}
 .snum{font-size:28px;font-weight:700;line-height:1;}.sdenom{font-size:11px;opacity:.75;}
-.score-info h3{font-size:18px;font-weight:600;margin-bottom:4px;}
-.score-info p{font-size:13px;opacity:.8;margin-bottom:10px;}
-.mood-tag{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.2);border-radius:20px;padding:5px 14px;font-size:13px;}
+.sinfo h3{font-size:18px;font-weight:600;margin-bottom:4px;}.sinfo p{font-size:13px;opacity:.8;margin-bottom:10px;}
+.mood{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.2);border-radius:20px;padding:5px 14px;font-size:13px;}
 
-/* SIDES */
-.sides-header{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
-.side-card{border-radius:14px;padding:18px 20px;}
-.side-agent{background:#f0fdf4;border:1.5px solid #86efac;}
-.side-customer{background:#eff6ff;border:1.5px solid #93c5fd;}
-.side-title{font-size:12px;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
-.side-agent .side-title{color:#166534;}
-.side-customer .side-title{color:#1e40af;}
-.side-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
-.side-label{font-size:12px;color:#6b7280;}
-.side-score{font-size:14px;font-weight:600;}
-.side-mini-bar{height:4px;background:#e5e7eb;border-radius:2px;margin-top:3px;}
-.side-mini-fill{height:4px;border-radius:2px;}
-.sa-fill{background:#22c55e;}.sc-fill{background:#3b82f6;}
+.sides{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+.scard{border-radius:14px;padding:18px 20px;}
+.scard.ag{background:#f0fdf4;border:1.5px solid #86efac;}
+.scard.cu{background:#eff6ff;border:1.5px solid #93c5fd;}
+.stit{font-size:12px;font-weight:600;margin-bottom:10px;}
+.ag .stit{color:#166534;}.cu .stit{color:#1e40af;}
+.srow{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.slbl{font-size:12px;color:#6b7280;}.ssc{font-size:14px;font-weight:600;}
+.sbar{height:4px;background:#e5e7eb;border-radius:2px;margin-top:4px;}
+.sbarfill{height:4px;border-radius:2px;}
+.ag .sbarfill{background:#22c55e;}.cu .sbarfill{background:#3b82f6;}
+.stxt{font-size:12px;color:#4b5563;margin-top:8px;}
 
-/* CATS */
-.cats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
-@media(max-width:640px){.cats-grid{grid-template-columns:1fr;}.sides-header{grid-template-columns:1fr;}}
-.cat-card{background:#fff;border:1px solid #e8eaf0;border-radius:12px;padding:14px 16px;}
-.cat-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
-.cat-name{font-size:13px;font-weight:500;color:#3d4466;}
-.cat-score{font-size:16px;font-weight:700;}
-.sc-hi{color:#16a34a;}.sc-md{color:#d97706;}.sc-lo{color:#dc2626;}
-.bar-bg{height:5px;background:#f0f1f5;border-radius:3px;margin-bottom:8px;}
-.bar-fill{height:5px;border-radius:3px;transition:width 1s ease;}
+.cgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.ccard{background:#fff;border:1px solid #e8eaf0;border-radius:12px;padding:14px 16px;}
+.chead{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.cname{font-size:13px;font-weight:500;color:#3d4466;}.cscore{font-size:16px;font-weight:700;}
+.hi{color:#16a34a;}.md{color:#d97706;}.lo{color:#dc2626;}
+.bbar{height:5px;background:#f0f1f5;border-radius:3px;margin-bottom:8px;}
+.bfill{height:5px;border-radius:3px;}
 .bhi{background:#22c55e;}.bmd{background:#f59e0b;}.blo{background:#ef4444;}
-.cat-comment{font-size:12px;color:#9098b1;line-height:1.55;}
+.cnote{font-size:11px;color:#4f46e5;margin-bottom:2px;}.cnote2{font-size:11px;color:#1e40af;}
 
-/* SECTIONS */
-.sec-card{background:#fff;border:1px solid #e8eaf0;border-radius:12px;padding:16px 18px;margin-bottom:10px;}
-.sec-title{font-size:12px;font-weight:600;color:#6c63ff;margin-bottom:8px;display:flex;align-items:center;gap:7px;text-transform:uppercase;letter-spacing:.5px;}
-.sec-dot{width:6px;height:6px;border-radius:50%;background:#6c63ff;flex-shrink:0;}
-.sec-text{font-size:13px;color:#5a6282;line-height:1.7;}
+.seccard{background:#fff;border:1px solid #e8eaf0;border-radius:12px;padding:16px 18px;margin-bottom:10px;}
+.sectit{font-size:12px;font-weight:600;color:#6c63ff;margin-bottom:8px;display:flex;align-items:center;gap:7px;text-transform:uppercase;letter-spacing:.5px;}
+.secdot{width:6px;height:6px;border-radius:50%;background:#6c63ff;flex-shrink:0;}
+.sectxt{font-size:13px;color:#5a6282;line-height:1.7;}
 
-/* RECS */
-.recs-box{background:#f8f7ff;border:1.5px solid #ddd8ff;border-radius:14px;padding:18px 20px;margin-bottom:16px;}
-.recs-box h3{font-size:13px;font-weight:600;color:#4f46e5;margin-bottom:12px;}
-.rec-row{display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;}
-.rec-n{width:22px;height:22px;border-radius:50%;background:#6c63ff;color:#fff;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
-.rec-text{font-size:13px;color:#5a6282;line-height:1.6;}
+.recs{background:#f8f7ff;border:1.5px solid #ddd8ff;border-radius:14px;padding:18px 20px;margin-bottom:16px;}
+.recs h3{font-size:13px;font-weight:600;color:#4f46e5;margin-bottom:12px;}
+.rrow{display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;}
+.rnum{width:22px;height:22px;border-radius:50%;background:#6c63ff;color:#fff;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.rtxt{font-size:13px;color:#5a6282;line-height:1.6;}
 
-/* AI CHAT */
-.ai-chat-box{background:#fff;border:1.5px solid #ddd8ff;border-radius:16px;overflow:hidden;margin-bottom:16px;}
-.ai-chat-header{background:linear-gradient(135deg,#6c63ff,#4f46e5);padding:14px 18px;display:flex;align-items:center;gap:10px;}
-.ai-chat-header h3{color:#fff;font-size:14px;font-weight:600;}
-.ai-chat-header p{color:rgba(255,255,255,.75);font-size:12px;}
-.ai-dot{width:8px;height:8px;border-radius:50%;background:#4ade80;animation:pulse 2s infinite;}
+/* General results */
+.gcard{background:#fff;border:1px solid #e8eaf0;border-radius:12px;padding:16px 18px;margin-bottom:10px;}
+
+/* Chat */
+.chatbox{background:#fff;border:1.5px solid #ddd8ff;border-radius:16px;overflow:hidden;margin-bottom:16px;}
+.chath{background:linear-gradient(135deg,#6c63ff,#4f46e5);padding:14px 18px;display:flex;align-items:center;gap:10px;}
+.chatdot{width:8px;height:8px;border-radius:50%;background:#4ade80;animation:pulse 2s infinite;}
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
-.chat-messages{padding:16px;max-height:320px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;}
-.chat-msg{max-width:80%;padding:10px 14px;border-radius:12px;font-size:13px;line-height:1.6;}
-.msg-ai{background:#f5f4ff;color:#3d4466;border-radius:12px 12px 12px 2px;align-self:flex-end;}
-.msg-user{background:#eeeeff;color:#1a1d2e;border-radius:12px 12px 2px 12px;align-self:flex-start;}
-.msg-loading{background:#f5f4ff;color:#9098b1;font-style:italic;align-self:flex-end;}
-.chat-input-row{display:flex;gap:8px;padding:12px 16px;border-top:1px solid #f0f1f5;background:#fafbff;}
-.chat-input{flex:1;padding:10px 14px;border-radius:10px;border:1.5px solid #e8eaf0;background:#fff;font-size:13px;font-family:'Heebo',sans-serif;outline:none;direction:rtl;}
-.chat-input:focus{border-color:#6c63ff;}
-.chat-send{padding:10px 16px;border-radius:10px;background:linear-gradient(135deg,#6c63ff,#4f46e5);border:none;color:#fff;font-size:13px;font-family:'Heebo',sans-serif;cursor:pointer;white-space:nowrap;}
-.chat-send:disabled{opacity:.5;cursor:not-allowed;}
+.chath h3{color:#fff;font-size:14px;font-weight:600;}.chath p{color:rgba(255,255,255,.75);font-size:12px;}
+.chatmsgs{padding:16px;max-height:300px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;}
+.cmsg{max-width:80%;padding:10px 14px;border-radius:12px;font-size:13px;line-height:1.6;}
+.cai{background:#f5f4ff;color:#3d4466;border-radius:12px 12px 12px 2px;align-self:flex-end;}
+.cuser{background:#eeeeff;color:#1a1d2e;border-radius:12px 12px 2px 12px;align-self:flex-start;}
+.cload{background:#f5f4ff;color:#9098b1;font-style:italic;align-self:flex-end;}
+.chatinrow{display:flex;gap:8px;padding:12px 16px;border-top:1px solid #f0f1f5;background:#fafbff;}
+.chatin{flex:1;padding:10px 14px;border-radius:10px;border:1.5px solid #e8eaf0;background:#fff;font-size:13px;font-family:'Heebo',sans-serif;outline:none;direction:rtl;}
+.chatin:focus{border-color:#6c63ff;}
+.chatsend{padding:10px 16px;border-radius:10px;background:linear-gradient(135deg,#6c63ff,#4f46e5);border:none;color:#fff;font-size:13px;font-family:'Heebo',sans-serif;cursor:pointer;}
+.chatsend:disabled{opacity:.5;cursor:not-allowed;}
 
-/* HISTORY */
-.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;}
-.stat-card{background:#fff;border:1px solid #e8eaf0;border-radius:14px;padding:18px 20px;}
-.stat-label{font-size:12px;color:#9098b1;margin-bottom:6px;}
-.stat-val{font-size:26px;font-weight:700;color:#1a1d2e;}
-.hist-item{background:#fff;border:1px solid #e8eaf0;border-radius:12px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:border-color .18s;margin-bottom:8px;}
-.hist-item:hover{border-color:#a5a0f5;}
-.hi-name{font-size:14px;font-weight:500;color:#1a1d2e;}
-.hi-meta{font-size:12px;color:#9098b1;margin-top:2px;}
-.hi-score{font-size:20px;font-weight:700;}
-.hist-empty{text-align:center;padding:40px;color:#c0c6d9;font-size:13px;background:#fff;border-radius:14px;border:1.5px dashed #e8eaf0;}
+/* History */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;}
+.stcard{background:#fff;border:1px solid #e8eaf0;border-radius:14px;padding:18px 20px;}
+.stlbl{font-size:12px;color:#9098b1;margin-bottom:6px;}.stval{font-size:26px;font-weight:700;}
+.hitem{background:#fff;border:1px solid #e8eaf0;border-radius:12px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:border-color .15s;margin-bottom:8px;}
+.hitem:hover{border-color:#a5a0f5;}
+.hname{font-size:14px;font-weight:500;}.hmeta{font-size:12px;color:#9098b1;margin-top:2px;}
+.hscore{font-size:20px;font-weight:700;}
+.hempty{text-align:center;padding:40px;color:#c0c6d9;font-size:13px;background:#fff;border-radius:14px;border:1.5px dashed #e8eaf0;}
 
-/* SETTINGS */
-.set-label{font-size:14px;font-weight:600;color:#1a1d2e;margin-bottom:12px;}
-.key-row{display:flex;gap:10px;}
-.key-row .field{flex:1;}
-.btn-save{padding:10px 20px;border-radius:10px;background:linear-gradient(135deg,#6c63ff,#4f46e5);border:none;color:#fff;font-family:'Heebo',sans-serif;font-size:13px;font-weight:600;cursor:pointer;height:42px;}
-.saved-note{display:none;align-items:center;gap:6px;font-size:12px;color:#16a34a;background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:6px 12px;margin-top:8px;width:fit-content;}
-.info-box{background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:14px 16px;font-size:13px;color:#1d4ed8;line-height:1.7;margin-top:16px;}
-.info-box a{color:#4f46e5;}
+/* Settings */
+.setlbl{font-size:14px;font-weight:600;margin-bottom:12px;}
+.krow{display:flex;gap:8px;margin-bottom:8px;align-items:center;}
+.krow .fi{flex:1;}
+.kremove{padding:6px 12px;border-radius:8px;border:1px solid #fecaca;background:#fff5f5;color:#dc2626;cursor:pointer;font-size:12px;font-family:'Heebo',sans-serif;margin-top:18px;}
+.snote{display:none;align-items:center;gap:6px;font-size:12px;color:#16a34a;background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:6px 12px;margin-top:8px;width:fit-content;}
+.ibox{background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:14px 16px;font-size:13px;color:#1d4ed8;line-height:1.7;margin-top:14px;}
+.ibox a{color:#4f46e5;}
 
-.page-footer {
-  text-align: center;
-  padding: 28px 0 8px;
-  font-size: 12px;
-  font-weight: 600;
-  color: #9098b1;
-  border-top: 1px solid #e8eaf0;
-  margin-top: 32px;
-  letter-spacing: 0.3px;
-}
-.page-footer span {
-  color: #4f46e5;
-  font-weight: 700;
-}
+.pfooter{text-align:center;padding:24px 0 4px;font-size:12px;font-weight:600;color:#9098b1;border-top:1px solid #e8eaf0;margin-top:28px;letter-spacing:.3px;}
+.pfooter span{color:#4f46e5;font-weight:700;}
+
+@media(max-width:640px){.cgrid,.sides{grid-template-columns:1fr;}}
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
 
 <nav class="sidebar">
-  <div class="sidebar-logo">
-    <div class="logo-row">
-      <div class="logo-icon">🎧</div>
-      <div><div class="logo-title">מוקד AI</div><div class="logo-sub">ביקורת שיחות</div></div>
-    </div>
+  <div class="logo">
+    <div class="logo-icon">🎧</div>
+    <div><div class="logo-title">מוקד AI</div><div class="logo-sub">ביקורת שיחות</div></div>
   </div>
-  <div class="sidebar-nav">
-    <div class="nav-label">ניתוח</div>
-    <button class="nav-item active" id="nav-analyze" onclick="navTo('analyze',this)"><span class="icon">🎙️</span>תמלול וניתוח</button>
-    <button class="nav-item" id="nav-history" onclick="navTo('history',this)"><span class="icon">📋</span>היסטוריה</button>
-    <div class="nav-label" style="margin-top:10px">מערכת</div>
-    <button class="nav-item" id="nav-settings" onclick="navTo('settings',this)"><span class="icon">⚙️</span>הגדרות</button>
+  <div class="nav">
+    <div class="nav-lbl">ניתוח</div>
+    <button class="nav-btn active" onclick="navTo('analyze',this)"><span class="ic">🎙️</span>תמלול וניתוח</button>
+    <button class="nav-btn" onclick="navTo('history',this)"><span class="ic">📋</span>היסטוריה</button>
+    <div class="nav-lbl" style="margin-top:10px">מערכת</div>
+    <button class="nav-btn" onclick="navTo('settings',this)"><span class="ic">⚙️</span>הגדרות</button>
   </div>
-  <div class="sidebar-footer">מופעל על ידי<br>Google Gemini</div>
+  <div class="side-footer">מופעל על ידי<br>Google Gemini</div>
 </nav>
 
 <main class="main">
 
-  <!-- ANALYZE PAGE -->
-  <div class="page active" id="page-analyze">
-    <div class="page-header">
-      <h1>ניתוח שיחה</h1>
-      <p>העלה קובץ שמע וקבל דוח איכות מלא + שיחה עם סוכן AI</p>
-    </div>
+<!-- ANALYZE -->
+<div class="pg active" id="pg-analyze">
+  <div class="ph"><h1>ניתוח שיחה</h1><p>העלה קובץ שמע וקבל דוח איכות מלא + שיחה עם סוכן AI</p></div>
 
-    <div id="analyzeForm">
-      <div class="card">
-        <div class="card-title">📊 סוג השיחה</div>
-        <div class="type-btns">
-          <button class="type-btn active" id="btnSales" onclick="setType('sales',this)">📈 שיחת מכירה</button>
-          <button class="type-btn" id="btnService" onclick="setType('service',this)">🎧 שיחת שירות</button>
-          <button class="type-btn" id="btnGeneral" onclick="setType('general',this)">💬 כללי</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-title">👤 פרטי השיחה</div>
-        <div class="field-row">
-          <div class="field" id="agentNameField"><label>שם הנציג</label><input type="text" id="agentName" placeholder="לדוגמה: יוסי כהן"></div>
-          <div class="field" style="flex:.6"><label>מזהה שיחה</label><input type="text" id="callId" placeholder="#4521"></div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-title">📁 קובץ השיחה</div>
-        <div class="upload-zone">
-          <input type="file" id="audioInput" accept="audio/*,video/*,.mp3,.wav,.m4a,.mp4,.wmv,.aac,.ogg,.flac,.wma">
-          <div class="uz-icon">🎙️</div>
-          <h3>גרור קובץ שמע לכאן</h3>
-          <p>MP3, WAV, WMV, MP4, M4A, AAC ועוד</p>
-        </div>
-        <div id="fileChip" style="display:none" class="file-chip">✓ <span id="fileName"></span></div>
-        <div class="or-line">או הדבק תמלול ישירות</div>
-        <textarea class="tarea" id="manualText" placeholder="נציג: שלום, מדבר יוסי...&#10;לקוח: שלום, יש לי בעיה עם..."></textarea>
-      </div>
-
-      <div class="err-box" id="errBox"></div>
-      <button class="btn-primary" onclick="runAnalysis()">נתח שיחה ✦</button>
-    </div>
-
-    <div class="loading" id="loadingDiv">
-      <div class="spinner"></div>
-      <p id="loadingMsg">מכין ניתוח...</p>
-    </div>
-
-    <div id="resultsDiv" style="display:none">
-      <div class="res-topbar">
-        <h2>תוצאות ניתוח</h2>
-        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-          <span class="agent-pill" id="agentPill"></span>
-          <button class="btn-sec" onclick="downloadPDF()">📄 הורד PDF</button>
-          <button class="btn-sec" onclick="resetForm()">+ שיחה חדשה</button>
-        </div>
-      </div>
-
-      <!-- Score Banner -->
-      <div class="score-banner">
-        <div class="score-circle"><div class="snum" id="rScore">-</div><div class="sdenom">/ 100</div></div>
-        <div class="score-info">
-          <h3 id="rGrade"></h3>
-          <p id="rGradeText"></p>
-          <div class="mood-tag" id="rMood"></div>
-        </div>
-      </div>
-
-      <!-- Agent vs Customer -->
-      <div class="sides-header" id="rSides"></div>
-
-      <!-- Categories -->
-      <div class="cats-grid" id="rCats"></div>
-
-      <!-- Sections -->
-      <div id="rSections"></div>
-
-      <!-- Recommendations -->
-      <div class="recs-box" id="rRecs"></div>
-
-      <!-- General transcript display -->
-      <div id="rGeneral" style="display:none"></div>
-
-      <!-- AI Agent Chat -->
-      <div class="ai-chat-box">
-        <div class="ai-chat-header">
-          <div class="ai-dot"></div>
-          <div>
-            <h3>סוכן AI — שאל שאלות על השיחה</h3>
-            <p>שאל כל שאלה על השיחה שנותחה</p>
-          </div>
-        </div>
-        <div class="chat-messages" id="chatMessages">
-          <div class="chat-msg msg-ai">שלום! אני סוכן AI ואני מכיר את השיחה שנותחה. תוכל לשאול אותי כל שאלה — על ביצועי הנציג, על תגובות הלקוח, על מה ניתן לשפר ועוד. 💬</div>
-        </div>
-        <div class="chat-input-row">
-          <input type="text" class="chat-input" id="chatInput" placeholder="לדוגמה: איפה הנציג איבד את הלקוח?" onkeydown="if(event.key==='Enter')sendChat()">
-          <button class="chat-send" id="chatSendBtn" onclick="sendChat()">שלח ↑</button>
-        </div>
-      </div>
-
-    </div>
-
-      <div class="page-footer">© כל הזכויות שמורות ל<span>אדיר לוי</span></div>
-  </div>
-
-  <!-- HISTORY PAGE -->
-  <div class="page" id="page-history">
-    <div class="page-header"><h1>היסטוריה</h1><p>כל השיחות שנותחו</p></div>
-    <div class="stats-row" id="statsRow"></div>
-    <div id="histList"></div>
-    <div style="margin-top:12px">
-      <button class="btn-sec" onclick="clearHistory()" style="font-size:12px;color:#dc2626;border-color:#fecaca">🗑 נקה היסטוריה</button>
-    </div>
-
-      <div class="page-footer">© כל הזכויות שמורות ל<span>אדיר לוי</span></div>
-  </div>
-
-  <!-- SETTINGS PAGE -->
-  <div class="page" id="page-settings">
-    <div class="page-header"><h1>הגדרות</h1><p>מפתח API ובחירת מודל</p></div>
+  <div id="analyzeForm">
     <div class="card">
-      <div class="set-label">🔑 מפתח Gemini API</div>
-      <div class="key-row">
-        <div class="field"><label>המפתח שלך</label><input type="password" id="apiKeyInput" placeholder="AIza..."></div>
-        <button class="btn-save" onclick="saveKey()">שמור</button>
+      <div class="ctitle">📊 סוג השיחה</div>
+      <div class="type-row">
+        <button class="tbtn on" id="btnSales" onclick="setType('sales',this)">📈 מכירה</button>
+        <button class="tbtn" id="btnService" onclick="setType('service',this)">🎧 שירות</button>
+        <button class="tbtn" id="btnGeneral" onclick="setType('general',this)">💬 כללי</button>
       </div>
-      <div class="saved-note" id="savedNote">✓ נשמר בהצלחה</div>
-      <div class="info-box">
-        <strong>קבלת מפתח חינמי:</strong><br>
-        1. כנס ל: <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com/app/apikey</a><br>
-        2. התחבר עם Google ← לחץ <strong>Create API Key</strong><br>
-        3. העתק והדבק כאן<br><br>
-        <strong>חינמי לחלוטין · ללא כרטיס אשראי</strong><br><br>
-        💡 <strong>טיפ:</strong> אם מקבלים שגיאת מגבלה — המערכת תמתין אוטומטית ותנסה שוב. אפשר גם לעבור ל-Flash Lite בהגדרות המודל.
+    </div>
+    <div class="card" id="agentCard">
+      <div class="ctitle">👤 פרטי השיחה</div>
+      <div class="frow">
+        <div class="fi"><label>שם הנציג</label><input type="text" id="agentName" placeholder="לדוגמה: יוסי כהן"></div>
+        <div class="fi" style="flex:.6"><label>מזהה שיחה</label><input type="text" id="callId" placeholder="#4521"></div>
       </div>
     </div>
     <div class="card">
-      <div class="set-label">🤖 מודל AI</div>
-      <div class="field" style="margin-bottom:12px">
-        <label>מודל פעיל</label>
-        <select id="modelSel">
-          <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash Lite — חינמי, מגבלות גבוהות (מומלץ)</option>
-          <option value="gemini-2.5-flash">Gemini 2.5 Flash — מדויק יותר</option>
-          <option value="gemini-2.5-pro">Gemini 2.5 Pro — הכי מדויק</option>
-        </select>
+      <div class="ctitle">📁 קובץ השיחה</div>
+      <div class="upzone">
+        <input type="file" id="audioInput" accept="audio/*,video/*,.mp3,.wav,.m4a,.mp4,.wmv,.aac,.ogg,.flac,.wma,.amr">
+        <div class="uic">🎙️</div>
+        <h3>גרור קובץ שמע לכאן</h3>
+        <p>MP3, WAV, WMV, MP4, M4A, AAC, AMR ועוד</p>
       </div>
-      <button class="btn-save" onclick="saveModel()">שמור מודל</button>
+      <div class="fchip" id="fchip">✓ <span id="fname"></span></div>
+      <div id="audioPlayerWrap" style="display:none;margin-top:10px">
+        <audio id="audioPlayer" controls style="width:100%;border-radius:8px;margin-top:4px"></audio>
+      </div>
+      <div class="orline">או הדבק תמלול ישירות</div>
+      <textarea class="ta" id="manualText" placeholder="נציג: שלום...&#10;לקוח: שלום..."></textarea>
     </div>
-
-      <div class="page-footer">© כל הזכויות שמורות ל<span>אדיר לוי</span></div>
+    <div class="err" id="errBox"></div>
+    <button class="btn-p" onclick="runAnalysis()">נתח שיחה ✦</button>
   </div>
+
+  <div class="loading" id="loadDiv"><div class="spin"></div><p id="loadMsg">מנתח...</p></div>
+
+  <div id="resDiv" style="display:none">
+    <div class="rtop">
+      <h2>תוצאות ניתוח</h2>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <span class="pill" id="agPill"></span>
+        <button class="btn-s" onclick="downloadPDF()">📄 PDF</button>
+        <button class="btn-s" onclick="resetForm()">+ שיחה חדשה</button>
+      </div>
+    </div>
+    <div class="banner">
+      <div class="scircle"><div class="snum" id="rScore">-</div><div class="sdenom">/ 100</div></div>
+      <div class="sinfo"><h3 id="rGrade"></h3><p id="rGradeText"></p><div class="mood" id="rMood"></div></div>
+    </div>
+    <div class="sides" id="rSides"></div>
+    <div class="cgrid" id="rCats"></div>
+    <div id="rSecs"></div>
+    <div class="recs" id="rRecs"></div>
+    <div id="rGeneral" style="display:none"></div>
+    <div id="resultPlayerWrap" style="display:none;margin-bottom:16px">
+      <div class="card" style="padding:14px 18px">
+        <div class="ctitle" style="margin-bottom:10px">🔊 השמע את השיחה</div>
+        <audio id="resultPlayer" controls style="width:100%;border-radius:8px"></audio>
+      </div>
+    </div>
+    <div class="chatbox">
+      <div class="chath"><div class="chatdot"></div><div><h3>סוכן AI — שאל על השיחה</h3><p>שאל כל שאלה על השיחה שנותחה</p></div></div>
+      <div class="chatmsgs" id="chatMsgs"><div class="cmsg cai">שלום! אני מכיר את השיחה שנותחה. שאל אותי כל שאלה 💬</div></div>
+      <div class="chatinrow">
+        <input type="text" class="chatin" id="chatIn" placeholder="לדוגמה: מה שם הנציג?" onkeydown="if(event.key==='Enter')sendChat()">
+        <button class="chatsend" id="chatBtn" onclick="sendChat()">שלח ↑</button>
+      </div>
+    </div>
+  </div>
+  <div class="pfooter">© כל הזכויות שמורות ל<span>אדיר לוי</span></div>
+</div>
+
+<!-- HISTORY -->
+<div class="pg" id="pg-history">
+  <div class="ph"><h1>היסטוריה</h1><p>כל השיחות שנותחו</p></div>
+  <div class="stats" id="statsRow"></div>
+  <div id="histList"></div>
+  <div style="margin-top:12px"><button class="btn-s" onclick="clearHist()" style="color:#dc2626;border-color:#fecaca;font-size:12px">🗑 נקה היסטוריה</button></div>
+  <div class="pfooter">© כל הזכויות שמורות ל<span>אדיר לוי</span></div>
+</div>
+
+<!-- SETTINGS -->
+<div class="pg" id="pg-settings">
+  <div class="ph"><h1>הגדרות</h1><p>מפתחות API ומודל</p></div>
+  <div class="card">
+    <div class="setlbl">🔑 מפתחות Gemini API — סיבוב אוטומטי</div>
+    <p style="font-size:12px;color:#9098b1;margin-bottom:14px">הוסף עד 5 מפתחות ממפרויקטים שונים — המערכת תסובב ביניהם אוטומטית</p>
+    <div id="keysList"></div>
+    <button class="btn-s" onclick="addKeyField()" style="margin-top:8px;font-size:13px">+ הוסף מפתח</button>
+    <div style="margin-top:12px"><button class="btn-save" onclick="saveKeys()">שמור מפתחות</button></div>
+    <div class="snote" id="snote">✓ נשמר!</div>
+    <div class="ibox">
+      <strong>קבלת מפתח חינמי:</strong><br>
+      1. כנס ל: <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com/app/apikey</a><br>
+      2. לחץ <strong>Create API key in new project</strong> (כל פרויקט = מגבלה נפרדת!)<br>
+      3. חזור ולחץ שוב לקבלת מפתח נוסף<br><br>
+      <strong>✓ חינמי לחלוטין · ללא כרטיס אשראי</strong>
+    </div>
+  </div>
+  <div class="card">
+    <div class="setlbl">🤖 מודל AI</div>
+    <div class="fi" style="margin-bottom:12px">
+      <label>מודל פעיל</label>
+      <select id="modelSel">
+        <option value="gemini-2.5-flash">Gemini 2.5 Flash — מומלץ לאודיו</option>
+        <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash Lite — מהיר יותר</option>
+        <option value="gemini-2.5-pro">Gemini 2.5 Pro — הכי מדויק</option>
+      </select>
+    </div>
+    <button class="btn-save" onclick="saveModel()">שמור</button>
+  </div>
+  <div class="pfooter">© כל הזכויות שמורות ל<span>אדיר לוי</span></div>
+</div>
 
 </main>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
-// ─── STATE ──────────────────────────────────
-let callType = 'sales';
-let selectedFile = null;
-let currentAnalysis = null; // stores full analysis + transcript for chat
-let history = [];
-try { history = JSON.parse(localStorage.getItem('cqHistory') || '[]'); } catch(e) { history = []; }
+// ── STATE ─────────────────────────────────────────────
+var callType = 'sales';
+var selectedFile = null;
+var currentAnalysis = null;
+var hist = [];
+try { hist = JSON.parse(localStorage.getItem('cqHist') || '[]'); } catch(e){}
 
-// ─── INIT ────────────────────────────────────
-window.addEventListener('DOMContentLoaded', () => {
-  const key = localStorage.getItem('geminiKey') || '';
-  if (key) { document.getElementById('apiKeyInput').value = key; document.getElementById('savedNote').style.display='flex'; }
-  document.getElementById('modelSel').value = localStorage.getItem('geminiModel') || 'gemini-2.5-flash-lite';
-  document.getElementById('audioInput').addEventListener('change', e => {
-    const f = e.target.files[0];
+// ── INIT ──────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', function() {
+  loadKeyFields();
+  var ms = document.getElementById('modelSel');
+  if (ms) ms.value = localStorage.getItem('geminiModel') || 'gemini-2.5-flash';
+  var ai = document.getElementById('audioInput');
+  if (ai) ai.addEventListener('change', function(e) {
+    var f = e.target.files[0];
     if (!f) return;
     selectedFile = f;
-    document.getElementById('fileName').textContent = f.name + ' (' + (f.size/1024/1024).toFixed(1) + ' MB)';
-    document.getElementById('fileChip').style.display = 'inline-flex';
+    document.getElementById('fname').textContent = f.name + ' (' + (f.size/1024/1024).toFixed(1) + ' MB)';
+    document.getElementById('fchip').style.display = 'flex';
+    // Setup audio player
+    var url = URL.createObjectURL(f);
+    var ap = document.getElementById('audioPlayer');
+    var rp = document.getElementById('resultPlayer');
+    if (ap) { ap.src = url; document.getElementById('audioPlayerWrap').style.display = 'block'; }
+    if (rp) { rp.src = url; }
   });
-  renderHistory();
+  renderHist();
 });
 
-// ─── NAV ─────────────────────────────────────
-function navTo(page, btn) {
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  document.getElementById('page-'+page).classList.add('active');
+// ── NAV ───────────────────────────────────────────────
+function navTo(pg, btn) {
+  document.querySelectorAll('.pg').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.nav-btn').forEach(function(b){b.classList.remove('active');});
+  document.getElementById('pg-'+pg).classList.add('active');
   btn.classList.add('active');
-  if (page==='history') renderHistory();
+  if (pg === 'history') renderHist();
 }
 
-// ─── SETTINGS ────────────────────────────────
-function saveKey() {
-  const k = document.getElementById('apiKeyInput').value.trim();
-  if (!k) return;
-  localStorage.setItem('geminiKey', k);
-  const n = document.getElementById('savedNote');
-  n.style.display='flex';
-  setTimeout(()=>n.style.display='none', 3000);
-}
-function saveModel() { localStorage.setItem('geminiModel', document.getElementById('modelSel').value); }
+// ── TYPE ──────────────────────────────────────────────
 function setType(t, btn) {
   callType = t;
-  document.querySelectorAll('.type-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  // Show/hide agent name field for general mode
-  const agentField = document.getElementById('agentNameField');
-  if (agentField) agentField.style.display = t==='general' ? 'none' : 'block';
+  document.querySelectorAll('.tbtn').forEach(function(b){b.classList.remove('on');});
+  btn.classList.add('on');
+  var ac = document.getElementById('agentCard');
+  if (ac) ac.style.display = t === 'general' ? 'none' : 'block';
 }
 
-// ─── UPLOAD ───────────────────────────────────
-async function uploadFile(file, apiKey) {
-  setMsg('מעלה קובץ לשרת...');
-  const mime = getAudioMime(file);
-  const initRes = await fetch('https://generativelanguage.googleapis.com/upload/v1beta/files?key='+apiKey, {
-    method:'POST',
-    headers:{
-      'X-Goog-Upload-Protocol':'resumable','X-Goog-Upload-Command':'start',
-      'X-Goog-Upload-Header-Content-Length':String(file.size),
-      'X-Goog-Upload-Header-Content-Type':mime,'Content-Type':'application/json'
-    },
-    body: JSON.stringify({file:{display_name:file.name}})
-  });
-  if (!initRes.ok) throw new Error('שגיאה בהתחלת העלאה ('+initRes.status+')');
-  const uploadUrl = initRes.headers.get('X-Goog-Upload-URL');
-  if (!uploadUrl) throw new Error('לא התקבל URL להעלאה');
-
-  setMsg('מעלה קובץ... ('+( file.size/1024/1024).toFixed(1)+' MB)');
-  const upRes = await fetch(uploadUrl, {
-    method:'POST',
-    headers:{'Content-Length':String(file.size),'X-Goog-Upload-Offset':'0','X-Goog-Upload-Command':'upload, finalize','Content-Type':mime},
-    body: file
-  });
-  if (!upRes.ok) throw new Error('שגיאה בהעלאה ('+upRes.status+')');
-  const upData = await upRes.json();
-  const fileUri = upData?.file?.uri;
-  const fileName = upData?.file?.name;
-  if (!fileUri) throw new Error('לא התקבל URI מהשרת');
-
-  setMsg('מעבד קובץ שמע...');
-  let state = upData?.file?.state || 'PROCESSING';
-  let tries = 0;
-  while (state==='PROCESSING' && tries<30) {
-    await new Promise(r=>setTimeout(r,2000)); tries++;
-    const stRes = await fetch('https://generativelanguage.googleapis.com/v1beta/'+fileName+'?key='+apiKey);
-    const stData = await stRes.json();
-    state = stData?.file?.state || stData?.state || 'ACTIVE';
-  }
-  if (state==='FAILED') throw new Error('עיבוד הקובץ נכשל בשרת');
-  return { uri: fileUri, mimeType: mime };
+// ── KEY MANAGEMENT ────────────────────────────────────
+function getKeys() {
+  try { return JSON.parse(localStorage.getItem('geminiKeys') || '[]').filter(function(k){return k.trim();}); }
+  catch(e) { return []; }
+}
+function getKey() {
+  var keys = getKeys();
+  if (!keys.length) return '';
+  var idx = parseInt(localStorage.getItem('geminiKeyIdx') || '0') % keys.length;
+  return keys[idx];
+}
+function rotateKey() {
+  var keys = getKeys();
+  if (keys.length < 2) return getKey();
+  var idx = (parseInt(localStorage.getItem('geminiKeyIdx') || '0') + 1) % keys.length;
+  localStorage.setItem('geminiKeyIdx', String(idx));
+  setMsg('עובר למפתח ' + (idx+1) + '...');
+  return keys[idx];
+}
+function loadKeyFields() {
+  var list = document.getElementById('keysList');
+  if (!list) return;
+  list.innerHTML = '';
+  var keys = getKeys();
+  var arr = keys.length ? keys : [''];
+  arr.forEach(function(k, i) { addKeyRow(k, i); });
+}
+function addKeyField() {
+  var list = document.getElementById('keysList');
+  if (!list) return;
+  addKeyRow('', list.children.length);
+}
+function addKeyRow(val, idx) {
+  var list = document.getElementById('keysList');
+  var d = document.createElement('div');
+  d.className = 'krow';
+  d.innerHTML = '<div class="fi"><label>מפתח '+(idx+1)+'</label><input type="password" class="kInput" placeholder="AIza..." value="'+val+'"></div>'
+    + (idx > 0 ? '<button class="kremove" onclick="this.parentElement.remove()">הסר</button>' : '');
+  list.appendChild(d);
+}
+function saveKeys() {
+  var inputs = document.querySelectorAll('.kInput');
+  var keys = Array.from(inputs).map(function(i){return i.value.trim();}).filter(function(k){return k;});
+  localStorage.setItem('geminiKeys', JSON.stringify(keys));
+  localStorage.setItem('geminiKeyIdx', '0');
+  var n = document.getElementById('snote');
+  n.textContent = '✓ ' + keys.length + ' מפתח' + (keys.length===1?'':'ות') + ' נשמרו';
+  n.style.display = 'flex';
+  setTimeout(function(){n.style.display='none';}, 3000);
+}
+function saveModel() {
+  localStorage.setItem('geminiModel', document.getElementById('modelSel').value);
+  alert('מודל עודכן!');
 }
 
-function fileToBase64(file) {
-  return new Promise((res, rej) => {
-    const reader = new FileReader();
-    reader.onload = e => res(e.target.result.split(',')[1]);
-    reader.onerror = rej;
-    reader.readAsDataURL(file);
+// ── HELPERS ───────────────────────────────────────────
+function setMsg(t) { var el = document.getElementById('loadMsg'); if(el) el.textContent = t; }
+function showErr(msg) { var e = document.getElementById('errBox'); e.textContent = msg; e.style.display = 'block'; }
+function fileToB64(file) {
+  return new Promise(function(res, rej) {
+    var r = new FileReader();
+    r.onload = function(e) { res(e.target.result.split(',')[1]); };
+    r.onerror = rej;
+    r.readAsDataURL(file);
   });
 }
-
-function getAudioMime(file) {
-  const ext = file.name.split('.').pop().toLowerCase();
-  const map = {mp3:'audio/mpeg',wav:'audio/wav',m4a:'audio/mp4',aac:'audio/aac',ogg:'audio/ogg',flac:'audio/flac',wma:'audio/x-ms-wma',opus:'audio/opus',mp4:'video/mp4',wmv:'video/x-ms-wmv',avi:'video/x-msvideo',mov:'video/quicktime',webm:'video/webm'};
-  if (file.type && file.type!=='application/octet-stream') return file.type;
+function getMime(file) {
+  var ext = file.name.split('.').pop().toLowerCase();
+  var map = {mp3:'audio/mpeg',wav:'audio/wav',m4a:'audio/mp4',aac:'audio/aac',ogg:'audio/ogg',flac:'audio/flac',wma:'audio/x-ms-wma',amr:'audio/amr',mp4:'video/mp4',wmv:'video/x-ms-wmv',avi:'video/x-msvideo',mov:'video/quicktime',webm:'video/webm'};
+  if (file.type && file.type !== 'application/octet-stream') return file.type;
   return map[ext] || 'audio/mpeg';
 }
 
-// ─── GEMINI CALL ──────────────────────────────
-async function callGemini(parts, model, apiKey, maxTokens=8192, jsonMode=true) {
-  for (let attempt=0; attempt<5; attempt++) {
-    if (attempt>0) {
-      const waitSec = attempt<=2 ? 15 : 30;
-      for (let s=waitSec; s>0; s--) {
-        setMsg('ממתין '+s+' שניות לפני ניסיון '+(attempt+1)+'...');
-        await new Promise(r=>setTimeout(r,1000));
+// ── API CALL ──────────────────────────────────────────
+async function callGemini(parts, maxTokens, jsonMode) {
+  maxTokens = maxTokens || 8192;
+  jsonMode = jsonMode !== false;
+  var model = localStorage.getItem('geminiModel') || 'gemini-2.5-flash';
+  var apiKey = getKey();
+  if (!apiKey) throw new Error('נא לשמור מפתח Gemini בהגדרות');
+
+  for (var attempt = 0; attempt < 4; attempt++) {
+    if (attempt > 0) {
+      var wait = 15;
+      for (var s = wait; s > 0; s--) {
+        setMsg('ממתין ' + s + ' שניות...');
+        await new Promise(function(r){setTimeout(r,1000);});
       }
     }
-    const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+model+':generateContent?key='+apiKey, {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ contents:[{parts}], generationConfig:{temperature:0.3, maxOutputTokens:maxTokens, ...(jsonMode ? {responseMimeType:'application/json'} : {})} })
+    var body = { contents:[{parts:parts}], generationConfig:{temperature:0.3, maxOutputTokens:maxTokens} };
+    if (jsonMode) body.generationConfig.responseMimeType = 'application/json';
+
+    var res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+model+':generateContent?key='+apiKey, {
+      method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)
     });
-    const d = await res.json();
+    var d = await res.json();
+
     if (d.error) {
-      const msg = d.error.message || '';
-      // Extract wait time from error if available
-      const waitMatch = msg.match(/retry in ([0-9.]+)s/i);
-      const waitMs = waitMatch ? Math.ceil(parseFloat(waitMatch[1])+2)*1000 : null;
-      const isQuota = msg.includes('quota') || msg.includes('429') || msg.includes('RESOURCE_EXHAUSTED');
-      const isOverload = msg.includes('high demand')||msg.includes('overloaded')||msg.includes('503');
-      if (attempt<4 && (isQuota||isOverload)) {
-        if (waitMs) {
-          const secs = Math.ceil(waitMs/1000);
-          for (let s=secs; s>0; s--) {
-            setMsg('מגבלת API — ממתין '+s+' שניות...');
-            await new Promise(r=>setTimeout(r,1000));
-          }
-        }
-        continue;
-      }
+      var msg = d.error.message || '';
+      var isQuota = msg.includes('quota') || msg.includes('RESOURCE_EXHAUSTED') || res.status === 429;
+      if (isQuota && attempt < 3) { apiKey = rotateKey(); continue; }
       throw new Error(msg);
     }
     return d;
   }
-  throw new Error('חרגת ממגבלת ה-API החינמי. נסה שוב בעוד מספר דקות.');
+  throw new Error('חרגת ממגבלת API. נסה שוב בעוד דקה.');
 }
 
 function parseJSON(raw) {
-  // With responseMimeType:'application/json', Gemini always returns valid JSON
-  // But we still handle edge cases just in case
-  let clean = raw.trim();
-  // Strip markdown fences if somehow present
-  clean = clean.replace(/^```json\s*/,'').replace(/\s*```$/,'');
-  // Find JSON object boundaries
-  const si = clean.indexOf('{'), ei = clean.lastIndexOf('}');
+  var clean = raw.trim();
+
+  // New format: JSON section + TRANSCRIPT section
+  var transcript = '';
+  var jsonPart = clean;
+
+  // Extract TRANSCRIPT section if present
+  var tSplit = clean.indexOf('\nTRANSCRIPT:');
+  if (tSplit === -1) tSplit = clean.indexOf('\nTranscript:');
+  if (tSplit === -1) tSplit = clean.indexOf('\ntranscript:');
+  if (tSplit !== -1) {
+    transcript = clean.slice(tSplit).replace(/^\n(TRANSCRIPT|Transcript|transcript):\s*/,'').trim();
+    jsonPart = clean.slice(0, tSplit);
+  }
+
+  // Strip JSON: header if present
+  jsonPart = jsonPart.replace(/^JSON:\s*/,'').trim();
+  jsonPart = jsonPart.replace(/^```json\s*/,'').replace(/\s*```$/,'');
+
+  // Fix trailing commas
+  jsonPart = jsonPart.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '');
+  jsonPart = jsonPart.replace(/,\s*([}\]])/g, '$1');
+
+  var si = jsonPart.indexOf('{'), ei = jsonPart.lastIndexOf('}');
   if (si === -1 || ei === -1) throw new Error('לא נמצא JSON בתשובה');
-  clean = clean.slice(si, ei+1);
-  const result = JSON.parse(clean);
+  jsonPart = jsonPart.slice(si, ei+1);
 
-  // Normalize transcript — convert array format to string
-  if (Array.isArray(result.transcript)) {
-    result.transcript = result.transcript
-      .map(t => (t.speaker || t.name || '') + ': ' + (t.text || t.content || ''))
-      .join('\n');
-  }
+  var result = JSON.parse(jsonPart);
 
-  // Normalize keyMoments — extract text if objects
-  if (Array.isArray(result.keyMoments)) {
-    result.keyMoments = result.keyMoments.map(m =>
-      typeof m === 'string' ? m : (m.text || m.description || JSON.stringify(m))
-    );
-  }
-
-  // Fix boolean fields that come as strings
-  ['resolved','closing'].forEach(k => {
-    if (typeof result[k] === 'string') {
-      result[k] = result[k] === 'true';
+  // Use extracted transcript or from JSON if included
+  if (transcript) {
+    result.transcript = transcript;
+  } else if (result.transcript) {
+    if (Array.isArray(result.transcript)) {
+      result.transcript = result.transcript.map(function(t){
+        return (t.speaker||t.name||'') + ': ' + (t.text||t.content||'');
+      }).join('\n');
     }
-  });
-
-  // Fix zero scores — if model returned zeros, likely didn't fill in
-  if (result.totalScore === 0 && result.agentScore === 0) {
-    // scores are genuinely empty, leave as is
   }
+
+  if (Array.isArray(result.keyMoments)) {
+    result.keyMoments = result.keyMoments.map(function(m){
+      return typeof m === 'string' ? m : (m.text||m.description||'');
+    });
+  }
+  if (typeof result.resolved === 'string') result.resolved = result.resolved === 'true';
+
+  // Translate grade to Hebrew
+  var gradeMap = {'A':'מצוין','B':'טוב','C':'בינוני','D':'טעון שיפור',
+    'Excellent':'מצוין','Good':'טוב','Fair':'בינוני','Poor':'טעון שיפור',
+    'excellent':'מצוין','good':'טוב','fair':'בינוני','poor':'טעון שיפור',
+    'needs improvement':'טעון שיפור','Needs Improvement':'טעון שיפור',
+    'Average':'בינוני','average':'בינוני'};
+  if (result.grade && gradeMap[result.grade]) result.grade = gradeMap[result.grade];
+
+  // Translate mood to Hebrew
+  var moodMap = {'Positive':'חיובי','Negative':'שלילי','Neutral':'ניטרלי',
+    'positive':'חיובי','negative':'שלילי','neutral':'ניטרלי',
+    'Angry':'לקוח כועס','angry':'לקוח כועס','Very Satisfied':'לקוח מרוצה מאוד',
+    'very satisfied':'לקוח מרוצה מאוד','Happy':'חיובי','happy':'חיובי'};
+  if (result.mood && moodMap[result.mood]) result.mood = moodMap[result.mood];
 
   return result;
 }
 
-// ─── MAIN ANALYSIS ────────────────────────────
+// ── ANALYSIS ──────────────────────────────────────────
 async function runAnalysis() {
-  const apiKey = localStorage.getItem('geminiKey');
-  if (!apiKey) { showErr('נא לשמור מפתח Gemini בהגדרות תחילה'); return; }
-  const manualText = document.getElementById('manualText').value.trim();
-  if (!selectedFile && !manualText) { showErr('נא להעלות קובץ שמע או להדביק תמלול'); return; }
+  if (!getKeys().length) { showErr('נא לשמור מפתח Gemini בהגדרות תחילה'); return; }
+  var manual = document.getElementById('manualText').value.trim();
+  if (!selectedFile && !manual) { showErr('נא להעלות קובץ שמע או להדביק טקסט'); return; }
 
-  const agentName = document.getElementById('agentName').value.trim() || 'הנציג';
-  const callId = document.getElementById('callId').value.trim() || '#'+Date.now().toString().slice(-4);
-  const model = localStorage.getItem('geminiModel') || 'gemini-2.5-flash';
-  const typeLabel = callType==='sales' ? 'מכירה' : callType==='service' ? 'שירות לקוחות' : 'כללי';
-  const agentRole = callType==='sales' ? 'נציג מכירות' : callType==='service' ? 'נציג שירות' : '';
+  var agentName = document.getElementById('agentName').value.trim() || 'הנציג';
+  var callId = document.getElementById('callId').value.trim() || '#' + Date.now().toString().slice(-4);
+  var typeLabel = callType==='sales'?'מכירה':callType==='service'?'שירות לקוחות':'כללי';
+  var agentRole = callType==='sales'?'נציג מכירות':callType==='service'?'נציג שירות':'';
 
-  document.getElementById('analyzeForm').style.display='none';
-  document.getElementById('errBox').style.display='none';
-  document.getElementById('loadingDiv').style.display='block';
-  document.getElementById('resultsDiv').style.display='none';
+  document.getElementById('analyzeForm').style.display = 'none';
+  document.getElementById('errBox').style.display = 'none';
+  document.getElementById('loadDiv').style.display = 'block';
+  document.getElementById('resDiv').style.display = 'none';
 
   try {
-    let parts = [];
-    let transcriptText = manualText;
+    var parts = [];
+    var transcriptText = manual;
 
-    // Single API call: transcribe + analyze together
-    setMsg('מתמלל ומנתח...');
     if (selectedFile) {
-      const mimeType = getAudioMime(selectedFile);
-      const b64 = await fileToBase64(selectedFile);
-      parts = [{ inline_data:{ mime_type:mimeType, data:b64 } }];
-    } else {
-      parts = [{ text: 'תמלול השיחה:\n' + manualText }];
+      setMsg('ממיר קובץ שמע...');
+      var b64 = await fileToB64(selectedFile);
+      var mime = getMime(selectedFile);
+      parts.push({inline_data:{mime_type:mime, data:b64}});
     }
 
-    const audioInstr = selectedFile ? 'האזן לקובץ השמע, תמלל אותו ונתח.' : '';
+    var isGeneral = callType === 'general';
+    var closingField = callType==='sales' ? '"closing": false, "closingNote": "האם נסגרה עסקה"' : '"resolved": false, "resolvedNote": "האם הבעיה נפתרה"';
 
-    const isGeneral = callType === 'general';
-    const closingField = callType === 'sales'
-      ? '"closing": false, "closingNote": "האם נסגרה עסקה"'
-      : '"resolved": false, "resolvedNote": "האם הבעיה נפתרה"';
+    var result, raw;
 
-    const prompt = isGeneral ? `${audioInstr}
-זהה מי מדבר בשיחה (שמות, תפקידים, קשר — אבא/ילד, חברים, זוג וכו') ונתח לעומק.
+    if (isGeneral && selectedFile) {
+      // Step 1: Transcribe only
+      setMsg('מתמלל את השיחה...');
+      var tParts = parts.concat([{text: 'תמלל את כל השיחה בעברית בלבד. כתוב כל שורה בפורמט: שם: טקסט. החזר רק את התמלול, ללא הסברים.'}]);
+      var tData = await callGemini(tParts, 4096, false);
+      var tCand = tData.candidates && tData.candidates[0];
+      transcriptText = tCand && tCand.content && tCand.content.parts && tCand.content.parts[0] && tCand.content.parts[0].text || '';
 
-החזר אובייקט JSON עם השדות הבאים:
-- speakers: מערך של דוברים, כל אחד עם name ו-role
-- relationship: תיאור הקשר בין הדוברים
-- purpose: מטרת השיחה
-- mainPoints: מערך של 3-4 נקודות עיקריות (מחרוזות)
-- atmosphere: תיאור מפורט של האווירה
-- closing: איך הסתיימה השיחה
-- mood: אווירה כללית קצרה
-- moodEmoji: אמוג'י אחד
-- keyMoments: מערך של 3 רגעים משמעותיים (מחרוזות)
-- summary: תקציר 3-4 משפטים
-- transcript: מחרוזת עם התמלול המלא בפורמט "שם: טקסט" שורה שורה` :
-`${audioInstr}
-נתח שיחת ${typeLabel} בין ${agentRole} (${agentName}) ולקוח. נתח כל צד בנפרד.
-${callType==='sales' ? 'שים דגש: זיהוי צרכים, הצגת מוצר, טיפול בהתנגדויות, סגירה.' : 'שים דגש: הבנת הבעיה, אמפתיה, פתרון מלא, שביעות רצון.'}
-
-החזר אובייקט JSON עם השדות הבאים:
-- totalScore: מספר 0-100
-- grade: מצוין / טוב / בינוני / טעון שיפור
-- gradeText: משפט קצר על השיחה
-- mood: חיובי / ניטרלי / שלילי / לקוח כועס / לקוח מרוצה מאוד
-- moodEmoji: אמוג'י אחד
-- agentScore: מספר 0-100
-- agentSummary: משפט על ביצועי הנציג
-- customerScore: מספר 0-100
-- customerSummary: משפט על תגובת הלקוח
-- categories: מערך של 6 אובייקטים עם name, score, agentNote, customerNote — לקטגוריות: פתיח, גוף השיחה, פתרון ללקוח, שביעות רצון, סיום שיחה, אווירה כללית
-- sections: אובייקט עם opening/body/solution/satisfaction/closing/atmosphere — כל אחד עם title ו-text
-- recommendations: מערך של 3 המלצות לנציג
-- ${callType==='sales' ? 'closing: בוליאן האם נסגרה עסקה, closingNote: הסבר' : 'resolved: בוליאן האם הבעיה נפתרה, resolvedNote: הסבר'}
-- transcript: מחרוזת עם התמלול המלא בפורמט "שם: טקסט" שורה שורה`
-
-    parts.push({ text: prompt });
-    setMsg('מנתח שיחה...');
-
-    const data = await callGemini(parts, model, apiKey);
-    const candidate = data.candidates?.[0];
-    if (!candidate) throw new Error('לא התקבלה תשובה: '+(data.promptFeedback?.blockReason||'לא ידוע'));
-
-    const raw = candidate?.content?.parts?.[0]?.text || '';
-    if (!raw.trim()) throw new Error('תשובה ריקה. נסה שוב.');
-
-    let result;
-    try {
+      // Step 2: Analyze the transcript text only (no audio, no JSON confusion)
+      setMsg('מנתח שיחה...');
+      var analyzePrompt = 'ענה בעברית בלבד. נתח את תמלול השיחה הבא וזהה מי מדבר (שמות, תפקידים, קשר — אבא/ילד, חברים, זוג וכו).' +
+        ' החזר JSON תקני בלבד עם השדות: speakers (מערך name,role), relationship, purpose, mainPoints (מערך 3-4 מחרוזות), atmosphere, closing, mood, moodEmoji, keyMoments (מערך 3 מחרוזות), summary.' +
+        '\n\nתמלול:\n' + transcriptText;
+      var aData = await callGemini([{text: analyzePrompt}], 4096, true);
+      var aCand = aData.candidates && aData.candidates[0];
+      raw = aCand && aCand.content && aCand.content.parts && aCand.content.parts[0] && aCand.content.parts[0].text || '';
+      if (!raw.trim()) throw new Error('תשובה ריקה מהניתוח');
       result = parseJSON(raw);
-    } catch(parseErr) {
-      console.error('Parse error:', parseErr.message);
-      console.error('Raw response:', raw);
-      throw new Error('שגיאת פענוח תשובה. נסה שוב.');
-    }
+      result.transcript = transcriptText;
 
-    console.log('✅ Parsed result keys:', Object.keys(result));
-    console.log('✅ Full result:', JSON.stringify(result, null, 2).slice(0, 1000));
-
-    // Store for chat
-    // Save transcript: from manual input, or from AI result field
-    const finalTranscript = manualText || result.transcript || '';
-    currentAnalysis = { result, agentName, callId, typeLabel, agentRole, transcriptText: finalTranscript, raw };
-
-    document.getElementById('loadingDiv').style.display='none';
-    // Detect general by checking if result has 'speakers' field
-    if (result.speakers !== undefined) {
-      renderGeneral(result, callId);
     } else {
-      renderResults(result, agentName, callId);
-    }
-    saveToHistory(result, agentName, callId);
+      // Service / Sales / General with text
+      var audioNote = selectedFile ? 'IMPORTANT: Listen to the audio carefully. Base analysis ONLY on what you hear.' : '';
+      var prompt;
+      if (isGeneral) {
+        prompt = 'ענה בעברית בלבד.\nזהה מי מדבר בשיחה הבאה ונתח לעומק.\n' +
+          'החזר JSON תקני בלבד עם: speakers (מערך name,role), relationship, purpose, mainPoints (מערך 3-4 מחרוזות), atmosphere, closing, mood, moodEmoji, keyMoments (מערך 3 מחרוזות), summary, transcript (מחרוזת קצרה בלבד).' +
+          '\n\nתמלול:\n' + manual;
+        parts = [{text: prompt}];
+      } else {
+        prompt = (audioNote ? audioNote + '\n' : '') +
+          'ענה בעברית בלבד.\nנתח שיחת ' + typeLabel + ' בין ' + agentRole + ' (' + agentName + ') ללקוח.\n' +
+          (callType==='sales'?'דגש: זיהוי צרכים, הצגת מוצר, טיפול בהתנגדויות, סגירה.':'דגש: הבנת הבעיה, אמפתיה, פתרון מלא, שביעות רצון.') +
+          '\nהחזר בפורמט: שורה ראשונה JSON:, אחריה JSON, אחריה שורה TRANSCRIPT:, אחריה התמלול.' +
+          '\nה-JSON יכלול: totalScore, grade, gradeText, mood, moodEmoji, agentScore, agentSummary, customerScore, customerSummary, categories (מערך 6: פתיח/גוף השיחה/פתרון ללקוח/שביעות רצון/סיום שיחה/אווירה כללית — כל אחד name,score,agentNote,customerNote), sections (opening/body/solution/satisfaction/closing/atmosphere — כל אחד title,text), recommendations (מערך 3), ' + closingField + '.';
+        if (!selectedFile) parts = [{text: 'תמלול:\n' + manual + '\n\n' + prompt}];
+        else parts.push({text: prompt});
+      }
 
-    // Reset chat
-    document.getElementById('chatMessages').innerHTML = '<div class="chat-msg msg-ai">שלום! אני מכיר את השיחה של <strong>'+agentName+'</strong> שנותחה. שאל אותי כל שאלה — על הנציג, על הלקוח, על מה שעבד ומה לא. 💬</div>';
+      setMsg('מנתח שיחה...');
+      var data = await callGemini(parts, 8192, isGeneral);
+      var candidate = data.candidates && data.candidates[0];
+      if (!candidate) throw new Error('לא התקבלה תשובה');
+      raw = candidate.content && candidate.content.parts && candidate.content.parts[0] && candidate.content.parts[0].text || '';
+      if (!raw.trim()) throw new Error('תשובה ריקה');
+      result = parseJSON(raw);
+      transcriptText = manual || result.transcript || transcriptText || '';
+      result.transcript = transcriptText;
+    }
+
+    currentAnalysis = {result:result, agentName:agentName, callId:callId, typeLabel:typeLabel, agentRole:agentRole, transcript:result.transcript||transcriptText};
+    console.log('transcript length:', (result.transcript||'').length);
+
+    document.getElementById('loadDiv').style.display = 'none';
+
+    if (isGeneral) renderGeneral(result, callId);
+    else renderResult(result, agentName, callId);
+    saveHist(result, agentName, callId);
+
+    document.getElementById('chatMsgs').innerHTML = '<div class="cmsg cai">שלום! אני מכיר את השיחה של <strong>'+agentName+'</strong>. שאל אותי כל שאלה 💬</div>';
 
   } catch(err) {
-    document.getElementById('loadingDiv').style.display='none';
-    document.getElementById('analyzeForm').style.display='block';
+    document.getElementById('loadDiv').style.display = 'none';
+    document.getElementById('analyzeForm').style.display = 'block';
     showErr(err.message || 'שגיאה לא ידועה');
   }
 }
 
-// ─── RENDER GENERAL ───────────────────────────
+// ── RENDER ────────────────────────────────────────────
+function renderResult(r, agent, id) {
+  document.getElementById('resDiv').style.display = 'block';
+  document.getElementById('rGeneral').style.display = 'none';
+  if (selectedFile && document.getElementById('resultPlayerWrap')) {
+    document.getElementById('resultPlayerWrap').style.display = 'block';
+  }
+  document.getElementById('agPill').textContent = agent + ' · ' + id;
+  document.getElementById('rScore').textContent = r.totalScore || '-';
+  document.getElementById('rGrade').textContent = r.grade || '';
+  document.getElementById('rGradeText').textContent = r.gradeText || '';
+  document.getElementById('rMood').textContent = (r.moodEmoji||'') + ' ' + (r.mood||'');
+
+  var as = r.agentScore||0, cs = r.customerScore||0;
+  var ac = as>=80?'#16a34a':as>=55?'#d97706':'#dc2626';
+  var cc = cs>=80?'#16a34a':cs>=55?'#d97706':'#dc2626';
+  var closingHtml = r.resolved!==undefined
+    ? '<div style="margin-top:8px;font-size:12px;font-weight:600;color:'+(r.resolved?'#16a34a':'#dc2626')+'">'+(r.resolved?'✓ הבעיה נפתרה':'✗ הבעיה לא נפתרה')+'</div>'
+    : r.closing!==undefined
+    ? '<div style="margin-top:8px;font-size:12px;font-weight:600;color:'+(r.closing?'#16a34a':'#dc2626')+'">'+(r.closing?'✓ נסגרה עסקה':'✗ לא נסגרה עסקה')+'</div>'
+    : '';
+
+  document.getElementById('rSides').innerHTML =
+    '<div class="scard ag"><div class="stit">👤 '+agent+' — נציג</div><div class="srow"><span class="slbl">ציון</span><span class="ssc" style="color:'+ac+'">'+as+'</span></div><div class="sbar"><div class="sbarfill" style="width:'+as+'%"></div></div><div class="stxt">'+(r.agentSummary||'')+'</div></div>' +
+    '<div class="scard cu"><div class="stit">🙋 הלקוח</div><div class="srow"><span class="slbl">שביעות רצון</span><span class="ssc" style="color:'+cc+'">'+cs+'</span></div><div class="sbar"><div class="sbarfill" style="width:'+cs+'%"></div></div><div class="stxt">'+(r.customerSummary||'')+'</div>'+closingHtml+'</div>';
+
+  document.getElementById('rCats').innerHTML = (r.categories||[]).map(function(c) {
+    var lv = c.score>=80?'hi':c.score>=55?'md':'lo';
+    return '<div class="ccard"><div class="chead"><span class="cname">'+c.name+'</span><span class="cscore '+lv+'">'+c.score+'</span></div><div class="bbar"><div class="bfill b'+lv+'" style="width:'+c.score+'%"></div></div><div class="cnote">👤 '+(c.agentNote||'')+'</div><div class="cnote2">🙋 '+(c.customerNote||'')+'</div></div>';
+  }).join('');
+
+  var titleMap = {'Opening':'פתיח','Body':'גוף השיחה','Call Body':'גוף השיחה','Solution':'פתרון ללקוח','Customer Satisfaction':'שביעות רצון','Satisfaction':'שביעות רצון','Closing':'סיום שיחה','Atmosphere':'תחושה כללית','General Atmosphere':'תחושה כללית'};
+  document.getElementById('rSecs').innerHTML = Object.values(r.sections||{}).map(function(s) {
+    var title = titleMap[s.title] || s.title;
+    return '<div class="seccard"><div class="sectit"><span class="secdot"></span>'+title+'</div><div class="sectxt">'+s.text+'</div></div>';
+  }).join('');
+
+  document.getElementById('rRecs').innerHTML = '<h3>✦ המלצות לנציג</h3>' + (r.recommendations||[]).map(function(rec,i) {
+    return '<div class="rrow"><div class="rnum">'+(i+1)+'</div><div class="rtxt">'+rec+'</div></div>';
+  }).join('');
+}
+
 function renderGeneral(r, id) {
-  document.getElementById('resultsDiv').style.display='block';
-  document.getElementById('agentPill').textContent = 'שיחה כללית · '+id;
+  document.getElementById('resDiv').style.display = 'block';
+  if (selectedFile && document.getElementById('resultPlayerWrap')) {
+    document.getElementById('resultPlayerWrap').style.display = 'block';
+  }
+  document.getElementById('agPill').textContent = 'שיחה כללית · ' + id;
   document.getElementById('rScore').textContent = '💬';
   document.getElementById('rGrade').textContent = r.relationship || 'שיחה כללית';
   document.getElementById('rGradeText').textContent = r.summary || '';
-  document.getElementById('rMood').textContent = (r.moodEmoji||'')+ ' '+(r.mood||'');
-
+  document.getElementById('rMood').textContent = (r.moodEmoji||'') + ' ' + (r.mood||'');
   document.getElementById('rSides').innerHTML = '';
   document.getElementById('rCats').innerHTML = '';
-  document.getElementById('rSections').innerHTML = '';
+  document.getElementById('rSecs').innerHTML = '';
   document.getElementById('rRecs').innerHTML = '';
 
-  // Speakers pills
-  const speakers = (r.speakers||[]).map(s=>
-    `<div style="display:inline-flex;align-items:center;gap:6px;background:#f5f4ff;border:1px solid #ddd8ff;border-radius:20px;padding:6px 16px;font-size:13px;margin-left:8px;margin-bottom:8px">
-      <span style="font-weight:600;color:#4f46e5">${s.name}</span>
-      <span style="color:#9098b1">${s.role}</span>
-    </div>`
-  ).join('');
-
-  // Main points
-  const mainPoints = (r.mainPoints||[]).map((p,i)=>
-    `<div class="rec-row"><div class="rec-n">${i+1}</div><div class="rec-text">${p}</div></div>`
-  ).join('');
-
-  // Key moments
-  const moments = (r.keyMoments||[]).map((m,i)=>
-    `<div class="rec-row"><div class="rec-n" style="background:#f59e0b">⚡</div><div class="rec-text">${m.text||m}</div></div>`
-  ).join('');
-
-  const secCard = (icon, title, text, color='#6c63ff') =>
-    text ? `<div class="sec-card">
-      <div class="sec-title" style="color:${color}"><span class="sec-dot" style="background:${color}"></span>${icon} ${title}</div>
-      <div class="sec-text">${text}</div>
-    </div>` : '';
-
-  const transcript = r.transcript || '';
-
-  document.getElementById('rGeneral').style.display='block';
-  document.getElementById('rGeneral').innerHTML = `
-    ${speakers ? `<div class="card" style="margin-bottom:16px">
-      <div class="card-title">👥 דוברים שזוהו</div>
-      <div>${speakers}</div>
-    </div>` : ''}
-
-    ${secCard('🎯','מטרת השיחה', r.purpose, '#4f46e5')}
-    ${secCard('🌡️','אווירה בשיחה', r.atmosphere, '#0891b2')}
-    ${secCard('🏁','סיום השיחה', r.closing, '#16a34a')}
-    ${secCard('📋','סיכום', r.summary, '#6c63ff')}
-
-    ${mainPoints ? `<div class="recs-box" style="margin-bottom:16px">
-      <h3>📌 דברים עיקריים</h3>${mainPoints}
-    </div>` : ''}
-
-    ${moments ? `<div class="recs-box" style="background:#fffbeb;border-color:#fde68a;margin-bottom:16px">
-      <h3 style="color:#d97706">⚡ רגעים משמעותיים</h3>${moments}
-    </div>` : ''}
-
-    ${transcript ? `<div class="card">
-      <div class="card-title">📝 תמלול השיחה</div>
-      <div style="font-size:13px;color:#5a6282;line-height:2;white-space:pre-wrap;max-height:450px;overflow-y:auto;direction:rtl;border-top:1px solid #f0f1f5;padding-top:12px">${transcript}</div>
-    </div>` : ''}
-  `;
-}
-
-// ─── RENDER RESULTS ───────────────────────────
-function renderResults(r, agent, id) {
-  document.getElementById('resultsDiv').style.display='block';
-  document.getElementById('agentPill').textContent = agent+' · '+id;
-  document.getElementById('rScore').textContent = r.totalScore||'-';
-  document.getElementById('rGrade').textContent = r.grade||'';
-  document.getElementById('rGradeText').textContent = r.gradeText||'';
-  document.getElementById('rMood').textContent = (r.moodEmoji||'')+ ' '+(r.mood||'');
-
-  // Agent vs Customer
-  const aScore = r.agentScore||0, cScore = r.customerScore||0;
-  const alv = aScore>=80?'#16a34a':aScore>=55?'#d97706':'#dc2626';
-  const clv = cScore>=80?'#16a34a':cScore>=55?'#d97706':'#dc2626';
-  document.getElementById('rSides').innerHTML = `
-    <div class="side-card side-agent">
-      <div class="side-title">👤 ${agent} — נציג</div>
-      <div class="side-row"><span class="side-label">ציון ביצועים</span><span class="side-score" style="color:${alv}">${aScore}</span></div>
-      <div class="side-mini-bar"><div class="side-mini-fill sa-fill" style="width:${aScore}%"></div></div>
-      <div style="font-size:12px;color:#4b5563;margin-top:8px">${r.agentSummary||''}</div>
-    </div>
-    <div class="side-card side-customer">
-      <div class="side-title">🙋 הלקוח</div>
-      <div class="side-row"><span class="side-label">שביעות רצון</span><span class="side-score" style="color:${clv}">${cScore}</span></div>
-      <div class="side-mini-bar"><div class="side-mini-fill sc-fill" style="width:${cScore}%"></div></div>
-      <div style="font-size:12px;color:#4b5563;margin-top:8px">${r.customerSummary||''}</div>
-      ${r.resolved!==undefined ? '<div style="margin-top:8px;font-size:12px;font-weight:600;color:'+(r.resolved?'#16a34a':'#dc2626')+'">'+(r.resolved?'✓ הבעיה נפתרה':'✗ הבעיה לא נפתרה')+'</div>' : ''}
-      ${r.closingNote!==undefined ? '<div style="margin-top:8px;font-size:12px;font-weight:600;color:'+(r.closing?'#16a34a':'#dc2626')+'">'+(r.closing?'✓ נסגרה עסקה':'✗ לא נסגרה עסקה')+'</div>' : ''}
-    </div>`;
-
-  // Categories
-  document.getElementById('rCats').innerHTML = (r.categories||[]).map(c=>{
-    const lv=c.score>=80?'hi':c.score>=55?'md':'lo';
-    return `<div class="cat-card">
-      <div class="cat-head"><span class="cat-name">${c.name}</span><span class="cat-score sc-${lv}">${c.score}</span></div>
-      <div class="bar-bg"><div class="bar-fill b${lv}" style="width:${c.score}%"></div></div>
-      <div style="font-size:11px;color:#4f46e5;margin-bottom:3px">👤 ${c.agentNote||''}</div>
-      <div style="font-size:11px;color:#1e40af">🙋 ${c.customerNote||''}</div>
-    </div>`;
+  var speakers = (r.speakers||[]).map(function(s) {
+    return '<div style="display:inline-flex;align-items:center;gap:6px;background:#f5f4ff;border:1px solid #ddd8ff;border-radius:20px;padding:5px 14px;font-size:13px;margin-left:8px;margin-bottom:6px"><strong style="color:#4f46e5">'+s.name+'</strong><span style="color:#9098b1">'+s.role+'</span></div>';
   }).join('');
 
-  // Sections
-  document.getElementById('rSections').innerHTML = Object.values(r.sections||{}).map(s=>
-    `<div class="sec-card"><div class="sec-title"><span class="sec-dot"></span>${s.title}</div><div class="sec-text">${s.text}</div></div>`
-  ).join('');
+  var pts = (r.mainPoints||[]).map(function(p,i){return '<div class="rrow"><div class="rnum">'+(i+1)+'</div><div class="rtxt">'+p+'</div></div>';}).join('');
+  var moms = (r.keyMoments||[]).map(function(m,i){return '<div class="rrow"><div class="rnum" style="background:#f59e0b">⚡</div><div class="rtxt">'+m+'</div></div>';}).join('');
 
-  // Recs
-  document.getElementById('rRecs').innerHTML = '<h3>✦ המלצות לנציג</h3>'+(r.recommendations||[]).map((rec,i)=>
-    `<div class="rec-row"><div class="rec-n">${i+1}</div><div class="rec-text">${rec}</div></div>`
-  ).join('');
+  var secHtml = function(icon, title, text, color) {
+    return text ? '<div class="gcard"><div class="sectit" style="color:'+color+'"><span class="secdot" style="background:'+color+'"></span>'+icon+' '+title+'</div><div class="sectxt">'+text+'</div></div>' : '';
+  };
+
+  var g = document.getElementById('rGeneral');
+  g.style.display = 'block';
+  g.innerHTML =
+    (speakers ? '<div class="gcard"><div class="ctitle">👥 דוברים</div><div>'+speakers+'</div></div>' : '') +
+    secHtml('🎯','מטרת השיחה', r.purpose, '#4f46e5') +
+    secHtml('🌡️','אווירה', r.atmosphere, '#0891b2') +
+    secHtml('🏁','סיום', r.closing, '#16a34a') +
+    (pts ? '<div class="recs" style="margin-bottom:16px"><h3>📌 דברים עיקריים</h3>'+pts+'</div>' : '') +
+    (moms ? '<div class="recs" style="background:#fffbeb;border-color:#fde68a;margin-bottom:16px"><h3 style="color:#d97706">⚡ רגעים משמעותיים</h3>'+moms+'</div>' : '') +
+    (r.transcript ? '<div class="gcard"><div class="ctitle">📝 תמלול</div><div style="font-size:13px;color:#5a6282;line-height:1.9;white-space:pre-wrap;max-height:400px;overflow-y:auto;padding-top:8px;border-top:1px solid #f0f1f5">'+r.transcript+'</div></div>' : '');
 }
 
-// ─── AI CHAT ──────────────────────────────────
+// ── CHAT ──────────────────────────────────────────────
 async function sendChat() {
-  const input = document.getElementById('chatInput');
-  const q = input.value.trim();
+  var input = document.getElementById('chatIn');
+  var q = input.value.trim();
   if (!q || !currentAnalysis) return;
+  if (!getKeys().length) return;
 
-  const apiKey = localStorage.getItem('geminiKey');
-  if (!apiKey) return;
-
-  const messages = document.getElementById('chatMessages');
+  var msgs = document.getElementById('chatMsgs');
   input.value = '';
-  document.getElementById('chatSendBtn').disabled = true;
-
-  // Add user message
-  messages.innerHTML += `<div class="chat-msg msg-user">${q}</div>`;
-  messages.innerHTML += `<div class="chat-msg msg-loading" id="chatLoading">חושב...</div>`;
-  messages.scrollTop = messages.scrollHeight;
+  document.getElementById('chatBtn').disabled = true;
+  msgs.innerHTML += '<div class="cmsg cuser">'+q+'</div><div class="cmsg cload" id="cload">חושב...</div>';
+  msgs.scrollTop = msgs.scrollHeight;
 
   try {
-    const model = localStorage.getItem('geminiModel') || 'gemini-2.5-flash';
-    const { result, agentName, typeLabel, agentRole, transcriptText } = currentAnalysis;
+    var ca = currentAnalysis;
+    var fullTranscript = ca.transcript || ca.result.transcript || '';
+    var ctx = 'אתה סוכן AI שמנתח שיחות מוקד. ענה בעברית בלבד, קצר וממוקד.\n' +
+      'חשוב: אם שואלים על פרט מהשיחה (שם, מה נאמר) — חפש רק בתמלול המלא למטה.\n' +
+      'אל תמציא מידע שלא מופיע בתמלול.\n\n' +
+      '=== ניתוח ===\nסוג: '+ca.typeLabel+'\n'+
+      (ca.result.totalScore ? 'ציון: '+ca.result.totalScore+'/100 ('+ca.result.grade+')\n' : '') +
+      (ca.result.agentSummary ? 'ביצועי נציג: '+ca.result.agentSummary+'\n' : '') +
+      (ca.result.customerSummary ? 'תגובת לקוח: '+ca.result.customerSummary+'\n' : '') +
+      (ca.result.recommendations ? 'המלצות: '+(ca.result.recommendations||[]).join(' | ')+'\n' : '') +
+      '\n=== תמלול מלא של השיחה (המקור היחיד לעובדות) ===\n' +
+      (fullTranscript || '(תמלול לא זמין)');
 
-    const fullTranscript = transcriptText || result.transcript || '';
-    const systemContext = `אתה סוכן AI שמנתח שיחות מוקד. יש לך גישה מלאה לשיחה שנותחה.
-חשוב ביותר: ענה רק על בסיס התמלול המצורף. אל תמציא פרטים. אם שאלו על שם — חפש בתמלול בלבד.
-
-=== ניתוח השיחה ===
-סוג: ${typeLabel}
-ציון כולל: ${result.totalScore}/100 (${result.grade})
-ציון נציג: ${result.agentScore}/100 | ציון לקוח: ${result.customerScore}/100
-מצב רוח: ${result.mood} ${result.moodEmoji||''}
-סיכום נציג: ${result.agentSummary}
-סיכום לקוח: ${result.customerSummary}
-המלצות: ${(result.recommendations||[]).join(' | ')}
-
-=== תמלול מלא של השיחה (זהו המקור האמין היחיד) ===
-${fullTranscript || '(תמלול לא זמין — ענה רק על בסיס הניתוח למעלה)'}
-
-כללי מחייבים:
-- שם הנציג — חפש רק בתמלול (שורות שמתחילות ב"נציג:")
-- שם הלקוח — חפש רק בתמלול (שורות שמתחילות ב"לקוח:")
-- אל תשתמש בשם "${agentName}" אלא אם הוא מופיע בתמלול
-- אם פרט לא מופיע בתמלול — אמור "לא ניתן לדעת מהתמלול"
-ענה בעברית, קצר וממוקד.`;
-
-    const parts = [{ text: systemContext+'\n\nשאלה: '+q }];
-    const data = await callGemini(parts, model, apiKey, 1024, false);
-    const answer = data.candidates?.[0]?.content?.parts?.[0]?.text || 'לא הצלחתי לענות, נסה שוב.';
-
-    document.getElementById('chatLoading').remove();
-    messages.innerHTML += `<div class="chat-msg msg-ai">${answer}</div>`;
+    var data = await callGemini([{text: ctx + '\n\nשאלה: ' + q}], 1024, false);
+    var answer = data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0] && data.candidates[0].content.parts[0].text || 'לא הצלחתי לענות.';
+    var ld = document.getElementById('cload');
+    if (ld) ld.remove();
+    msgs.innerHTML += '<div class="cmsg cai">'+answer+'</div>';
   } catch(err) {
-    document.getElementById('chatLoading').remove();
-    messages.innerHTML += `<div class="chat-msg msg-ai" style="color:#dc2626">שגיאה: ${err.message}</div>`;
+    var ld2 = document.getElementById('cload');
+    if (ld2) ld2.remove();
+    msgs.innerHTML += '<div class="cmsg cai" style="color:#dc2626">שגיאה: '+err.message+'</div>';
   }
-
-  document.getElementById('chatSendBtn').disabled = false;
-  messages.scrollTop = messages.scrollHeight;
+  document.getElementById('chatBtn').disabled = false;
+  msgs.scrollTop = msgs.scrollHeight;
 }
 
-// ─── PDF DOWNLOAD ─────────────────────────────
-function downloadPDF() {
-  if (!currentAnalysis) return;
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
-  const { result: r, agentName, callId, typeLabel, transcriptText } = currentAnalysis;
-  const isGeneral = callType === 'general';
-
-  // RTL support via unicode
-  doc.setR2L(true);
-
-  let y = 20;
-  const lh = 7; // line height
-  const margin = 15;
-  const pageW = 210;
-  const maxW = pageW - margin*2;
-
-  const addLine = (text, size=11, bold=false, color=[30,29,46]) => {
-    if (y > 270) { doc.addPage(); y = 20; }
-    doc.setFontSize(size);
-    doc.setFont('helvetica', bold ? 'bold' : 'normal');
-    doc.setTextColor(...color);
-    doc.text(text || '', pageW - margin, y, { align:'right' });
-    y += lh;
-  };
-
-  const addBlock = (title, text, titleColor=[108,99,255]) => {
-    if (y > 260) { doc.addPage(); y = 20; }
-    addLine(title, 11, true, titleColor);
-    if (text) {
-      const lines = doc.splitTextToSize(text, maxW);
-      lines.forEach(line => {
-        if (y > 270) { doc.addPage(); y = 20; }
-        doc.setFontSize(10); doc.setFont('helvetica','normal'); doc.setTextColor(90,98,130);
-        doc.text(line, pageW - margin, y, { align:'right' });
-        y += 6;
-      });
-    }
-    y += 3;
-  };
-
-  // Header
-  doc.setFillColor(108, 99, 255);
-  doc.rect(0, 0, 210, 30, 'F');
-  doc.setFontSize(16); doc.setFont('helvetica','bold'); doc.setTextColor(255,255,255);
-  doc.text('Call Quality Report', pageW - margin, 13, { align:'right' });
-  doc.setFontSize(10); doc.setFont('helvetica','normal');
-  doc.text(isGeneral ? 'General Transcript' : typeLabel + ' | ' + agentName + ' | ' + callId, pageW - margin, 22, { align:'right' });
-  doc.text(new Date().toLocaleDateString('he-IL'), margin, 22);
-  y = 40;
-
-  if (isGeneral) {
-    addLine('סיכום שיחה', 13, true, [30,29,46]);
-    y += 2;
-    addBlock('קשר בין הדוברים:', r.relationship || '');
-    addBlock('תקציר:', r.summary || '');
-    addBlock('אווירה:', (r.moodEmoji||'') + ' ' + (r.mood||''));
-    if (r.speakers?.length) {
-      addLine('דוברים:', 11, true, [108,99,255]);
-      r.speakers.forEach(s => addLine('• ' + s.name + ' — ' + s.role, 10, false, [90,98,130]));
-      y += 3;
-    }
-    if (r.keyMoments?.length) {
-      addLine('רגעים מרכזיים:', 11, true, [108,99,255]);
-      r.keyMoments.forEach((m,i) => addBlock((i+1)+'.', m.text||m));
-    }
-    if (transcriptText) {
-      y += 5;
-      addLine('תמלול השיחה:', 11, true, [108,99,255]);
-      const tLines = doc.splitTextToSize(transcriptText, maxW);
-      tLines.forEach(line => {
-        if (y > 270) { doc.addPage(); y = 20; }
-        doc.setFontSize(9); doc.setFont('helvetica','normal'); doc.setTextColor(90,98,130);
-        doc.text(line, pageW - margin, y, { align:'right' });
-        y += 5.5;
-      });
-    }
-  } else {
-    // Score
-    doc.setFillColor(245,244,255);
-    doc.roundedRect(margin, y, maxW, 22, 3, 3, 'F');
-    doc.setFontSize(22); doc.setFont('helvetica','bold'); doc.setTextColor(108,99,255);
-    doc.text(String(r.totalScore||0), pageW - margin - 5, y+14, { align:'right' });
-    doc.setFontSize(10); doc.setFont('helvetica','normal'); doc.setTextColor(30,29,46);
-    doc.text((r.grade||'') + ' — ' + (r.gradeText||''), pageW - margin - 25, y+9, { align:'right' });
-    doc.text((r.moodEmoji||'') + ' ' + (r.mood||''), pageW - margin - 25, y+16, { align:'right' });
-    y += 28;
-
-    // Scores
-    addLine('ניתוח נציג ולקוח', 12, true);
-    addBlock('נציג — ציון ' + (r.agentScore||0) + '/100:', r.agentSummary||'', [22,163,74]);
-    addBlock('לקוח — שביעות רצון ' + (r.customerScore||0) + '/100:', r.customerSummary||'', [30,64,175]);
-
-    // Categories
-    y += 2;
-    addLine('ניתוח קטגוריות', 12, true);
-    (r.categories||[]).forEach(c => {
-      addLine('• ' + c.name + ' — ' + c.score + '/100', 10, true, [60,68,102]);
-      if (c.agentNote) addLine('  נציג: ' + c.agentNote, 9, false, [90,98,130]);
-      if (c.customerNote) addLine('  לקוח: ' + c.customerNote, 9, false, [90,98,130]);
-      y += 1;
-    });
-
-    // Sections
-    y += 3;
-    addLine('ניתוח מפורט', 12, true);
-    Object.values(r.sections||{}).forEach(s => addBlock(s.title+':', s.text||''));
-
-    // Recommendations
-    y += 3;
-    addLine('המלצות לנציג', 12, true, [108,99,255]);
-    (r.recommendations||[]).forEach((rec,i) => addBlock((i+1)+'.', rec));
-
-    // Transcript
-    if (transcriptText) {
-      y += 5;
-      if (y > 240) { doc.addPage(); y = 20; }
-      addLine('תמלול השיחה', 12, true);
-      const tLines = doc.splitTextToSize(transcriptText, maxW);
-      tLines.forEach(line => {
-        if (y > 270) { doc.addPage(); y = 20; }
-        doc.setFontSize(9); doc.setFont('helvetica','normal'); doc.setTextColor(90,98,130);
-        doc.text(line, pageW - margin, y, { align:'right' });
-        y += 5.5;
-      });
-    }
-  }
-
-  const filename = isGeneral ? 'transcript_'+callId+'.pdf' : 'call_report_'+agentName+'_'+callId+'.pdf';
-  doc.save(filename);
+// ── HISTORY ───────────────────────────────────────────
+function saveHist(r, agent, id) {
+  hist.unshift({id:id, agent:agent, type:callType, score:r.totalScore||0, grade:r.grade||'', mood:r.mood||'', moodEmoji:r.moodEmoji||'', date:new Date().toLocaleDateString('he-IL'), data:r});
+  if (hist.length > 50) hist = hist.slice(0,50);
+  localStorage.setItem('cqHist', JSON.stringify(hist));
 }
-
-// ─── HISTORY ──────────────────────────────────
-function saveToHistory(r, agent, id) {
-  history.unshift({id,agent,type:callType,score:r.totalScore,grade:r.grade,mood:r.mood,moodEmoji:r.moodEmoji,date:new Date().toLocaleDateString('he-IL'),data:r});
-  if (history.length>50) history=history.slice(0,50);
-  localStorage.setItem('cqHistory', JSON.stringify(history));
-}
-
-function renderHistory() {
-  const avg = history.length ? Math.round(history.reduce((s,h)=>s+h.score,0)/history.length) : 0;
-  const best = history.length ? Math.max(...history.map(h=>h.score)) : 0;
-  document.getElementById('statsRow').innerHTML = `
-    <div class="stat-card"><div class="stat-label">סה"כ שיחות</div><div class="stat-val">${history.length}</div></div>
-    <div class="stat-card"><div class="stat-label">ממוצע ציון</div><div class="stat-val" style="color:#4f46e5">${avg}</div></div>
-    <div class="stat-card"><div class="stat-label">ציון שיא</div><div class="stat-val" style="color:#16a34a">${best}</div></div>`;
-  const el = document.getElementById('histList');
-  if (!history.length) { el.innerHTML='<div class="hist-empty">עדיין אין שיחות בהיסטוריה</div>'; return; }
-  el.innerHTML = history.map((h,i)=>{
-    const cls=h.score>=80?'sc-hi':h.score>=55?'sc-md':'sc-lo';
-    return `<div class="hist-item" onclick="viewHistory(${i})">
-      <div><div class="hi-name">${h.agent} <span style="color:#c0c6d9;font-weight:400">· ${h.id}</span></div>
-      <div class="hi-meta">${h.type==='sales'?'מכירה':'שירות'} · ${h.date} · ${h.moodEmoji||''} ${h.mood||''}</div></div>
-      <div class="hi-score ${cls}">${h.score}</div>
-    </div>`;
+function renderHist() {
+  var avg = hist.length ? Math.round(hist.reduce(function(s,h){return s+h.score;},0)/hist.length) : 0;
+  var best = hist.length ? Math.max.apply(null, hist.map(function(h){return h.score;})) : 0;
+  document.getElementById('statsRow').innerHTML =
+    '<div class="stcard"><div class="stlbl">סה"כ שיחות</div><div class="stval">'+hist.length+'</div></div>' +
+    '<div class="stcard"><div class="stlbl">ממוצע ציון</div><div class="stval" style="color:#4f46e5">'+avg+'</div></div>' +
+    '<div class="stcard"><div class="stlbl">ציון שיא</div><div class="stval" style="color:#16a34a">'+best+'</div></div>';
+  var el = document.getElementById('histList');
+  if (!hist.length) { el.innerHTML = '<div class="hempty">עדיין אין שיחות בהיסטוריה</div>'; return; }
+  el.innerHTML = hist.map(function(h,i) {
+    var cls = h.score>=80?'hi':h.score>=55?'md':'lo';
+    return '<div class="hitem" onclick="viewHist('+i+')"><div><div class="hname">'+h.agent+' <span style="color:#c0c6d9;font-weight:400">· '+h.id+'</span></div><div class="hmeta">'+(h.type==='sales'?'מכירה':h.type==='service'?'שירות':'כללי')+' · '+h.date+' · '+(h.moodEmoji||'')+' '+(h.mood||'')+'</div></div><div class="hscore '+cls+'">'+h.score+'</div></div>';
   }).join('');
 }
-
-function viewHistory(i) {
-  const e=history[i];
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  document.getElementById('page-analyze').classList.add('active');
-  document.getElementById('nav-analyze').classList.add('active');
-  document.getElementById('analyzeForm').style.display='none';
-  currentAnalysis={ result:e.data, agentName:e.agent, callId:e.id, typeLabel:e.type==='sales'?'מכירה':'שירות', agentRole:e.type==='sales'?'נציג מכירות':'נציג שירות', transcriptText:'', raw:'' };
-  renderResults(e.data, e.agent, e.id);
-  document.getElementById('chatMessages').innerHTML='<div class="chat-msg msg-ai">שלום! שאל אותי שאלות על השיחה של <strong>'+e.agent+'</strong>. 💬</div>';
+function viewHist(i) {
+  var e = hist[i];
+  navTo('analyze', document.querySelector('.nav-btn'));
+  document.getElementById('analyzeForm').style.display = 'none';
+  currentAnalysis = {result:e.data, agentName:e.agent, callId:e.id, typeLabel:e.type==='sales'?'מכירה':e.type==='service'?'שירות':'כללי', transcript:e.data.transcript||''};
+  if (e.type === 'general') renderGeneral(e.data, e.id);
+  else renderResult(e.data, e.agent, e.id);
+  document.getElementById('chatMsgs').innerHTML = '<div class="cmsg cai">שלום! שאל אותי על השיחה של <strong>'+e.agent+'</strong> 💬</div>';
   window.scrollTo(0,0);
 }
-
-function clearHistory() {
+function clearHist() {
   if (!confirm('למחוק את כל ההיסטוריה?')) return;
-  history=[]; localStorage.removeItem('cqHistory'); renderHistory();
+  hist = []; localStorage.removeItem('cqHist'); renderHist();
 }
-
 function resetForm() {
-  document.getElementById('resultsDiv').style.display='none';
-  document.getElementById('analyzeForm').style.display='block';
-  document.getElementById('audioInput').value='';
-  document.getElementById('manualText').value='';
-  document.getElementById('fileChip').style.display='none';
-  document.getElementById('errBox').style.display='none';
-  selectedFile=null; currentAnalysis=null;
+  document.getElementById('resDiv').style.display = 'none';
+  document.getElementById('analyzeForm').style.display = 'block';
+  document.getElementById('audioInput').value = '';
+  document.getElementById('manualText').value = '';
+  document.getElementById('fchip').style.display = 'none';
+  document.getElementById('errBox').style.display = 'none';
+  selectedFile = null; currentAnalysis = null;
+  var rp = document.getElementById('resultPlayerWrap');
+  if (rp) rp.style.display = 'none';
+  var ap = document.getElementById('audioPlayerWrap');
+  if (ap) ap.style.display = 'none';
 }
 
-function setMsg(t) { document.getElementById('loadingMsg').textContent=t; }
-function showErr(msg) { const e=document.getElementById('errBox'); e.textContent=msg; e.style.display='block'; }
+// ── PDF ───────────────────────────────────────────────
+function downloadPDF() {
+  if (!currentAnalysis || !window.jspdf) return;
+  var doc = new window.jspdf.jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  var r = currentAnalysis.result;
+  var agent = currentAnalysis.agentName;
+  var id = currentAnalysis.callId;
+  doc.setR2L(true);
+  var y = 20, m = 15, pw = 210, mw = pw - m*2;
+  var line = function(txt, sz, bold, col) {
+    if (y > 270) { doc.addPage(); y = 20; }
+    doc.setFontSize(sz||11); doc.setFont('helvetica', bold?'bold':'normal');
+    doc.setTextColor.apply(doc, col||[30,29,46]);
+    doc.text(txt||'', pw-m, y, {align:'right'}); y += 7;
+  };
+  var block = function(title, text, tc) {
+    line(title, 11, true, tc||[108,99,255]);
+    if (text) { var ls = doc.splitTextToSize(text, mw); ls.forEach(function(l){if(y>270){doc.addPage();y=20;} doc.setFontSize(10);doc.setFont('helvetica','normal');doc.setTextColor(90,98,130);doc.text(l,pw-m,y,{align:'right'});y+=6;}); }
+    y += 2;
+  };
+  doc.setFillColor(108,99,255); doc.rect(0,0,210,30,'F');
+  doc.setFontSize(16);doc.setFont('helvetica','bold');doc.setTextColor(255,255,255);
+  doc.text('Call Quality Report', pw-m, 13, {align:'right'});
+  doc.setFontSize(10);doc.setFont('helvetica','normal');
+  doc.text(agent+' | '+id, pw-m, 22, {align:'right'});
+  doc.text(new Date().toLocaleDateString('he-IL'), m, 22);
+  y = 40;
+  if (r.totalScore) {
+    line('ציון כולל: '+r.totalScore+'/100 — '+r.grade, 13, true);
+    block('סיכום:', r.gradeText);
+    block('נציג:', r.agentSummary);
+    block('לקוח:', r.customerSummary);
+    (r.categories||[]).forEach(function(c){line('• '+c.name+' — '+c.score, 10, false,[60,68,102]);});
+    y+=4;
+    (r.recommendations||[]).forEach(function(rec,i){block((i+1)+'.', rec);});
+  } else {
+    block('קשר:', r.relationship);
+    block('מטרה:', r.purpose);
+    block('אווירה:', r.atmosphere);
+    block('סיום:', r.closing);
+    block('סיכום:', r.summary);
+  }
+  if (currentAnalysis.transcript) {
+    y+=4; line('תמלול:', 12, true);
+    var tls = doc.splitTextToSize(currentAnalysis.transcript, mw);
+    tls.forEach(function(l){if(y>270){doc.addPage();y=20;} doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(90,98,130);doc.text(l,pw-m,y,{align:'right'});y+=5.5;});
+  }
+  doc.save('call_'+agent+'_'+id+'.pdf');
+}
 </script>
 </body>
 </html>
