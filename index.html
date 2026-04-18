@@ -579,8 +579,8 @@ function buildCritPrompt(type) {
   var lines = items.map(function(c) {
     return c.name + ' (משקל ' + c.w + '%)' + (c.desc ? ' — ' + c.desc : '');
   }).join('\n');
-  return '\n\nקריטריוני ביקורת:\n' + lines + (inst ? '\n\nהוראות נוספות:\n' + inst : '') +
-    '\n\nחשב totalScore לפי המשקלות. השתמש בשמות הקטגוריות המותאמים.';
+  return '\n\nקריטריוני ביקורת מותאמים:\n' + lines + (inst ? '\n\nהוראות נוספות:\n' + inst : '') +
+    '\n\nחשוב: עבור כל קטגוריה, ציין score בין 0-100 (ציון ביצוע בקטגוריה) ו-weight (המשקל האחוזי שניתן). ה-totalScore = סכום של (score * weight / 100) לכל קטגוריה. השתמש בשמות הקטגוריות המותאמים.';
 }
 
 // TIMER
@@ -847,7 +847,7 @@ async function runAnalysis() {
         critPrompt + '\n' +
         'החזר בפורמט:\nJSON:\n{...}\n\nTRANSCRIPT:\n...תמלול...\n\n' +
         'ה-JSON יכלול: totalScore, grade, gradeText, mood, moodEmoji, agentScore, agentSummary, customerScore, customerSummary, ' +
-        'categories (מערך לפי הקריטריונים: ' + catNames + ' — כל אחד: name,score,agentNote,customerNote), ' +
+        'categories (מערך לפי הקריטריונים: ' + catNames + ' — כל אחד: name (שם הקטגוריה), score (ציון 0-100 לקטגוריה זו — לא המשקל!), weight (המשקל אחוזי), agentNote, customerNote), ' +
         'sections (opening/body/solution/satisfaction/closing/atmosphere — כל אחד: title,text), ' +
         'recommendations (מערך 3), ' +
         (callType === 'sales' ? 'closing (בוליאן), closingNote' : 'resolved (בוליאן), resolvedNote') + '.';
@@ -916,9 +916,18 @@ function renderResult(r, agent, id) {
   var cats = r.categories || [];
   for (var ci = 0; ci < cats.length; ci++) {
     var c = cats[ci];
-    var lv = c.score >= 80 ? 'hi' : c.score >= 55 ? 'md' : 'lo';
-    var sc = c.score >= 80 ? 'shi' : c.score >= 55 ? 'smd' : 'slo';
-    catsHtml += '<div class="ccard"><div class="chead"><span class="cname">' + c.name + '</span><span class="cscore ' + sc + '">' + c.score + '</span></div><div class="bbar"><div class="bf b' + lv + '" style="width:' + c.score + '%"></div></div><div class="cnote">👤 ' + (c.agentNote || '') + '</div><div class="cnote2">🙋 ' + (c.customerNote || '') + '</div></div>';
+    var score = c.score || 0;
+    var weight = c.weight || c.w || 0;
+    var lv = score >= 80 ? 'hi' : score >= 55 ? 'md' : 'lo';
+    var sc = score >= 80 ? 'shi' : score >= 55 ? 'smd' : 'slo';
+    var wb = weight ? '<span style="font-size:10px;color:#9098b1;margin-top:1px">\u05de\u05e9\u05e7\u05dc ' + weight + '%</span>' : '';
+    var row = '<div class="ccard">';
+    row += '<div class="chead"><div style="display:flex;flex-direction:column;gap:1px"><span class="cname">' + c.name + '</span>' + wb + '</div>';
+    row += '<span class="cscore ' + sc + '">' + score + '</span></div>';
+    row += '<div class="bbar"><div class="bf b' + lv + '" style="width:' + score + '%"></div></div>';
+    row += '<div class="cnote">\u{1F464} ' + (c.agentNote || '') + '</div>';
+    row += '<div class="cnote2">\u{1F64B} ' + (c.customerNote || '') + '</div></div>';
+    catsHtml += row;
   }
   document.getElementById('rCats').innerHTML = catsHtml;
 
