@@ -167,7 +167,23 @@ textarea.tarea::placeholder{color:#c0c6d9;}
 .saved-note{display:none;align-items:center;gap:6px;font-size:12px;color:#16a34a;background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:6px 12px;margin-top:8px;width:fit-content;}
 .info-box{background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:14px 16px;font-size:13px;color:#1d4ed8;line-height:1.7;margin-top:16px;}
 .info-box a{color:#4f46e5;}
+
+.page-footer {
+  text-align: center;
+  padding: 28px 0 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #9098b1;
+  border-top: 1px solid #e8eaf0;
+  margin-top: 32px;
+  letter-spacing: 0.3px;
+}
+.page-footer span {
+  color: #4f46e5;
+  font-weight: 700;
+}
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
 
@@ -185,7 +201,7 @@ textarea.tarea::placeholder{color:#c0c6d9;}
     <div class="nav-label" style="margin-top:10px">מערכת</div>
     <button class="nav-item" id="nav-settings" onclick="navTo('settings',this)"><span class="icon">⚙️</span>הגדרות</button>
   </div>
-  <div class="sidebar-footer">מופעל על ידי<br>Google Gemini 2.5 Flash</div>
+  <div class="sidebar-footer">מופעל על ידי<br>Google Gemini</div>
 </nav>
 
 <main class="main">
@@ -203,13 +219,14 @@ textarea.tarea::placeholder{color:#c0c6d9;}
         <div class="type-btns">
           <button class="type-btn active" id="btnSales" onclick="setType('sales',this)">📈 שיחת מכירה</button>
           <button class="type-btn" id="btnService" onclick="setType('service',this)">🎧 שיחת שירות</button>
+          <button class="type-btn" id="btnGeneral" onclick="setType('general',this)">💬 כללי</button>
         </div>
       </div>
 
       <div class="card">
         <div class="card-title">👤 פרטי השיחה</div>
         <div class="field-row">
-          <div class="field"><label>שם הנציג</label><input type="text" id="agentName" placeholder="לדוגמה: יוסי כהן"></div>
+          <div class="field" id="agentNameField"><label>שם הנציג</label><input type="text" id="agentName" placeholder="לדוגמה: יוסי כהן"></div>
           <div class="field" style="flex:.6"><label>מזהה שיחה</label><input type="text" id="callId" placeholder="#4521"></div>
         </div>
       </div>
@@ -241,6 +258,7 @@ textarea.tarea::placeholder{color:#c0c6d9;}
         <h2>תוצאות ניתוח</h2>
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
           <span class="agent-pill" id="agentPill"></span>
+          <button class="btn-sec" onclick="downloadPDF()">📄 הורד PDF</button>
           <button class="btn-sec" onclick="resetForm()">+ שיחה חדשה</button>
         </div>
       </div>
@@ -267,6 +285,9 @@ textarea.tarea::placeholder{color:#c0c6d9;}
       <!-- Recommendations -->
       <div class="recs-box" id="rRecs"></div>
 
+      <!-- General transcript display -->
+      <div id="rGeneral" style="display:none"></div>
+
       <!-- AI Agent Chat -->
       <div class="ai-chat-box">
         <div class="ai-chat-header">
@@ -286,6 +307,8 @@ textarea.tarea::placeholder{color:#c0c6d9;}
       </div>
 
     </div>
+
+      <div class="page-footer">© כל הזכויות שמורות ל<span>אדיר לוי</span></div>
   </div>
 
   <!-- HISTORY PAGE -->
@@ -296,6 +319,8 @@ textarea.tarea::placeholder{color:#c0c6d9;}
     <div style="margin-top:12px">
       <button class="btn-sec" onclick="clearHistory()" style="font-size:12px;color:#dc2626;border-color:#fecaca">🗑 נקה היסטוריה</button>
     </div>
+
+      <div class="page-footer">© כל הזכויות שמורות ל<span>אדיר לוי</span></div>
   </div>
 
   <!-- SETTINGS PAGE -->
@@ -313,7 +338,8 @@ textarea.tarea::placeholder{color:#c0c6d9;}
         1. כנס ל: <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com/app/apikey</a><br>
         2. התחבר עם Google ← לחץ <strong>Create API Key</strong><br>
         3. העתק והדבק כאן<br><br>
-        <strong>חינמי לחלוטין · ללא כרטיס אשראי</strong>
+        <strong>חינמי לחלוטין · ללא כרטיס אשראי</strong><br><br>
+        💡 <strong>טיפ:</strong> אם מקבלים שגיאת מגבלה — המערכת תמתין אוטומטית ותנסה שוב. אפשר גם לעבור ל-Flash Lite בהגדרות המודל.
       </div>
     </div>
     <div class="card">
@@ -321,12 +347,15 @@ textarea.tarea::placeholder{color:#c0c6d9;}
       <div class="field" style="margin-bottom:12px">
         <label>מודל פעיל</label>
         <select id="modelSel">
-          <option value="gemini-2.5-flash">Gemini 2.5 Flash — מומלץ</option>
-          <option value="gemini-2.5-pro">Gemini 2.5 Pro — מדויק יותר</option>
+          <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash Lite — חינמי, מגבלות גבוהות (מומלץ)</option>
+          <option value="gemini-2.5-flash">Gemini 2.5 Flash — מדויק יותר</option>
+          <option value="gemini-2.5-pro">Gemini 2.5 Pro — הכי מדויק</option>
         </select>
       </div>
       <button class="btn-save" onclick="saveModel()">שמור מודל</button>
     </div>
+
+      <div class="page-footer">© כל הזכויות שמורות ל<span>אדיר לוי</span></div>
   </div>
 
 </main>
@@ -343,7 +372,7 @@ try { history = JSON.parse(localStorage.getItem('cqHistory') || '[]'); } catch(e
 window.addEventListener('DOMContentLoaded', () => {
   const key = localStorage.getItem('geminiKey') || '';
   if (key) { document.getElementById('apiKeyInput').value = key; document.getElementById('savedNote').style.display='flex'; }
-  document.getElementById('modelSel').value = localStorage.getItem('geminiModel') || 'gemini-2.5-flash';
+  document.getElementById('modelSel').value = localStorage.getItem('geminiModel') || 'gemini-2.5-flash-lite';
   document.getElementById('audioInput').addEventListener('change', e => {
     const f = e.target.files[0];
     if (!f) return;
@@ -377,6 +406,9 @@ function setType(t, btn) {
   callType = t;
   document.querySelectorAll('.type-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
+  // Show/hide agent name field for general mode
+  const agentField = document.getElementById('agentNameField');
+  if (agentField) agentField.style.display = t==='general' ? 'none' : 'block';
 }
 
 // ─── UPLOAD ───────────────────────────────────
@@ -421,6 +453,15 @@ async function uploadFile(file, apiKey) {
   return { uri: fileUri, mimeType: mime };
 }
 
+function fileToBase64(file) {
+  return new Promise((res, rej) => {
+    const reader = new FileReader();
+    reader.onload = e => res(e.target.result.split(',')[1]);
+    reader.onerror = rej;
+    reader.readAsDataURL(file);
+  });
+}
+
 function getAudioMime(file) {
   const ext = file.name.split('.').pop().toLowerCase();
   const map = {mp3:'audio/mpeg',wav:'audio/wav',m4a:'audio/mp4',aac:'audio/aac',ogg:'audio/ogg',flac:'audio/flac',wma:'audio/x-ms-wma',opus:'audio/opus',mp4:'video/mp4',wmv:'video/x-ms-wmv',avi:'video/x-msvideo',mov:'video/quicktime',webm:'video/webm'};
@@ -430,8 +471,14 @@ function getAudioMime(file) {
 
 // ─── GEMINI CALL ──────────────────────────────
 async function callGemini(parts, model, apiKey, maxTokens=8192) {
-  for (let attempt=0; attempt<3; attempt++) {
-    if (attempt>0) { setMsg('ניסיון '+(attempt+1)+' מתוך 3...'); await new Promise(r=>setTimeout(r,3000)); }
+  for (let attempt=0; attempt<5; attempt++) {
+    if (attempt>0) {
+      const waitSec = attempt<=2 ? 15 : 30;
+      for (let s=waitSec; s>0; s--) {
+        setMsg('ממתין '+s+' שניות לפני ניסיון '+(attempt+1)+'...');
+        await new Promise(r=>setTimeout(r,1000));
+      }
+    }
     const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+model+':generateContent?key='+apiKey, {
       method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ contents:[{parts}], generationConfig:{temperature:0.3, maxOutputTokens:maxTokens} })
@@ -439,12 +486,26 @@ async function callGemini(parts, model, apiKey, maxTokens=8192) {
     const d = await res.json();
     if (d.error) {
       const msg = d.error.message || '';
-      if (attempt<2 && (msg.includes('high demand')||msg.includes('overloaded')||msg.includes('503'))) continue;
+      // Extract wait time from error if available
+      const waitMatch = msg.match(/retry in ([0-9.]+)s/i);
+      const waitMs = waitMatch ? Math.ceil(parseFloat(waitMatch[1])+2)*1000 : null;
+      const isQuota = msg.includes('quota') || msg.includes('429') || msg.includes('RESOURCE_EXHAUSTED');
+      const isOverload = msg.includes('high demand')||msg.includes('overloaded')||msg.includes('503');
+      if (attempt<4 && (isQuota||isOverload)) {
+        if (waitMs) {
+          const secs = Math.ceil(waitMs/1000);
+          for (let s=secs; s>0; s--) {
+            setMsg('מגבלת API — ממתין '+s+' שניות...');
+            await new Promise(r=>setTimeout(r,1000));
+          }
+        }
+        continue;
+      }
       throw new Error(msg);
     }
     return d;
   }
-  throw new Error('השרת עמוס, נסה שוב בעוד דקה');
+  throw new Error('חרגת ממגבלת ה-API החינמי. נסה שוב בעוד מספר דקות.');
 }
 
 function parseJSON(raw) {
@@ -454,7 +515,23 @@ function parseJSON(raw) {
   clean = clean.slice(si,ei+1)
     .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g,'')
     .replace(/,\s*([}\]])/g,'$1');
-  return JSON.parse(clean);
+  const result = JSON.parse(clean);
+
+  // Normalize transcript — convert array format to string
+  if (Array.isArray(result.transcript)) {
+    result.transcript = result.transcript
+      .map(t => (t.speaker || t.name || '') + ': ' + (t.text || t.content || ''))
+      .join('\n');
+  }
+
+  // Normalize keyMoments — extract text if objects
+  if (Array.isArray(result.keyMoments)) {
+    result.keyMoments = result.keyMoments.map(m =>
+      typeof m === 'string' ? m : (m.text || m.description || JSON.stringify(m))
+    );
+  }
+
+  return result;
 }
 
 // ─── MAIN ANALYSIS ────────────────────────────
@@ -467,8 +544,8 @@ async function runAnalysis() {
   const agentName = document.getElementById('agentName').value.trim() || 'הנציג';
   const callId = document.getElementById('callId').value.trim() || '#'+Date.now().toString().slice(-4);
   const model = localStorage.getItem('geminiModel') || 'gemini-2.5-flash';
-  const typeLabel = callType==='sales' ? 'מכירה' : 'שירות לקוחות';
-  const agentRole = callType==='sales' ? 'נציג מכירות' : 'נציג שירות';
+  const typeLabel = callType==='sales' ? 'מכירה' : callType==='service' ? 'שירות לקוחות' : 'כללי';
+  const agentRole = callType==='sales' ? 'נציג מכירות' : callType==='service' ? 'נציג שירות' : '';
 
   document.getElementById('analyzeForm').style.display='none';
   document.getElementById('errBox').style.display='none';
@@ -479,48 +556,44 @@ async function runAnalysis() {
     let parts = [];
     let transcriptText = manualText;
 
+    // Single API call: transcribe + analyze together
+    setMsg('מתמלל ומנתח...');
     if (selectedFile) {
-      const { uri, mimeType } = await uploadFile(selectedFile, apiKey);
-
-      // Step 1: Get full transcript first
-      setMsg('מתמלל את השיחה...');
-      const transcriptParts = [
-        { file_data:{ mime_type:mimeType, file_uri:uri } },
-        { text: 'תמלל את כל השיחה בעברית. כתוב כל פסקה בפורמט: "נציג: [מה נאמר]" או "לקוח: [מה נאמר]". החזר רק את התמלול, ללא הסברים נוספים.' }
-      ];
-      const transcriptData = await callGemini(transcriptParts, model, apiKey, 4096);
-      transcriptText = transcriptData.candidates?.[0]?.content?.parts?.[0]?.text || '';
-
-      // Step 2: Now analyze with the transcript text (no need to re-upload file)
-      parts = [{ text: transcriptText ? 'תמלול השיחה:\n' + transcriptText : '' }];
+      const mimeType = getAudioMime(selectedFile);
+      const b64 = await fileToBase64(selectedFile);
+      parts = [{ inline_data:{ mime_type:mimeType, data:b64 } }];
     } else {
       parts = [{ text: 'תמלול השיחה:\n' + manualText }];
     }
 
-    const prompt = `אתה מנתח שיחות מוקד מקצועי.
-השיחה היא בין ${agentRole} (בשם: ${agentName}) לבין לקוח.
-${selectedFile ? 'האזן לקובץ השמע ונתח את השיחה.' : 'נתח את תמלול השיחה הבא.'}
+    const audioInstr = selectedFile ? 'האזן לקובץ השמע, תמלל אותו ונתח.' : '';
 
-חשוב: השיחה תמיד מורכבת משני צדדים — הנציג והלקוח. נתח כל צד בנפרד.
+    const isGeneral = callType === 'general';
+    const prompt = isGeneral ? `${audioInstr}
+זהה מי מדבר בשיחה (שמות, תפקידים, קשר — אבא/ילד, חברים, זוג וכו').
+נתח לעומק. החזר JSON תקני בלבד, ללא markdown, ללא טקסט מחוץ ל-JSON.
+כללים חשובים:
+- transcript חייב להיות מחרוזת טקסט בלבד (לא מערך)
+- בכל שדה מחרוזת: אל תשתמש בגרשיים כפולים בתוך הטקסט
+- mainPoints ו-keyMoments: מערכים של מחרוזות פשוטות בלבד
 
-החזר אובייקט JSON תקני בלבד. ללא markdown. ללא טקסט לפני או אחרי.
-
-שדות נדרשים:
-- totalScore: מספר 0-100 (ציון כולל לשיחה)
-- grade: מצוין / טוב / בינוני / טעון שיפור
-- gradeText: משפט אחד קצר על השיחה
-- mood: חיובי / ניטרלי / שלילי / לקוח כועס / לקוח מרוצה מאוד
-- moodEmoji: אמוג'י אחד
-- agentScore: מספר 0-100 (ציון לנציג)
-- agentSummary: משפט קצר על ביצועי הנציג
-- customerScore: מספר 0-100 (מדד שביעות רצון הלקוח)
-- customerSummary: משפט קצר על תגובת הלקוח
-- categories: מערך של 6 קטגוריות, כל אחת עם name, score (0-100), agentNote (מה עשה הנציג), customerNote (איך הגיב הלקוח):
-  פתיח, גוף השיחה, פתרון ללקוח, שביעות רצון, סיום שיחה, אווירה כללית
-- sections: אובייקט עם המפתחות opening, body, solution, satisfaction, closing, atmosphere — כל אחד עם title ו-text
-- recommendations: מערך של 3 המלצות ספציפיות לנציג
-${callType==='sales' ? '- closing: האם הסתיימה בעסקה? (true/false)\n- closingNote: הסבר קצר על הסגירה' : '- resolved: האם הבעיה נפתרה? (true/false)\n- resolvedNote: הסבר קצר'}
-${manualText ? '\nתמלול השיחה:\n'+manualText.slice(0,4000) : ''}`;
+{
+  "speakers": [{"name":"שם","role":"תפקיד/קשר"}],
+  "relationship": "תיאור הקשר",
+  "purpose": "מטרת השיחה",
+  "mainPoints": ["נקודה 1","נקודה 2","נקודה 3"],
+  "atmosphere": "תיאור האווירה",
+  "closing": "איך הסתיימה השיחה",
+  "mood": "אווירה קצרה",
+  "moodEmoji": "אמוג'י",
+  "keyMoments": ["רגע 1","רגע 2","רגע 3"],
+  "summary": "תקציר 3-4 משפטים",
+  "transcript": "שם: טקסט\nשם: טקסט\nשם: טקסט"
+}` :
+`${audioInstr}
+השיחה היא בין ${agentRole} (בשם: ${agentName}) לבין לקוח. נתח נציג ולקוח בנפרד.
+החזר JSON תקני בלבד, ללא markdown.
+{"totalScore":0,"grade":"טוב","gradeText":"","mood":"חיובי","moodEmoji":"😊","agentScore":0,"agentSummary":"","customerScore":0,"customerSummary":"","categories":[{"name":"פתיח","score":0,"agentNote":"","customerNote":""},{"name":"גוף השיחה","score":0,"agentNote":"","customerNote":""},{"name":"פתרון ללקוח","score":0,"agentNote":"","customerNote":""},{"name":"שביעות רצון","score":0,"agentNote":"","customerNote":""},{"name":"סיום שיחה","score":0,"agentNote":"","customerNote":""},{"name":"אווירה כללית","score":0,"agentNote":"","customerNote":""}],"sections":{"opening":{"title":"פתיח","text":""},"body":{"title":"גוף השיחה","text":""},"solution":{"title":"פתרון ללקוח","text":""},"satisfaction":{"title":"שביעות רצון","text":""},"closing":{"title":"סיום שיחה","text":""},"atmosphere":{"title":"תחושה כללית","text":""}},"recommendations":["","",""],"${callType==='sales'?'closing":"false","closingNote":"':'resolved":"false","resolvedNote":"'}","transcript":"תמלול מלא"}`
 
     parts.push({ text: prompt });
     setMsg('מנתח שיחה...');
@@ -532,15 +605,30 @@ ${manualText ? '\nתמלול השיחה:\n'+manualText.slice(0,4000) : ''}`;
     const raw = candidate?.content?.parts?.[0]?.text || '';
     if (!raw.trim()) throw new Error('תשובה ריקה. נסה שוב.');
 
-    const result = parseJSON(raw);
+    let result;
+    try {
+      result = parseJSON(raw);
+    } catch(parseErr) {
+      console.error('Parse error:', parseErr.message);
+      console.error('Raw response:', raw);
+      throw new Error('שגיאת פענוח תשובה. נסה שוב.');
+    }
+
+    console.log('✅ Parsed result keys:', Object.keys(result));
+    console.log('✅ Full result:', JSON.stringify(result, null, 2).slice(0, 1000));
 
     // Store for chat
-    // Use transcript from AI result if we uploaded audio (no manual text)
+    // Save transcript: from manual input, or from AI result field
     const finalTranscript = manualText || result.transcript || '';
     currentAnalysis = { result, agentName, callId, typeLabel, agentRole, transcriptText: finalTranscript, raw };
 
     document.getElementById('loadingDiv').style.display='none';
-    renderResults(result, agentName, callId);
+    // Detect general by checking if result has 'speakers' field
+    if (result.speakers !== undefined) {
+      renderGeneral(result, callId);
+    } else {
+      renderResults(result, agentName, callId);
+    }
     saveToHistory(result, agentName, callId);
 
     // Reset chat
@@ -551,6 +639,73 @@ ${manualText ? '\nתמלול השיחה:\n'+manualText.slice(0,4000) : ''}`;
     document.getElementById('analyzeForm').style.display='block';
     showErr(err.message || 'שגיאה לא ידועה');
   }
+}
+
+// ─── RENDER GENERAL ───────────────────────────
+function renderGeneral(r, id) {
+  document.getElementById('resultsDiv').style.display='block';
+  document.getElementById('agentPill').textContent = 'שיחה כללית · '+id;
+  document.getElementById('rScore').textContent = '💬';
+  document.getElementById('rGrade').textContent = r.relationship || 'שיחה כללית';
+  document.getElementById('rGradeText').textContent = r.summary || '';
+  document.getElementById('rMood').textContent = (r.moodEmoji||'')+ ' '+(r.mood||'');
+
+  document.getElementById('rSides').innerHTML = '';
+  document.getElementById('rCats').innerHTML = '';
+  document.getElementById('rSections').innerHTML = '';
+  document.getElementById('rRecs').innerHTML = '';
+
+  // Speakers pills
+  const speakers = (r.speakers||[]).map(s=>
+    `<div style="display:inline-flex;align-items:center;gap:6px;background:#f5f4ff;border:1px solid #ddd8ff;border-radius:20px;padding:6px 16px;font-size:13px;margin-left:8px;margin-bottom:8px">
+      <span style="font-weight:600;color:#4f46e5">${s.name}</span>
+      <span style="color:#9098b1">${s.role}</span>
+    </div>`
+  ).join('');
+
+  // Main points
+  const mainPoints = (r.mainPoints||[]).map((p,i)=>
+    `<div class="rec-row"><div class="rec-n">${i+1}</div><div class="rec-text">${p}</div></div>`
+  ).join('');
+
+  // Key moments
+  const moments = (r.keyMoments||[]).map((m,i)=>
+    `<div class="rec-row"><div class="rec-n" style="background:#f59e0b">⚡</div><div class="rec-text">${m.text||m}</div></div>`
+  ).join('');
+
+  const secCard = (icon, title, text, color='#6c63ff') =>
+    text ? `<div class="sec-card">
+      <div class="sec-title" style="color:${color}"><span class="sec-dot" style="background:${color}"></span>${icon} ${title}</div>
+      <div class="sec-text">${text}</div>
+    </div>` : '';
+
+  const transcript = r.transcript || '';
+
+  document.getElementById('rGeneral').style.display='block';
+  document.getElementById('rGeneral').innerHTML = `
+    ${speakers ? `<div class="card" style="margin-bottom:16px">
+      <div class="card-title">👥 דוברים שזוהו</div>
+      <div>${speakers}</div>
+    </div>` : ''}
+
+    ${secCard('🎯','מטרת השיחה', r.purpose, '#4f46e5')}
+    ${secCard('🌡️','אווירה בשיחה', r.atmosphere, '#0891b2')}
+    ${secCard('🏁','סיום השיחה', r.closing, '#16a34a')}
+    ${secCard('📋','סיכום', r.summary, '#6c63ff')}
+
+    ${mainPoints ? `<div class="recs-box" style="margin-bottom:16px">
+      <h3>📌 דברים עיקריים</h3>${mainPoints}
+    </div>` : ''}
+
+    ${moments ? `<div class="recs-box" style="background:#fffbeb;border-color:#fde68a;margin-bottom:16px">
+      <h3 style="color:#d97706">⚡ רגעים משמעותיים</h3>${moments}
+    </div>` : ''}
+
+    ${transcript ? `<div class="card">
+      <div class="card-title">📝 תמלול השיחה</div>
+      <div style="font-size:13px;color:#5a6282;line-height:2;white-space:pre-wrap;max-height:450px;overflow-y:auto;direction:rtl;border-top:1px solid #f0f1f5;padding-top:12px">${transcript}</div>
+    </div>` : ''}
+  `;
 }
 
 // ─── RENDER RESULTS ───────────────────────────
@@ -628,10 +783,10 @@ async function sendChat() {
 
     const fullTranscript = transcriptText || result.transcript || '';
     const systemContext = `אתה סוכן AI שמנתח שיחות מוקד. יש לך גישה מלאה לשיחה שנותחה.
+חשוב ביותר: ענה רק על בסיס התמלול המצורף. אל תמציא פרטים. אם שאלו על שם — חפש בתמלול בלבד.
 
-=== פרטי השיחה ===
+=== ניתוח השיחה ===
 סוג: ${typeLabel}
-נציג: ${agentName} (${agentRole})
 ציון כולל: ${result.totalScore}/100 (${result.grade})
 ציון נציג: ${result.agentScore}/100 | ציון לקוח: ${result.customerScore}/100
 מצב רוח: ${result.mood} ${result.moodEmoji||''}
@@ -639,10 +794,15 @@ async function sendChat() {
 סיכום לקוח: ${result.customerSummary}
 המלצות: ${(result.recommendations||[]).join(' | ')}
 
-=== תמלול מלא של השיחה ===
-${fullTranscript || '(תמלול לא זמין)'}
+=== תמלול מלא של השיחה (זהו המקור האמין היחיד) ===
+${fullTranscript || '(תמלול לא זמין — ענה רק על בסיס הניתוח למעלה)'}
 
-ענה בעברית בתשובה ממוקדת. אם שואלים על פרט ספציפי מהשיחה (שם, מה נאמר, מתי) — השתמש בתמלול המלא.`;
+כללי מחייבים:
+- שם הנציג — חפש רק בתמלול (שורות שמתחילות ב"נציג:")
+- שם הלקוח — חפש רק בתמלול (שורות שמתחילות ב"לקוח:")
+- אל תשתמש בשם "${agentName}" אלא אם הוא מופיע בתמלול
+- אם פרט לא מופיע בתמלול — אמור "לא ניתן לדעת מהתמלול"
+ענה בעברית, קצר וממוקד.`;
 
     const parts = [{ text: systemContext+'\n\nשאלה: '+q }];
     const data = await callGemini(parts, model, apiKey, 1024);
@@ -657,6 +817,138 @@ ${fullTranscript || '(תמלול לא זמין)'}
 
   document.getElementById('chatSendBtn').disabled = false;
   messages.scrollTop = messages.scrollHeight;
+}
+
+// ─── PDF DOWNLOAD ─────────────────────────────
+function downloadPDF() {
+  if (!currentAnalysis) return;
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+  const { result: r, agentName, callId, typeLabel, transcriptText } = currentAnalysis;
+  const isGeneral = callType === 'general';
+
+  // RTL support via unicode
+  doc.setR2L(true);
+
+  let y = 20;
+  const lh = 7; // line height
+  const margin = 15;
+  const pageW = 210;
+  const maxW = pageW - margin*2;
+
+  const addLine = (text, size=11, bold=false, color=[30,29,46]) => {
+    if (y > 270) { doc.addPage(); y = 20; }
+    doc.setFontSize(size);
+    doc.setFont('helvetica', bold ? 'bold' : 'normal');
+    doc.setTextColor(...color);
+    doc.text(text || '', pageW - margin, y, { align:'right' });
+    y += lh;
+  };
+
+  const addBlock = (title, text, titleColor=[108,99,255]) => {
+    if (y > 260) { doc.addPage(); y = 20; }
+    addLine(title, 11, true, titleColor);
+    if (text) {
+      const lines = doc.splitTextToSize(text, maxW);
+      lines.forEach(line => {
+        if (y > 270) { doc.addPage(); y = 20; }
+        doc.setFontSize(10); doc.setFont('helvetica','normal'); doc.setTextColor(90,98,130);
+        doc.text(line, pageW - margin, y, { align:'right' });
+        y += 6;
+      });
+    }
+    y += 3;
+  };
+
+  // Header
+  doc.setFillColor(108, 99, 255);
+  doc.rect(0, 0, 210, 30, 'F');
+  doc.setFontSize(16); doc.setFont('helvetica','bold'); doc.setTextColor(255,255,255);
+  doc.text('Call Quality Report', pageW - margin, 13, { align:'right' });
+  doc.setFontSize(10); doc.setFont('helvetica','normal');
+  doc.text(isGeneral ? 'General Transcript' : typeLabel + ' | ' + agentName + ' | ' + callId, pageW - margin, 22, { align:'right' });
+  doc.text(new Date().toLocaleDateString('he-IL'), margin, 22);
+  y = 40;
+
+  if (isGeneral) {
+    addLine('סיכום שיחה', 13, true, [30,29,46]);
+    y += 2;
+    addBlock('קשר בין הדוברים:', r.relationship || '');
+    addBlock('תקציר:', r.summary || '');
+    addBlock('אווירה:', (r.moodEmoji||'') + ' ' + (r.mood||''));
+    if (r.speakers?.length) {
+      addLine('דוברים:', 11, true, [108,99,255]);
+      r.speakers.forEach(s => addLine('• ' + s.name + ' — ' + s.role, 10, false, [90,98,130]));
+      y += 3;
+    }
+    if (r.keyMoments?.length) {
+      addLine('רגעים מרכזיים:', 11, true, [108,99,255]);
+      r.keyMoments.forEach((m,i) => addBlock((i+1)+'.', m.text||m));
+    }
+    if (transcriptText) {
+      y += 5;
+      addLine('תמלול השיחה:', 11, true, [108,99,255]);
+      const tLines = doc.splitTextToSize(transcriptText, maxW);
+      tLines.forEach(line => {
+        if (y > 270) { doc.addPage(); y = 20; }
+        doc.setFontSize(9); doc.setFont('helvetica','normal'); doc.setTextColor(90,98,130);
+        doc.text(line, pageW - margin, y, { align:'right' });
+        y += 5.5;
+      });
+    }
+  } else {
+    // Score
+    doc.setFillColor(245,244,255);
+    doc.roundedRect(margin, y, maxW, 22, 3, 3, 'F');
+    doc.setFontSize(22); doc.setFont('helvetica','bold'); doc.setTextColor(108,99,255);
+    doc.text(String(r.totalScore||0), pageW - margin - 5, y+14, { align:'right' });
+    doc.setFontSize(10); doc.setFont('helvetica','normal'); doc.setTextColor(30,29,46);
+    doc.text((r.grade||'') + ' — ' + (r.gradeText||''), pageW - margin - 25, y+9, { align:'right' });
+    doc.text((r.moodEmoji||'') + ' ' + (r.mood||''), pageW - margin - 25, y+16, { align:'right' });
+    y += 28;
+
+    // Scores
+    addLine('ניתוח נציג ולקוח', 12, true);
+    addBlock('נציג — ציון ' + (r.agentScore||0) + '/100:', r.agentSummary||'', [22,163,74]);
+    addBlock('לקוח — שביעות רצון ' + (r.customerScore||0) + '/100:', r.customerSummary||'', [30,64,175]);
+
+    // Categories
+    y += 2;
+    addLine('ניתוח קטגוריות', 12, true);
+    (r.categories||[]).forEach(c => {
+      addLine('• ' + c.name + ' — ' + c.score + '/100', 10, true, [60,68,102]);
+      if (c.agentNote) addLine('  נציג: ' + c.agentNote, 9, false, [90,98,130]);
+      if (c.customerNote) addLine('  לקוח: ' + c.customerNote, 9, false, [90,98,130]);
+      y += 1;
+    });
+
+    // Sections
+    y += 3;
+    addLine('ניתוח מפורט', 12, true);
+    Object.values(r.sections||{}).forEach(s => addBlock(s.title+':', s.text||''));
+
+    // Recommendations
+    y += 3;
+    addLine('המלצות לנציג', 12, true, [108,99,255]);
+    (r.recommendations||[]).forEach((rec,i) => addBlock((i+1)+'.', rec));
+
+    // Transcript
+    if (transcriptText) {
+      y += 5;
+      if (y > 240) { doc.addPage(); y = 20; }
+      addLine('תמלול השיחה', 12, true);
+      const tLines = doc.splitTextToSize(transcriptText, maxW);
+      tLines.forEach(line => {
+        if (y > 270) { doc.addPage(); y = 20; }
+        doc.setFontSize(9); doc.setFont('helvetica','normal'); doc.setTextColor(90,98,130);
+        doc.text(line, pageW - margin, y, { align:'right' });
+        y += 5.5;
+      });
+    }
+  }
+
+  const filename = isGeneral ? 'transcript_'+callId+'.pdf' : 'call_report_'+agentName+'_'+callId+'.pdf';
+  doc.save(filename);
 }
 
 // ─── HISTORY ──────────────────────────────────
