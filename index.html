@@ -8,37 +8,31 @@
 @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700&display=swap');
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:'Heebo',sans-serif;background:#f5f6fa;color:#1a1d2e;direction:rtl;display:flex;min-height:100vh;}
-
 .sidebar{width:220px;min-height:100vh;background:#fff;border-left:1px solid #e8eaf0;display:flex;flex-direction:column;position:fixed;right:0;top:0;z-index:100;}
 .logo{padding:20px;border-bottom:1px solid #f0f1f5;display:flex;align-items:center;gap:10px;}
 .logo-icon{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#6c63ff,#4f46e5);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
 .logo-title{font-size:14px;font-weight:600;}.logo-sub{font-size:11px;color:#9098b1;}
 .nav{padding:12px 10px;flex:1;}
 .nav-lbl{font-size:10px;font-weight:600;color:#b0b8cc;letter-spacing:.8px;padding:8px 10px 4px;text-transform:uppercase;}
-.nav-btn{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;font-size:13px;font-weight:500;color:#5a6282;cursor:pointer;transition:all .15s;border:none;background:none;width:100%;text-align:right;margin-bottom:2px;}
-.nav-btn:hover{background:#f5f6fa;color:#1a1d2e;}
-.nav-btn.active{background:#eeeeff;color:#4f46e5;}
-.nav-btn .ic{font-size:16px;width:20px;text-align:center;}
+.nb{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;font-size:13px;font-weight:500;color:#5a6282;cursor:pointer;transition:all .15s;border:none;background:none;width:100%;text-align:right;margin-bottom:2px;}
+.nb:hover{background:#f5f6fa;color:#1a1d2e;}
+.nb.on{background:#eeeeff;color:#4f46e5;}
+.nb .ic{font-size:16px;width:20px;text-align:center;}
 .side-footer{padding:14px;border-top:1px solid #f0f1f5;font-size:11px;color:#c0c6d9;text-align:center;line-height:1.6;}
-
 .main{margin-right:220px;flex:1;padding:32px 36px;max-width:calc(100vw - 220px);}
-.pg{display:none;}.pg.active{display:block;}
+.pg{display:none;}.pg.on{display:block;}
 .ph{margin-bottom:28px;}.ph h1{font-size:22px;font-weight:700;margin-bottom:4px;}.ph p{font-size:13px;color:#9098b1;}
-
 .card{background:#fff;border-radius:16px;border:1px solid #e8eaf0;padding:24px;margin-bottom:16px;}
 .ctitle{font-size:13px;font-weight:600;margin-bottom:14px;}
-
 .type-row{display:flex;gap:8px;}
 .tbtn{flex:1;padding:11px;border-radius:10px;border:1.5px solid #e8eaf0;background:#fff;color:#9098b1;font-size:13px;font-family:'Heebo',sans-serif;cursor:pointer;transition:all .15s;font-weight:500;}
 .tbtn:hover{border-color:#a5a0f5;color:#4f46e5;}
 .tbtn.on{background:#eeeeff;border-color:#6c63ff;color:#4f46e5;font-weight:600;}
-
 .frow{display:flex;gap:12px;margin-bottom:14px;}
 .fi{flex:1;}
 .fi label{display:block;font-size:12px;font-weight:500;color:#5a6282;margin-bottom:6px;}
 .fi input,.fi select{width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid #e8eaf0;background:#fafbff;color:#1a1d2e;font-size:13px;font-family:'Heebo',sans-serif;outline:none;transition:border-color .2s;}
 .fi input:focus,.fi select:focus{border-color:#6c63ff;background:#fff;}
-
 .upzone{border:2px dashed #dde0ea;border-radius:12px;padding:28px;text-align:center;cursor:pointer;transition:all .2s;background:#fafbff;position:relative;}
 .upzone:hover{border-color:#6c63ff;background:#f5f4ff;}
 .upzone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
@@ -51,20 +45,23 @@ body{font-family:'Heebo',sans-serif;background:#f5f6fa;color:#1a1d2e;direction:r
 textarea.ta{width:100%;min-height:100px;padding:12px 14px;border-radius:10px;border:1.5px solid #e8eaf0;background:#fafbff;color:#1a1d2e;font-size:13px;font-family:'Heebo',sans-serif;resize:vertical;outline:none;direction:rtl;}
 textarea.ta:focus{border-color:#6c63ff;background:#fff;}
 textarea.ta::placeholder{color:#c0c6d9;}
-
 .btn-p{width:100%;padding:13px;border-radius:12px;background:linear-gradient(135deg,#6c63ff,#4f46e5);border:none;color:#fff;font-size:14px;font-weight:600;font-family:'Heebo',sans-serif;cursor:pointer;transition:all .2s;margin-top:4px;box-shadow:0 4px 14px rgba(79,70,229,.25);}
 .btn-p:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(79,70,229,.35);}
+.btn-p:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none;}
 .btn-s{padding:9px 18px;border-radius:9px;background:#fff;border:1.5px solid #e8eaf0;color:#5a6282;font-size:13px;font-family:'Heebo',sans-serif;cursor:pointer;transition:all .15s;font-weight:500;}
 .btn-s:hover{border-color:#a5a0f5;color:#4f46e5;}
 .btn-save{padding:10px 20px;border-radius:10px;background:linear-gradient(135deg,#6c63ff,#4f46e5);border:none;color:#fff;font-family:'Heebo',sans-serif;font-size:13px;font-weight:600;cursor:pointer;height:42px;}
-
 .loading{display:none;text-align:center;padding:60px 20px;}
 .spin{width:44px;height:44px;border:3px solid #e8eaf0;border-top-color:#6c63ff;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 16px;}
 @keyframes spin{to{transform:rotate(360deg);}}
 .loading p{font-size:14px;color:#9098b1;}
 .err{background:#fff5f5;border:1.5px solid #fecaca;border-radius:10px;padding:12px 16px;font-size:13px;color:#dc2626;margin-bottom:14px;display:none;line-height:1.6;}
-
-/* Results */
+.qtimer{display:none;background:#fffbeb;border:1.5px solid #fde68a;border-radius:12px;padding:16px 20px;margin-bottom:14px;text-align:center;}
+.qtimer h4{font-size:14px;font-weight:600;color:#d97706;margin-bottom:8px;}
+.qtimer .qnum{font-size:36px;font-weight:700;color:#b45309;letter-spacing:2px;}
+.qtimer p{font-size:12px;color:#92400e;margin-top:4px;}
+.qbar-bg{height:6px;background:#fde68a;border-radius:3px;overflow:hidden;margin-top:12px;}
+.qbar{height:100%;background:#f59e0b;border-radius:3px;transition:width 1s linear;}
 .rtop{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px;}
 .rtop h2{font-size:18px;font-weight:700;}
 .pill{background:#eeeeff;border:1px solid #c7c4f8;color:#4f46e5;font-size:12px;padding:5px 14px;border-radius:20px;font-weight:500;}
@@ -73,7 +70,6 @@ textarea.ta::placeholder{color:#c0c6d9;}
 .snum{font-size:28px;font-weight:700;line-height:1;}.sdenom{font-size:11px;opacity:.75;}
 .sinfo h3{font-size:18px;font-weight:600;margin-bottom:4px;}.sinfo p{font-size:13px;opacity:.8;margin-bottom:10px;}
 .mood{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.2);border-radius:20px;padding:5px 14px;font-size:13px;}
-
 .sides{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
 .scard{border-radius:14px;padding:18px 20px;}
 .scard.ag{background:#f0fdf4;border:1.5px solid #86efac;}
@@ -83,35 +79,28 @@ textarea.ta::placeholder{color:#c0c6d9;}
 .srow{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
 .slbl{font-size:12px;color:#6b7280;}.ssc{font-size:14px;font-weight:600;}
 .sbar{height:4px;background:#e5e7eb;border-radius:2px;margin-top:4px;}
-.sbarfill{height:4px;border-radius:2px;}
-.ag .sbarfill{background:#22c55e;}.cu .sbarfill{background:#3b82f6;}
+.sbf{height:4px;border-radius:2px;}
+.ag .sbf{background:#22c55e;}.cu .sbf{background:#3b82f6;}
 .stxt{font-size:12px;color:#4b5563;margin-top:8px;}
-
 .cgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
 .ccard{background:#fff;border:1px solid #e8eaf0;border-radius:12px;padding:14px 16px;}
 .chead{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
 .cname{font-size:13px;font-weight:500;color:#3d4466;}.cscore{font-size:16px;font-weight:700;}
-.hi{color:#16a34a;}.md{color:#d97706;}.lo{color:#dc2626;}
+.shi{color:#16a34a;}.smd{color:#d97706;}.slo{color:#dc2626;}
 .bbar{height:5px;background:#f0f1f5;border-radius:3px;margin-bottom:8px;}
-.bfill{height:5px;border-radius:3px;}
+.bf{height:5px;border-radius:3px;}
 .bhi{background:#22c55e;}.bmd{background:#f59e0b;}.blo{background:#ef4444;}
 .cnote{font-size:11px;color:#4f46e5;margin-bottom:2px;}.cnote2{font-size:11px;color:#1e40af;}
-
 .seccard{background:#fff;border:1px solid #e8eaf0;border-radius:12px;padding:16px 18px;margin-bottom:10px;}
 .sectit{font-size:12px;font-weight:600;color:#6c63ff;margin-bottom:8px;display:flex;align-items:center;gap:7px;text-transform:uppercase;letter-spacing:.5px;}
 .secdot{width:6px;height:6px;border-radius:50%;background:#6c63ff;flex-shrink:0;}
 .sectxt{font-size:13px;color:#5a6282;line-height:1.7;}
-
 .recs{background:#f8f7ff;border:1.5px solid #ddd8ff;border-radius:14px;padding:18px 20px;margin-bottom:16px;}
 .recs h3{font-size:13px;font-weight:600;color:#4f46e5;margin-bottom:12px;}
 .rrow{display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;}
 .rnum{width:22px;height:22px;border-radius:50%;background:#6c63ff;color:#fff;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
 .rtxt{font-size:13px;color:#5a6282;line-height:1.6;}
-
-/* General results */
 .gcard{background:#fff;border:1px solid #e8eaf0;border-radius:12px;padding:16px 18px;margin-bottom:10px;}
-
-/* Chat */
 .chatbox{background:#fff;border:1.5px solid #ddd8ff;border-radius:16px;overflow:hidden;margin-bottom:16px;}
 .chath{background:linear-gradient(135deg,#6c63ff,#4f46e5);padding:14px 18px;display:flex;align-items:center;gap:10px;}
 .chatdot{width:8px;height:8px;border-radius:50%;background:#4ade80;animation:pulse 2s infinite;}
@@ -121,14 +110,11 @@ textarea.ta::placeholder{color:#c0c6d9;}
 .cmsg{max-width:80%;padding:10px 14px;border-radius:12px;font-size:13px;line-height:1.6;}
 .cai{background:#f5f4ff;color:#3d4466;border-radius:12px 12px 12px 2px;align-self:flex-end;}
 .cuser{background:#eeeeff;color:#1a1d2e;border-radius:12px 12px 2px 12px;align-self:flex-start;}
-.cload{background:#f5f4ff;color:#9098b1;font-style:italic;align-self:flex-end;}
 .chatinrow{display:flex;gap:8px;padding:12px 16px;border-top:1px solid #f0f1f5;background:#fafbff;}
 .chatin{flex:1;padding:10px 14px;border-radius:10px;border:1.5px solid #e8eaf0;background:#fff;font-size:13px;font-family:'Heebo',sans-serif;outline:none;direction:rtl;}
 .chatin:focus{border-color:#6c63ff;}
 .chatsend{padding:10px 16px;border-radius:10px;background:linear-gradient(135deg,#6c63ff,#4f46e5);border:none;color:#fff;font-size:13px;font-family:'Heebo',sans-serif;cursor:pointer;}
 .chatsend:disabled{opacity:.5;cursor:not-allowed;}
-
-/* History */
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;}
 .stcard{background:#fff;border:1px solid #e8eaf0;border-radius:14px;padding:18px 20px;}
 .stlbl{font-size:12px;color:#9098b1;margin-bottom:6px;}.stval{font-size:26px;font-weight:700;}
@@ -137,24 +123,28 @@ textarea.ta::placeholder{color:#c0c6d9;}
 .hname{font-size:14px;font-weight:500;}.hmeta{font-size:12px;color:#9098b1;margin-top:2px;}
 .hscore{font-size:20px;font-weight:700;}
 .hempty{text-align:center;padding:40px;color:#c0c6d9;font-size:13px;background:#fff;border-radius:14px;border:1.5px dashed #e8eaf0;}
-
-/* Settings */
-.setlbl{font-size:14px;font-weight:600;margin-bottom:12px;}
 .krow{display:flex;gap:8px;margin-bottom:8px;align-items:center;}
 .krow .fi{flex:1;}
 .kremove{padding:6px 12px;border-radius:8px;border:1px solid #fecaca;background:#fff5f5;color:#dc2626;cursor:pointer;font-size:12px;font-family:'Heebo',sans-serif;margin-top:18px;}
 .snote{display:none;align-items:center;gap:6px;font-size:12px;color:#16a34a;background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:6px 12px;margin-top:8px;width:fit-content;}
 .ibox{background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:14px 16px;font-size:13px;color:#1d4ed8;line-height:1.7;margin-top:14px;}
 .ibox a{color:#4f46e5;}
-
+.crow{display:grid;grid-template-columns:1fr 70px 1fr auto;gap:8px;align-items:start;margin-bottom:8px;padding:10px 12px;background:#fafbff;border-radius:10px;border:1px solid #e8eaf0;}
+.crow input[type=text]{padding:8px 10px;border-radius:8px;border:1.5px solid #e8eaf0;background:#fff;font-size:13px;font-family:'Heebo',sans-serif;outline:none;width:100%;}
+.crow input[type=text]:focus{border-color:#6c63ff;}
+.crow input[type=number]{padding:8px 6px;border-radius:8px;border:1.5px solid #e8eaf0;background:#fff;font-size:13px;font-family:'Heebo',sans-serif;outline:none;width:100%;text-align:center;}
+.crow input[type=number]:focus{border-color:#6c63ff;}
+.crow .wlbl{font-size:10px;color:#9098b1;text-align:center;margin-top:2px;}
+.cremove{padding:6px 8px;border-radius:8px;border:1px solid #fecaca;background:#fff5f5;color:#dc2626;cursor:pointer;font-size:11px;margin-top:4px;}
+.wtotal{font-size:13px;font-weight:600;padding:7px 14px;border-radius:8px;margin-top:6px;display:inline-block;}
+.wok{background:#f0fdf4;color:#16a34a;border:1px solid #86efac;}
+.werr{background:#fff5f5;color:#dc2626;border:1px solid #fecaca;}
 .pfooter{text-align:center;padding:24px 0 4px;font-size:12px;font-weight:600;color:#9098b1;border-top:1px solid #e8eaf0;margin-top:28px;letter-spacing:.3px;}
 .pfooter span{color:#4f46e5;font-weight:700;}
-
 @media(max-width:640px){.cgrid,.sides{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
-
 <nav class="sidebar">
   <div class="logo">
     <div class="logo-icon">🎧</div>
@@ -162,21 +152,20 @@ textarea.ta::placeholder{color:#c0c6d9;}
   </div>
   <div class="nav">
     <div class="nav-lbl">ניתוח</div>
-    <button class="nav-btn active" onclick="navTo('analyze',this)"><span class="ic">🎙️</span>תמלול וניתוח</button>
-    <button class="nav-btn" onclick="navTo('history',this)"><span class="ic">📋</span>היסטוריה</button>
+    <button class="nb on" onclick="navTo('analyze',this)"><span class="ic">🎙️</span>תמלול וניתוח</button>
+    <button class="nb" onclick="navTo('history',this)"><span class="ic">📋</span>היסטוריה</button>
     <div class="nav-lbl" style="margin-top:10px">מערכת</div>
-    <button class="nav-btn" onclick="navTo('settings',this)"><span class="ic">⚙️</span>הגדרות</button>
+    <button class="nb" onclick="navTo('criteria',this)"><span class="ic">🎯</span>קריטריונים</button>
+    <button class="nb" onclick="navTo('settings',this)"><span class="ic">⚙️</span>הגדרות</button>
   </div>
   <div class="side-footer">מופעל על ידי<br>Google Gemini</div>
 </nav>
-
 <main class="main">
 
 <!-- ANALYZE -->
-<div class="pg active" id="pg-analyze">
+<div class="pg on" id="pg-analyze">
   <div class="ph"><h1>ניתוח שיחה</h1><p>העלה קובץ שמע וקבל דוח איכות מלא + שיחה עם סוכן AI</p></div>
-
-  <div id="analyzeForm">
+  <div id="aForm">
     <div class="card">
       <div class="ctitle">📊 סוג השיחה</div>
       <div class="type-row">
@@ -201,25 +190,35 @@ textarea.ta::placeholder{color:#c0c6d9;}
         <p>MP3, WAV, WMV, MP4, M4A, AAC, AMR ועוד</p>
       </div>
       <div class="fchip" id="fchip">✓ <span id="fname"></span></div>
-      <div id="audioPlayerWrap" style="display:none;margin-top:10px">
-        <audio id="audioPlayer" controls style="width:100%;border-radius:8px;margin-top:4px"></audio>
+      <div id="playerWrap" style="display:none;margin-top:10px">
+        <audio id="audioPlayer" controls style="width:100%;border-radius:8px"></audio>
       </div>
       <div class="orline">או הדבק תמלול ישירות</div>
       <textarea class="ta" id="manualText" placeholder="נציג: שלום...&#10;לקוח: שלום..."></textarea>
     </div>
     <div class="err" id="errBox"></div>
-    <button class="btn-p" onclick="runAnalysis()">נתח שיחה ✦</button>
+    <div class="qtimer" id="qtimer">
+      <h4>⏱ המגבלה תתאפס בעוד</h4>
+      <div class="qnum" id="qnum">60</div>
+      <p>שניות — המתן ואז נסה שוב</p>
+      <div class="qbar-bg"><div class="qbar" id="qbar" style="width:100%"></div></div>
+    </div>
+    <button class="btn-p" id="analyzeBtn" onclick="runAnalysis()">נתח שיחה ✦</button>
   </div>
-
   <div class="loading" id="loadDiv"><div class="spin"></div><p id="loadMsg">מנתח...</p></div>
-
   <div id="resDiv" style="display:none">
     <div class="rtop">
       <h2>תוצאות ניתוח</h2>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
         <span class="pill" id="agPill"></span>
-        <button class="btn-s" onclick="downloadPDF()">📄 PDF</button>
+        <button class="btn-s" onclick="dlPDF()">📄 PDF</button>
         <button class="btn-s" onclick="resetForm()">+ שיחה חדשה</button>
+      </div>
+    </div>
+    <div id="resultPlayerWrap" style="display:none;margin-bottom:16px">
+      <div class="card" style="padding:14px 18px">
+        <div class="ctitle" style="margin-bottom:10px">🔊 האזן לשיחה</div>
+        <audio id="resultPlayer" controls style="width:100%;border-radius:8px"></audio>
       </div>
     </div>
     <div class="banner">
@@ -231,12 +230,6 @@ textarea.ta::placeholder{color:#c0c6d9;}
     <div id="rSecs"></div>
     <div class="recs" id="rRecs"></div>
     <div id="rGeneral" style="display:none"></div>
-    <div id="resultPlayerWrap" style="display:none;margin-bottom:16px">
-      <div class="card" style="padding:14px 18px">
-        <div class="ctitle" style="margin-bottom:10px">🔊 השמע את השיחה</div>
-        <audio id="resultPlayer" controls style="width:100%;border-radius:8px"></audio>
-      </div>
-    </div>
     <div class="chatbox">
       <div class="chath"><div class="chatdot"></div><div><h3>סוכן AI — שאל על השיחה</h3><p>שאל כל שאלה על השיחה שנותחה</p></div></div>
       <div class="chatmsgs" id="chatMsgs"><div class="cmsg cai">שלום! אני מכיר את השיחה שנותחה. שאל אותי כל שאלה 💬</div></div>
@@ -258,26 +251,72 @@ textarea.ta::placeholder{color:#c0c6d9;}
   <div class="pfooter">© כל הזכויות שמורות ל<span>אדיר לוי</span></div>
 </div>
 
+<!-- CRITERIA -->
+<div class="pg" id="pg-criteria">
+  <div class="ph"><h1>קריטריוני ביקורת</h1><p>הגדר קטגוריות ומשקלות מותאמות לעסק שלך</p></div>
+  <div class="card">
+    <div class="ctitle">📈 קריטריונים — מכירה</div>
+    <p style="font-size:12px;color:#9098b1;margin-bottom:14px">עד 6 קטגוריות, סה"כ 100%</p>
+    <div style="display:grid;grid-template-columns:1fr 70px 1fr auto;gap:8px;padding:0 12px;margin-bottom:6px">
+      <span style="font-size:11px;color:#9098b1">שם קטגוריה</span>
+      <span style="font-size:11px;color:#9098b1;text-align:center">משקל</span>
+      <span style="font-size:11px;color:#9098b1">תיאור / מה לבדוק</span>
+      <span></span>
+    </div>
+    <div id="salesCrit"></div>
+    <button class="btn-s" onclick="addCrow('sales')" style="margin-top:8px;font-size:13px">+ הוסף קטגוריה</button>
+    <div id="salesTotal"></div>
+  </div>
+  <div class="card">
+    <div class="ctitle">🎧 קריטריונים — שירות</div>
+    <p style="font-size:12px;color:#9098b1;margin-bottom:14px">עד 6 קטגוריות, סה"כ 100%</p>
+    <div style="display:grid;grid-template-columns:1fr 70px 1fr auto;gap:8px;padding:0 12px;margin-bottom:6px">
+      <span style="font-size:11px;color:#9098b1">שם קטגוריה</span>
+      <span style="font-size:11px;color:#9098b1;text-align:center">משקל</span>
+      <span style="font-size:11px;color:#9098b1">תיאור / מה לבדוק</span>
+      <span></span>
+    </div>
+    <div id="serviceCrit"></div>
+    <button class="btn-s" onclick="addCrow('service')" style="margin-top:8px;font-size:13px">+ הוסף קטגוריה</button>
+    <div id="serviceTotal"></div>
+  </div>
+  <div class="card">
+    <div class="ctitle">📝 הוראות נוספות</div>
+    <div class="frow" style="margin-bottom:10px">
+      <div class="fi"><label>למכירה</label><textarea class="ta" id="salesInst" style="min-height:70px" placeholder="לדוגמה: בדוק האם הנציג הציע מוצר נלווה..."></textarea></div>
+    </div>
+    <div class="frow">
+      <div class="fi"><label>לשירות</label><textarea class="ta" id="serviceInst" style="min-height:70px" placeholder="לדוגמה: בדוק האם הנציג וידא שהבעיה נפתרה..."></textarea></div>
+    </div>
+  </div>
+  <div style="display:flex;gap:10px;margin-bottom:16px">
+    <button class="btn-p" style="flex:1" onclick="saveCrit()">💾 שמור קריטריונים</button>
+    <button class="btn-s" onclick="resetCrit()">↺ אפס</button>
+  </div>
+  <div class="snote" id="critSaved">✓ קריטריונים נשמרו!</div>
+  <div class="pfooter">© כל הזכויות שמורות ל<span>אדיר לוי</span></div>
+</div>
+
 <!-- SETTINGS -->
 <div class="pg" id="pg-settings">
   <div class="ph"><h1>הגדרות</h1><p>מפתחות API ומודל</p></div>
   <div class="card">
-    <div class="setlbl">🔑 מפתחות Gemini API — סיבוב אוטומטי</div>
-    <p style="font-size:12px;color:#9098b1;margin-bottom:14px">הוסף עד 5 מפתחות ממפרויקטים שונים — המערכת תסובב ביניהם אוטומטית</p>
+    <div style="font-size:14px;font-weight:600;margin-bottom:10px">🔑 מפתחות Gemini — סיבוב אוטומטי</div>
+    <p style="font-size:12px;color:#9098b1;margin-bottom:14px">הוסף עד 5 מפתחות ממפרויקטים שונים</p>
     <div id="keysList"></div>
-    <button class="btn-s" onclick="addKeyField()" style="margin-top:8px;font-size:13px">+ הוסף מפתח</button>
+    <button class="btn-s" onclick="addKeyRow()" style="margin-top:8px;font-size:13px">+ הוסף מפתח</button>
     <div style="margin-top:12px"><button class="btn-save" onclick="saveKeys()">שמור מפתחות</button></div>
-    <div class="snote" id="snote">✓ נשמר!</div>
+    <div class="snote" id="keysSaved">✓ נשמר!</div>
     <div class="ibox">
       <strong>קבלת מפתח חינמי:</strong><br>
       1. כנס ל: <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com/app/apikey</a><br>
-      2. לחץ <strong>Create API key in new project</strong> (כל פרויקט = מגבלה נפרדת!)<br>
+      2. לחץ <strong>Create API key in new project</strong> (כל פרויקט = מגבלה נפרדת)<br>
       3. חזור ולחץ שוב לקבלת מפתח נוסף<br><br>
-      <strong>✓ חינמי לחלוטין · ללא כרטיס אשראי</strong>
+      <strong>✓ חינמי · ללא כרטיס אשראי</strong>
     </div>
   </div>
   <div class="card">
-    <div class="setlbl">🤖 מודל AI</div>
+    <div style="font-size:14px;font-weight:600;margin-bottom:12px">🤖 מודל AI</div>
     <div class="fi" style="margin-bottom:12px">
       <label>מודל פעיל</label>
       <select id="modelSel">
@@ -292,122 +331,311 @@ textarea.ta::placeholder{color:#c0c6d9;}
 </div>
 
 </main>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
-// ── STATE ─────────────────────────────────────────────
+// STATE
 var callType = 'sales';
-var selectedFile = null;
-var currentAnalysis = null;
+var selFile = null;
+var curAnalysis = null;
 var hist = [];
-try { hist = JSON.parse(localStorage.getItem('cqHist') || '[]'); } catch(e){}
+var timerIv = null;
+var timerTotal = 0;
 
-// ── INIT ──────────────────────────────────────────────
+try { hist = JSON.parse(localStorage.getItem('cqHist') || '[]'); } catch(e) { hist = []; }
+
+// DEFAULT CRITERIA
+var DEF_SALES = [
+  {name:'פתיח ומיצוב', w:15, desc:'הצגה מקצועית, יצירת קרבה'},
+  {name:'זיהוי צרכים', w:20, desc:'שאלות פתוחות, הקשבה'},
+  {name:'הצגת פתרון', w:20, desc:'התאמה לצרכים, יתרונות'},
+  {name:'טיפול בהתנגדויות', w:20, desc:'תגובה מקצועית, שכנוע'},
+  {name:'סגירת עסקה', w:15, desc:'בקשת הסכמה, התקדמות'},
+  {name:'אווירה כללית', w:10, desc:'טון, אנרגיה, חיוביות'}
+];
+var DEF_SERVICE = [
+  {name:'פתיח ואמפתיה', w:15, desc:'קבלת פנים, הבנת מצב'},
+  {name:'הבנת הבעיה', w:20, desc:'שאלות, בירור מלא'},
+  {name:'פתרון הבעיה', w:25, desc:'יעילות, דיוק, מהירות'},
+  {name:'תקשורת ובהירות', w:15, desc:'הסברים ברורים, שפה נגישה'},
+  {name:'וידוא שביעות רצון', w:15, desc:'בדיקה שהלקוח מרוצה'},
+  {name:'סיום מקצועי', w:10, desc:'פרידה חיובית, הצעת עזרה'}
+];
+
+function getCrit(type) {
+  try {
+    var s = localStorage.getItem('crit_' + type);
+    return s ? JSON.parse(s) : (type === 'sales' ? DEF_SALES : DEF_SERVICE);
+  } catch(e) {
+    return type === 'sales' ? DEF_SALES : DEF_SERVICE;
+  }
+}
+
+function getInst(type) {
+  return localStorage.getItem('inst_' + type) || '';
+}
+
+// INIT
 window.addEventListener('DOMContentLoaded', function() {
-  loadKeyFields();
   var ms = document.getElementById('modelSel');
   if (ms) ms.value = localStorage.getItem('geminiModel') || 'gemini-2.5-flash';
+  loadKeysList();
   var ai = document.getElementById('audioInput');
-  if (ai) ai.addEventListener('change', function(e) {
-    var f = e.target.files[0];
-    if (!f) return;
-    selectedFile = f;
-    document.getElementById('fname').textContent = f.name + ' (' + (f.size/1024/1024).toFixed(1) + ' MB)';
-    document.getElementById('fchip').style.display = 'flex';
-    // Setup audio player
-    var url = URL.createObjectURL(f);
-    var ap = document.getElementById('audioPlayer');
-    var rp = document.getElementById('resultPlayer');
-    if (ap) { ap.src = url; document.getElementById('audioPlayerWrap').style.display = 'block'; }
-    if (rp) { rp.src = url; }
-  });
+  if (ai) {
+    ai.addEventListener('change', function(e) {
+      var f = e.target.files[0];
+      if (!f) return;
+      selFile = f;
+      document.getElementById('fname').textContent = f.name + ' (' + (f.size/1024/1024).toFixed(1) + ' MB)';
+      document.getElementById('fchip').style.display = 'flex';
+      try {
+        var url = URL.createObjectURL(f);
+        if (url && url.indexOf('null') === -1) {
+          var ap = document.getElementById('audioPlayer');
+          var rp = document.getElementById('resultPlayer');
+          if (ap) { ap.src = url; document.getElementById('playerWrap').style.display = 'block'; }
+          if (rp) rp.src = url;
+        }
+      } catch(e2) {}
+    });
+  }
   renderHist();
 });
 
-// ── NAV ───────────────────────────────────────────────
+// NAV
 function navTo(pg, btn) {
-  document.querySelectorAll('.pg').forEach(function(p){p.classList.remove('active');});
-  document.querySelectorAll('.nav-btn').forEach(function(b){b.classList.remove('active');});
-  document.getElementById('pg-'+pg).classList.add('active');
-  btn.classList.add('active');
+  document.querySelectorAll('.pg').forEach(function(p) { p.classList.remove('on'); });
+  document.querySelectorAll('.nb').forEach(function(b) { b.classList.remove('on'); });
+  document.getElementById('pg-' + pg).classList.add('on');
+  btn.classList.add('on');
   if (pg === 'history') renderHist();
+  if (pg === 'criteria') initCritPage();
 }
 
-// ── TYPE ──────────────────────────────────────────────
 function setType(t, btn) {
   callType = t;
-  document.querySelectorAll('.tbtn').forEach(function(b){b.classList.remove('on');});
+  document.querySelectorAll('.tbtn').forEach(function(b) { b.classList.remove('on'); });
   btn.classList.add('on');
   var ac = document.getElementById('agentCard');
   if (ac) ac.style.display = t === 'general' ? 'none' : 'block';
 }
 
-// ── KEY MANAGEMENT ────────────────────────────────────
+// KEYS
 function getKeys() {
-  try { return JSON.parse(localStorage.getItem('geminiKeys') || '[]').filter(function(k){return k.trim();}); }
+  try { return JSON.parse(localStorage.getItem('geminiKeys') || '[]').filter(function(k) { return k.trim(); }); }
   catch(e) { return []; }
 }
-function getKey() {
+
+function getCurKey() {
   var keys = getKeys();
   if (!keys.length) return '';
-  var idx = parseInt(localStorage.getItem('geminiKeyIdx') || '0') % keys.length;
-  return keys[idx];
+  return keys[parseInt(localStorage.getItem('geminiKeyIdx') || '0') % keys.length];
 }
-function rotateKey() {
-  var keys = getKeys();
-  if (keys.length < 2) return getKey();
-  var idx = (parseInt(localStorage.getItem('geminiKeyIdx') || '0') + 1) % keys.length;
-  localStorage.setItem('geminiKeyIdx', String(idx));
-  setMsg('עובר למפתח ' + (idx+1) + '...');
-  return keys[idx];
-}
-function loadKeyFields() {
+
+function loadKeysList() {
   var list = document.getElementById('keysList');
   if (!list) return;
   list.innerHTML = '';
   var keys = getKeys();
   var arr = keys.length ? keys : [''];
-  arr.forEach(function(k, i) { addKeyRow(k, i); });
+  for (var i = 0; i < arr.length; i++) {
+    addKeyRowWithVal(arr[i], i);
+  }
 }
-function addKeyField() {
+
+function addKeyRow() {
   var list = document.getElementById('keysList');
   if (!list) return;
-  addKeyRow('', list.children.length);
+  var idx = list.children.length;
+  addKeyRowWithVal('', idx);
 }
-function addKeyRow(val, idx) {
+
+function addKeyRowWithVal(val, idx) {
   var list = document.getElementById('keysList');
   var d = document.createElement('div');
   d.className = 'krow';
-  d.innerHTML = '<div class="fi"><label>מפתח '+(idx+1)+'</label><input type="password" class="kInput" placeholder="AIza..." value="'+val+'"></div>'
-    + (idx > 0 ? '<button class="kremove" onclick="this.parentElement.remove()">הסר</button>' : '');
+  d.innerHTML = '<div class="fi"><label>מפתח ' + (idx+1) + '</label><input type="password" class="kInp" placeholder="AIza..." value="' + (val||'') + '"></div>' +
+    (idx > 0 ? '<button class="kremove" onclick="this.parentElement.remove()">הסר</button>' : '');
   list.appendChild(d);
 }
+
 function saveKeys() {
-  var inputs = document.querySelectorAll('.kInput');
-  var keys = Array.from(inputs).map(function(i){return i.value.trim();}).filter(function(k){return k;});
+  var inputs = document.querySelectorAll('.kInp');
+  var keys = Array.from(inputs).map(function(i) { return i.value.trim(); }).filter(function(k) { return k; });
   localStorage.setItem('geminiKeys', JSON.stringify(keys));
   localStorage.setItem('geminiKeyIdx', '0');
-  var n = document.getElementById('snote');
-  n.textContent = '✓ ' + keys.length + ' מפתח' + (keys.length===1?'':'ות') + ' נשמרו';
+  var n = document.getElementById('keysSaved');
+  n.textContent = '✓ ' + keys.length + ' מפתח' + (keys.length === 1 ? '' : 'ות') + ' נשמרו';
   n.style.display = 'flex';
-  setTimeout(function(){n.style.display='none';}, 3000);
+  setTimeout(function() { n.style.display = 'none'; }, 3000);
 }
+
 function saveModel() {
   localStorage.setItem('geminiModel', document.getElementById('modelSel').value);
   alert('מודל עודכן!');
 }
 
-// ── HELPERS ───────────────────────────────────────────
-function setMsg(t) { var el = document.getElementById('loadMsg'); if(el) el.textContent = t; }
-function showErr(msg) { var e = document.getElementById('errBox'); e.textContent = msg; e.style.display = 'block'; }
+// CRITERIA
+function initCritPage() {
+  renderCritRows('sales');
+  renderCritRows('service');
+  var si = document.getElementById('salesInst');
+  var sv = document.getElementById('serviceInst');
+  if (si) si.value = getInst('sales');
+  if (sv) sv.value = getInst('service');
+}
+
+function renderCritRows(type) {
+  var con = document.getElementById(type + 'Crit');
+  if (!con) return;
+  con.innerHTML = '';
+  var items = getCrit(type);
+  for (var i = 0; i < items.length; i++) {
+    var c = items[i];
+    var row = document.createElement('div');
+    row.className = 'crow';
+    row.setAttribute('data-type', type);
+    row.innerHTML =
+      '<input type="text" class="cn" value="' + (c.name||'') + '" placeholder="שם קטגוריה">' +
+      '<div><input type="number" class="cw" min="0" max="100" value="' + (c.w||0) + '" oninput="updateWTotal(\'' + type + '\')"><div class="wlbl">%</div></div>' +
+      '<input type="text" class="cd" value="' + (c.desc||'') + '" placeholder="תיאור">' +
+      (i > 0 ? '<button class="cremove" onclick="this.closest(\'.crow\').remove();updateWTotal(\'' + type + '\')">✕</button>' : '<span></span>');
+    con.appendChild(row);
+  }
+  updateWTotal(type);
+}
+
+function updateWTotal(type) {
+  var inputs = document.querySelectorAll('#' + type + 'Crit .cw');
+  var sum = 0;
+  inputs.forEach(function(i) { sum += parseInt(i.value) || 0; });
+  var el = document.getElementById(type + 'Total');
+  if (el) el.innerHTML = '<div class="wtotal ' + (sum === 100 ? 'wok' : 'werr') + '">סה"כ: ' + sum + '% ' + (sum === 100 ? '✓' : '— חייב להיות 100%') + '</div>';
+}
+
+function addCrow(type) {
+  var con = document.getElementById(type + 'Crit');
+  if (!con) return;
+  var rows = con.querySelectorAll('.crow');
+  if (rows.length >= 6) { alert('מקסימום 6 קטגוריות'); return; }
+  var row = document.createElement('div');
+  row.className = 'crow';
+  var idx = rows.length;
+  row.innerHTML =
+    '<input type="text" class="cn" value="" placeholder="שם קטגוריה">' +
+    '<div><input type="number" class="cw" min="0" max="100" value="0" oninput="updateWTotal(\'' + type + '\')"><div class="wlbl">%</div></div>' +
+    '<input type="text" class="cd" value="" placeholder="תיאור">' +
+    '<button class="cremove" onclick="this.closest(\'.crow\').remove();updateWTotal(\'' + type + '\')">✕</button>';
+  con.appendChild(row);
+  updateWTotal(type);
+}
+
+function getCritFromDOM(type) {
+  var rows = document.querySelectorAll('#' + type + 'Crit .crow');
+  return Array.from(rows).map(function(r) {
+    return {
+      name: r.querySelector('.cn').value.trim() || 'קטגוריה',
+      w: parseInt(r.querySelector('.cw').value) || 0,
+      desc: r.querySelector('.cd').value.trim()
+    };
+  });
+}
+
+function saveCrit() {
+  var sc = getCritFromDOM('sales');
+  var vc = getCritFromDOM('service');
+  var sw = sc.reduce(function(a,b) { return a + b.w; }, 0);
+  var vw = vc.reduce(function(a,b) { return a + b.w; }, 0);
+  if (sw !== 100 || vw !== 100) {
+    alert('סה"כ המשקלות חייב להיות 100%\nמכירה: ' + sw + '%\nשירות: ' + vw + '%');
+    return;
+  }
+  localStorage.setItem('crit_sales', JSON.stringify(sc));
+  localStorage.setItem('crit_service', JSON.stringify(vc));
+  var si = document.getElementById('salesInst');
+  var sv = document.getElementById('serviceInst');
+  if (si) localStorage.setItem('inst_sales', si.value);
+  if (sv) localStorage.setItem('inst_service', sv.value);
+  var n = document.getElementById('critSaved');
+  if (n) { n.style.display = 'flex'; setTimeout(function() { n.style.display = 'none'; }, 3000); }
+}
+
+function resetCrit() {
+  if (!confirm('לאפס לברירת מחדל?')) return;
+  localStorage.removeItem('crit_sales');
+  localStorage.removeItem('crit_service');
+  localStorage.removeItem('inst_sales');
+  localStorage.removeItem('inst_service');
+  renderCritRows('sales');
+  renderCritRows('service');
+  var si = document.getElementById('salesInst');
+  var sv = document.getElementById('serviceInst');
+  if (si) si.value = '';
+  if (sv) sv.value = '';
+}
+
+function buildCritPrompt(type) {
+  var items = getCrit(type);
+  var inst = getInst(type);
+  var lines = items.map(function(c) {
+    return c.name + ' (משקל ' + c.w + '%)' + (c.desc ? ' — ' + c.desc : '');
+  }).join('\n');
+  return '\n\nקריטריוני ביקורת:\n' + lines + (inst ? '\n\nהוראות נוספות:\n' + inst : '') +
+    '\n\nחשב totalScore לפי המשקלות. השתמש בשמות הקטגוריות המותאמים.';
+}
+
+// TIMER
+function startTimer(secs) {
+  if (timerIv) return;
+  timerTotal = secs;
+  var rem = secs;
+  var btn = document.getElementById('analyzeBtn');
+  var td = document.getElementById('qtimer');
+  var qn = document.getElementById('qnum');
+  var qb = document.getElementById('qbar');
+  if (td) td.style.display = 'block';
+  if (btn) btn.disabled = true;
+  if (qn) qn.textContent = rem;
+  timerIv = setInterval(function() {
+    rem--;
+    if (qn) qn.textContent = rem;
+    if (qb) qb.style.width = Math.round(rem / timerTotal * 100) + '%';
+    if (rem <= 0) {
+      clearInterval(timerIv);
+      timerIv = null;
+      if (td) td.style.display = 'none';
+      localStorage.setItem('geminiKeyIdx', '0');
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = '✓ מוכן! לחץ לניתוח';
+        setTimeout(function() { btn.textContent = 'נתח שיחה ✦'; }, 4000);
+      }
+    }
+  }, 1000);
+}
+
+// HELPERS
+function setMsg(t) {
+  var el = document.getElementById('loadMsg');
+  if (el) el.textContent = t;
+}
+
+function showErr(msg) {
+  var e = document.getElementById('errBox');
+  if (e) { e.textContent = msg; e.style.display = 'block'; }
+}
+
 function fileToB64(file) {
   return new Promise(function(res, rej) {
     var r = new FileReader();
-    r.onload = function(e) { res(e.target.result.split(',')[1]); };
-    r.onerror = rej;
+    r.onload = function(e) {
+      try { res(e.target.result.split(',')[1]); }
+      catch(err) { rej(err); }
+    };
+    r.onerror = function() { rej(new Error('שגיאה בקריאת הקובץ')); };
     r.readAsDataURL(file);
   });
 }
+
 function getMime(file) {
   var ext = file.name.split('.').pop().toLowerCase();
   var map = {mp3:'audio/mpeg',wav:'audio/wav',m4a:'audio/mp4',aac:'audio/aac',ogg:'audio/ogg',flac:'audio/flac',wma:'audio/x-ms-wma',amr:'audio/amr',mp4:'video/mp4',wmv:'video/x-ms-wmv',avi:'video/x-msvideo',mov:'video/quicktime',webm:'video/webm'};
@@ -415,191 +643,229 @@ function getMime(file) {
   return map[ext] || 'audio/mpeg';
 }
 
-// ── API CALL ──────────────────────────────────────────
-async function callGemini(parts, maxTokens, jsonMode) {
-  maxTokens = maxTokens || 8192;
-  jsonMode = jsonMode !== false;
+// GEMINI API
+async function callGemini(parts, maxTok, jsonMode) {
+  maxTok = maxTok || 8192;
+  jsonMode = (jsonMode !== false);
   var model = localStorage.getItem('geminiModel') || 'gemini-2.5-flash';
-  var apiKey = getKey();
-  if (!apiKey) throw new Error('נא לשמור מפתח Gemini בהגדרות');
+  var keys = getKeys();
+  if (!keys.length) throw new Error('נא לשמור מפתח Gemini בהגדרות');
 
-  for (var attempt = 0; attempt < 4; attempt++) {
-    if (attempt > 0) {
-      var wait = 15;
-      for (var s = wait; s > 0; s--) {
-        setMsg('ממתין ' + s + ' שניות...');
-        await new Promise(function(r){setTimeout(r,1000);});
-      }
+  var body = {contents: [{parts: parts}], generationConfig: {temperature: 0.3, maxOutputTokens: maxTok}};
+  if (jsonMode) body.generationConfig.responseMimeType = 'application/json';
+
+  var startIdx = parseInt(localStorage.getItem('geminiKeyIdx') || '0') % keys.length;
+
+  for (var i = 0; i < keys.length; i++) {
+    var ki = (startIdx + i) % keys.length;
+    var key = keys[ki];
+    setMsg(keys.length > 1 ? 'מפתח ' + (ki+1) + '/' + keys.length + '...' : 'מנתח...');
+
+    var res, d;
+    try {
+      res = await fetch(
+        'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + key,
+        {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body)}
+      );
+      d = await res.json();
+    } catch(fe) {
+      throw new Error('שגיאת רשת: ' + fe.message);
     }
-    var body = { contents:[{parts:parts}], generationConfig:{temperature:0.3, maxOutputTokens:maxTokens} };
-    if (jsonMode) body.generationConfig.responseMimeType = 'application/json';
 
-    var res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+model+':generateContent?key='+apiKey, {
-      method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)
-    });
-    var d = await res.json();
-
-    if (d.error) {
-      var msg = d.error.message || '';
-      var isQuota = msg.includes('quota') || msg.includes('RESOURCE_EXHAUSTED') || res.status === 429;
-      if (isQuota && attempt < 3) { apiKey = rotateKey(); continue; }
-      throw new Error(msg);
+    if (!d.error && d.candidates && d.candidates.length) {
+      localStorage.setItem('geminiKeyIdx', String(ki));
+      return d;
     }
-    return d;
+
+    var em = (d.error && d.error.message) || '';
+    var isQ = res.status === 429 || em.indexOf('quota') !== -1 || em.indexOf('RESOURCE_EXHAUSTED') !== -1;
+    var isO = res.status === 503 || em.indexOf('high demand') !== -1 || em.indexOf('overloaded') !== -1;
+
+    if (isQ) { continue; }
+    if (isO) throw new Error('השרת עמוס. נסה שוב בעוד 30 שניות.');
+    throw new Error(em || 'תשובה לא תקינה מהשרת');
   }
-  throw new Error('חרגת ממגבלת API. נסה שוב בעוד דקה.');
+
+  startTimer(65);
+  throw new Error('כל המפתחות הגיעו למגבלה. הטיימר יתריע כשאפשר לנסות שוב.');
 }
 
-function parseJSON(raw) {
+// PARSE JSON
+function parseResp(raw) {
   var clean = raw.trim();
 
-  // New format: JSON section + TRANSCRIPT section
+  // Split transcript out
   var transcript = '';
-  var jsonPart = clean;
-
-  // Extract TRANSCRIPT section if present
-  var tSplit = clean.indexOf('\nTRANSCRIPT:');
-  if (tSplit === -1) tSplit = clean.indexOf('\nTranscript:');
-  if (tSplit === -1) tSplit = clean.indexOf('\ntranscript:');
-  if (tSplit !== -1) {
-    transcript = clean.slice(tSplit).replace(/^\n(TRANSCRIPT|Transcript|transcript):\s*/,'').trim();
-    jsonPart = clean.slice(0, tSplit);
+  var tMarkers = ['\nTRANSCRIPT:', '\nTranscript:', '\ntranscript:'];
+  for (var mi = 0; mi < tMarkers.length; mi++) {
+    var tIdx = clean.indexOf(tMarkers[mi]);
+    if (tIdx !== -1) {
+      transcript = clean.slice(tIdx + tMarkers[mi].length).trim();
+      clean = clean.slice(0, tIdx);
+      break;
+    }
   }
 
-  // Strip JSON: header if present
-  jsonPart = jsonPart.replace(/^JSON:\s*/,'').trim();
-  jsonPart = jsonPart.replace(/^```json\s*/,'').replace(/\s*```$/,'');
+  // Clean JSON
+  clean = clean.replace(/^JSON:\s*/, '').trim();
+  clean = clean.replace(/^```json\s*/, '').replace(/\s*```$/, '');
 
-  // Fix trailing commas
-  jsonPart = jsonPart.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '');
-  jsonPart = jsonPart.replace(/,\s*([}\]])/g, '$1');
+  // Remove control chars
+  var out = '';
+  for (var ci = 0; ci < clean.length; ci++) {
+    var cc = clean.charCodeAt(ci);
+    if (cc >= 32 || cc === 9 || cc === 10 || cc === 13) out += clean[ci];
+  }
+  clean = out;
 
-  var si = jsonPart.indexOf('{'), ei = jsonPart.lastIndexOf('}');
+  // Remove trailing commas
+  // Remove trailing commas
+  var cleaned = '';
+  var inStr = false;
+  var esc = false;
+  for (var xi = 0; xi < clean.length; xi++) {
+    var xc = clean[xi];
+    if (esc) { cleaned += xc; esc = false; continue; }
+    if (xc === '\\') { cleaned += xc; esc = true; continue; }
+    if (xc === '"') { inStr = !inStr; cleaned += xc; continue; }
+    if (!inStr && xc === ',' && xi + 1 < clean.length) {
+      var nx = clean[xi+1];
+      // Skip whitespace to find next non-space char
+      var nxi = xi + 1;
+      while (nxi < clean.length && (clean[nxi] === ' ' || clean[nxi] === '\n' || clean[nxi] === '\r' || clean[nxi] === '\t')) nxi++;
+      var nc = nxi < clean.length ? clean[nxi] : '';
+      if (nc === String.fromCharCode(125) || nc === String.fromCharCode(93)) continue;
+    }
+    cleaned += xc;
+  }
+  clean = cleaned;
+
+  var si = clean.indexOf(String.fromCharCode(123));
+  var ei = clean.lastIndexOf(String.fromCharCode(125));
   if (si === -1 || ei === -1) throw new Error('לא נמצא JSON בתשובה');
-  jsonPart = jsonPart.slice(si, ei+1);
+  clean = clean.slice(si, ei + 1);
 
-  var result = JSON.parse(jsonPart);
+  var result = JSON.parse(clean);
 
-  // Use extracted transcript or from JSON if included
   if (transcript) {
     result.transcript = transcript;
-  } else if (result.transcript) {
-    if (Array.isArray(result.transcript)) {
-      result.transcript = result.transcript.map(function(t){
-        return (t.speaker||t.name||'') + ': ' + (t.text||t.content||'');
-      }).join('\n');
+  } else if (Array.isArray(result.transcript)) {
+    var tlines = [];
+    for (var ti = 0; ti < result.transcript.length; ti++) {
+      var t = result.transcript[ti];
+      tlines.push((t.speaker || t.name || '') + ': ' + (t.text || t.content || ''));
     }
+    result.transcript = tlines.join('\n');
   }
 
   if (Array.isArray(result.keyMoments)) {
-    result.keyMoments = result.keyMoments.map(function(m){
-      return typeof m === 'string' ? m : (m.text||m.description||'');
+    result.keyMoments = result.keyMoments.map(function(m) {
+      return typeof m === 'string' ? m : (m.text || m.description || '');
     });
   }
-  if (typeof result.resolved === 'string') result.resolved = result.resolved === 'true';
 
-  // Translate grade to Hebrew
-  var gradeMap = {'A':'מצוין','B':'טוב','C':'בינוני','D':'טעון שיפור',
-    'Excellent':'מצוין','Good':'טוב','Fair':'בינוני','Poor':'טעון שיפור',
-    'excellent':'מצוין','good':'טוב','fair':'בינוני','poor':'טעון שיפור',
-    'needs improvement':'טעון שיפור','Needs Improvement':'טעון שיפור',
-    'Average':'בינוני','average':'בינוני'};
-  if (result.grade && gradeMap[result.grade]) result.grade = gradeMap[result.grade];
+  if (typeof result.resolved === 'string') result.resolved = (result.resolved === 'true');
 
-  // Translate mood to Hebrew
-  var moodMap = {'Positive':'חיובי','Negative':'שלילי','Neutral':'ניטרלי',
-    'positive':'חיובי','negative':'שלילי','neutral':'ניטרלי',
-    'Angry':'לקוח כועס','angry':'לקוח כועס','Very Satisfied':'לקוח מרוצה מאוד',
-    'very satisfied':'לקוח מרוצה מאוד','Happy':'חיובי','happy':'חיובי'};
-  if (result.mood && moodMap[result.mood]) result.mood = moodMap[result.mood];
+  // Translate grade
+  var gMap = {'A':'מצוין','B':'טוב','C':'בינוני','D':'טעון שיפור','Excellent':'מצוין','Good':'טוב','Fair':'בינוני','Poor':'טעון שיפור','excellent':'מצוין','good':'טוב','fair':'בינוני','poor':'טעון שיפור','needs improvement':'טעון שיפור','Needs Improvement':'טעון שיפור','Average':'בינוני','average':'בינוני'};
+  if (result.grade && gMap[result.grade]) result.grade = gMap[result.grade];
+
+  // Translate mood
+  var mMap = {'Positive':'חיובי','Negative':'שלילי','Neutral':'ניטרלי','positive':'חיובי','negative':'שלילי','neutral':'ניטרלי','Angry':'לקוח כועס','angry':'לקוח כועס','Happy':'חיובי','happy':'חיובי','Very Satisfied':'לקוח מרוצה מאוד'};
+  if (result.mood && mMap[result.mood]) result.mood = mMap[result.mood];
 
   return result;
 }
 
-// ── ANALYSIS ──────────────────────────────────────────
+// ANALYSIS
 async function runAnalysis() {
   if (!getKeys().length) { showErr('נא לשמור מפתח Gemini בהגדרות תחילה'); return; }
   var manual = document.getElementById('manualText').value.trim();
-  if (!selectedFile && !manual) { showErr('נא להעלות קובץ שמע או להדביק טקסט'); return; }
+  if (!selFile && !manual) { showErr('נא להעלות קובץ שמע או להדביק טקסט'); return; }
 
   var agentName = document.getElementById('agentName').value.trim() || 'הנציג';
   var callId = document.getElementById('callId').value.trim() || '#' + Date.now().toString().slice(-4);
-  var typeLabel = callType==='sales'?'מכירה':callType==='service'?'שירות לקוחות':'כללי';
-  var agentRole = callType==='sales'?'נציג מכירות':callType==='service'?'נציג שירות':'';
+  var typeLabel = callType === 'sales' ? 'מכירה' : callType === 'service' ? 'שירות לקוחות' : 'כללי';
+  var agentRole = callType === 'sales' ? 'נציג מכירות' : callType === 'service' ? 'נציג שירות' : '';
 
-  document.getElementById('analyzeForm').style.display = 'none';
+  document.getElementById('aForm').style.display = 'none';
   document.getElementById('errBox').style.display = 'none';
   document.getElementById('loadDiv').style.display = 'block';
   document.getElementById('resDiv').style.display = 'none';
+  if (timerIv) { clearInterval(timerIv); timerIv = null; }
+  document.getElementById('qtimer').style.display = 'none';
+  var ab = document.getElementById('analyzeBtn');
+  if (ab) { ab.disabled = false; ab.textContent = 'נתח שיחה ✦'; }
 
   try {
     var parts = [];
     var transcriptText = manual;
 
-    if (selectedFile) {
+    if (selFile) {
       setMsg('ממיר קובץ שמע...');
-      var b64 = await fileToB64(selectedFile);
-      var mime = getMime(selectedFile);
-      parts.push({inline_data:{mime_type:mime, data:b64}});
+      var b64 = await fileToB64(selFile);
+      var mime = getMime(selFile);
+      parts.push({inline_data: {mime_type: mime, data: b64}});
     }
-
-    var isGeneral = callType === 'general';
-    var closingField = callType==='sales' ? '"closing": false, "closingNote": "האם נסגרה עסקה"' : '"resolved": false, "resolvedNote": "האם הבעיה נפתרה"';
 
     var result, raw;
+    var isGeneral = (callType === 'general');
 
-    if (isGeneral && selectedFile) {
-      // Step 1: Transcribe only
-      setMsg('מתמלל את השיחה...');
-      var tParts = parts.concat([{text: 'תמלל את כל השיחה בעברית בלבד. כתוב כל שורה בפורמט: שם: טקסט. החזר רק את התמלול, ללא הסברים.'}]);
-      var tData = await callGemini(tParts, 4096, false);
-      var tCand = tData.candidates && tData.candidates[0];
-      transcriptText = tCand && tCand.content && tCand.content.parts && tCand.content.parts[0] && tCand.content.parts[0].text || '';
-
-      // Step 2: Analyze the transcript text only (no audio, no JSON confusion)
-      setMsg('מנתח שיחה...');
-      var analyzePrompt = 'ענה בעברית בלבד. נתח את תמלול השיחה הבא וזהה מי מדבר (שמות, תפקידים, קשר — אבא/ילד, חברים, זוג וכו).' +
-        ' החזר JSON תקני בלבד עם השדות: speakers (מערך name,role), relationship, purpose, mainPoints (מערך 3-4 מחרוזות), atmosphere, closing, mood, moodEmoji, keyMoments (מערך 3 מחרוזות), summary.' +
-        '\n\nתמלול:\n' + transcriptText;
-      var aData = await callGemini([{text: analyzePrompt}], 4096, true);
-      var aCand = aData.candidates && aData.candidates[0];
-      raw = aCand && aCand.content && aCand.content.parts && aCand.content.parts[0] && aCand.content.parts[0].text || '';
-      if (!raw.trim()) throw new Error('תשובה ריקה מהניתוח');
-      result = parseJSON(raw);
-      result.transcript = transcriptText;
+    if (isGeneral) {
+      setMsg('מתמלל ומנתח...');
+      var gPrompt = 'ענה בעברית בלבד. כל הערכים חייבים להיות בעברית.\n' +
+        (selFile ? 'האזן לקובץ השמע. תמלל בדיוק. אם מילה לא ברורה כתוב [לא ברור].\n' : '') +
+        'זהה מי מדבר (שמות, קשר — אבא/ילד, חברים, זוג וכו).\n' +
+        'החזר JSON תקני בלבד עם:\n' +
+        'speakers: מערך name,role\n' +
+        'relationship: תיאור קשר (2-3 משפטים)\n' +
+        'purpose: מטרת השיחה (2-3 משפטים)\n' +
+        'mainPoints: מערך 4-5 נקודות עיקריות (כל אחת משפט מלא)\n' +
+        'atmosphere: תיאור אווירה (3-4 משפטים)\n' +
+        'closing: איך הסתיימה השיחה (2-3 משפטים)\n' +
+        'mood: אווירה קצרה\n' +
+        'moodEmoji: אמוג׳י אחד\n' +
+        'keyMoments: מערך 3-4 רגעים משמעותיים (כל אחד משפט מלא)\n' +
+        'summary: תקציר 4-5 משפטים\n' +
+        'transcript: התמלול המלא כמחרוזת טקסט';
+      if (!selFile) gPrompt += '\n\nתמלול:\n' + manual;
+      parts.push({text: gPrompt});
+      var gData = await callGemini(parts, 8192, true);
+      var gCand = gData.candidates[0];
+      raw = gCand.content.parts[0].text || '';
+      if (!raw.trim()) throw new Error('תשובה ריקה');
+      result = parseResp(raw);
+      transcriptText = result.transcript || '';
 
     } else {
-      // Service / Sales / General with text
-      var audioNote = selectedFile ? 'IMPORTANT: Listen to the audio carefully. Base analysis ONLY on what you hear.' : '';
-      var prompt;
-      if (isGeneral) {
-        prompt = 'ענה בעברית בלבד.\nזהה מי מדבר בשיחה הבאה ונתח לעומק.\n' +
-          'החזר JSON תקני בלבד עם: speakers (מערך name,role), relationship, purpose, mainPoints (מערך 3-4 מחרוזות), atmosphere, closing, mood, moodEmoji, keyMoments (מערך 3 מחרוזות), summary, transcript (מחרוזת קצרה בלבד).' +
-          '\n\nתמלול:\n' + manual;
-        parts = [{text: prompt}];
-      } else {
-        prompt = (audioNote ? audioNote + '\n' : '') +
-          'ענה בעברית בלבד.\nנתח שיחת ' + typeLabel + ' בין ' + agentRole + ' (' + agentName + ') ללקוח.\n' +
-          (callType==='sales'?'דגש: זיהוי צרכים, הצגת מוצר, טיפול בהתנגדויות, סגירה.':'דגש: הבנת הבעיה, אמפתיה, פתרון מלא, שביעות רצון.') +
-          '\nהחזר בפורמט: שורה ראשונה JSON:, אחריה JSON, אחריה שורה TRANSCRIPT:, אחריה התמלול.' +
-          '\nה-JSON יכלול: totalScore, grade, gradeText, mood, moodEmoji, agentScore, agentSummary, customerScore, customerSummary, categories (מערך 6: פתיח/גוף השיחה/פתרון ללקוח/שביעות רצון/סיום שיחה/אווירה כללית — כל אחד name,score,agentNote,customerNote), sections (opening/body/solution/satisfaction/closing/atmosphere — כל אחד title,text), recommendations (מערך 3), ' + closingField + '.';
-        if (!selectedFile) parts = [{text: 'תמלול:\n' + manual + '\n\n' + prompt}];
-        else parts.push({text: prompt});
-      }
+      var critPrompt = buildCritPrompt(callType);
+      var catNames = getCrit(callType).map(function(c) { return c.name; }).join('/');
+      var audioNote = selFile ? 'IMPORTANT: Listen carefully. Base analysis ONLY on what you actually hear. Do NOT hallucinate.\n' : '';
+      var sPrompt = audioNote + 'ענה בעברית בלבד.\n' +
+        'נתח שיחת ' + typeLabel + ' בין ' + agentRole + ' (' + agentName + ') ללקוח.\n' +
+        (callType === 'sales' ? 'דגש: זיהוי צרכים, הצגת מוצר, טיפול בהתנגדויות, סגירה.' : 'דגש: הבנת הבעיה, אמפתיה, פתרון מלא, שביעות רצון.') +
+        critPrompt + '\n' +
+        'החזר בפורמט:\nJSON:\n{...}\n\nTRANSCRIPT:\n...תמלול...\n\n' +
+        'ה-JSON יכלול: totalScore, grade, gradeText, mood, moodEmoji, agentScore, agentSummary, customerScore, customerSummary, ' +
+        'categories (מערך לפי הקריטריונים: ' + catNames + ' — כל אחד: name,score,agentNote,customerNote), ' +
+        'sections (opening/body/solution/satisfaction/closing/atmosphere — כל אחד: title,text), ' +
+        'recommendations (מערך 3), ' +
+        (callType === 'sales' ? 'closing (בוליאן), closingNote' : 'resolved (בוליאן), resolvedNote') + '.';
+
+      if (!selFile) parts = [{text: 'תמלול:\n' + manual + '\n\n' + sPrompt}];
+      else parts.push({text: sPrompt});
 
       setMsg('מנתח שיחה...');
-      var data = await callGemini(parts, 8192, isGeneral);
-      var candidate = data.candidates && data.candidates[0];
-      if (!candidate) throw new Error('לא התקבלה תשובה');
-      raw = candidate.content && candidate.content.parts && candidate.content.parts[0] && candidate.content.parts[0].text || '';
+      var sData = await callGemini(parts, 8192, false);
+      var sCand = sData.candidates[0];
+      raw = sCand.content.parts[0].text || '';
       if (!raw.trim()) throw new Error('תשובה ריקה');
-      result = parseJSON(raw);
-      transcriptText = manual || result.transcript || transcriptText || '';
+      result = parseResp(raw);
+      transcriptText = manual || result.transcript || '';
       result.transcript = transcriptText;
     }
 
-    currentAnalysis = {result:result, agentName:agentName, callId:callId, typeLabel:typeLabel, agentRole:agentRole, transcript:result.transcript||transcriptText};
-    console.log('transcript length:', (result.transcript||'').length);
+    curAnalysis = {result: result, agentName: agentName, callId: callId, typeLabel: typeLabel, agentRole: agentRole, transcript: result.transcript || transcriptText};
 
     document.getElementById('loadDiv').style.display = 'none';
 
@@ -607,219 +873,255 @@ async function runAnalysis() {
     else renderResult(result, agentName, callId);
     saveHist(result, agentName, callId);
 
-    document.getElementById('chatMsgs').innerHTML = '<div class="cmsg cai">שלום! אני מכיר את השיחה של <strong>'+agentName+'</strong>. שאל אותי כל שאלה 💬</div>';
+    if (selFile) {
+      var rpw = document.getElementById('resultPlayerWrap');
+      if (rpw) rpw.style.display = 'block';
+    }
+
+    document.getElementById('chatMsgs').innerHTML = '<div class="cmsg cai">שלום! אני מכיר את השיחה של <strong>' + agentName + '</strong>. שאל אותי כל שאלה 💬</div>';
 
   } catch(err) {
     document.getElementById('loadDiv').style.display = 'none';
-    document.getElementById('analyzeForm').style.display = 'block';
-    showErr(err.message || 'שגיאה לא ידועה');
+    document.getElementById('aForm').style.display = 'block';
+    console.error('Analysis error:', err);
+    showErr(err.message || err.toString() || 'שגיאה לא ידועה');
   }
 }
 
-// ── RENDER ────────────────────────────────────────────
+// RENDER RESULT
 function renderResult(r, agent, id) {
   document.getElementById('resDiv').style.display = 'block';
   document.getElementById('rGeneral').style.display = 'none';
-  if (selectedFile && document.getElementById('resultPlayerWrap')) {
-    document.getElementById('resultPlayerWrap').style.display = 'block';
-  }
   document.getElementById('agPill').textContent = agent + ' · ' + id;
   document.getElementById('rScore').textContent = r.totalScore || '-';
   document.getElementById('rGrade').textContent = r.grade || '';
   document.getElementById('rGradeText').textContent = r.gradeText || '';
-  document.getElementById('rMood').textContent = (r.moodEmoji||'') + ' ' + (r.mood||'');
+  document.getElementById('rMood').textContent = (r.moodEmoji || '') + ' ' + (r.mood || '');
 
-  var as = r.agentScore||0, cs = r.customerScore||0;
-  var ac = as>=80?'#16a34a':as>=55?'#d97706':'#dc2626';
-  var cc = cs>=80?'#16a34a':cs>=55?'#d97706':'#dc2626';
-  var closingHtml = r.resolved!==undefined
-    ? '<div style="margin-top:8px;font-size:12px;font-weight:600;color:'+(r.resolved?'#16a34a':'#dc2626')+'">'+(r.resolved?'✓ הבעיה נפתרה':'✗ הבעיה לא נפתרה')+'</div>'
-    : r.closing!==undefined
-    ? '<div style="margin-top:8px;font-size:12px;font-weight:600;color:'+(r.closing?'#16a34a':'#dc2626')+'">'+(r.closing?'✓ נסגרה עסקה':'✗ לא נסגרה עסקה')+'</div>'
-    : '';
+  var as = r.agentScore || 0, cs = r.customerScore || 0;
+  var ac = as >= 80 ? '#16a34a' : as >= 55 ? '#d97706' : '#dc2626';
+  var cc = cs >= 80 ? '#16a34a' : cs >= 55 ? '#d97706' : '#dc2626';
+  var closHtml = '';
+  if (r.resolved !== undefined) {
+    closHtml = '<div style="margin-top:8px;font-size:12px;font-weight:600;color:' + (r.resolved ? '#16a34a' : '#dc2626') + '">' + (r.resolved ? '✓ הבעיה נפתרה' : '✗ הבעיה לא נפתרה') + '</div>';
+  } else if (r.closing !== undefined && typeof r.closing === 'boolean') {
+    closHtml = '<div style="margin-top:8px;font-size:12px;font-weight:600;color:' + (r.closing ? '#16a34a' : '#dc2626') + '">' + (r.closing ? '✓ נסגרה עסקה' : '✗ לא נסגרה עסקה') + '</div>';
+  }
 
   document.getElementById('rSides').innerHTML =
-    '<div class="scard ag"><div class="stit">👤 '+agent+' — נציג</div><div class="srow"><span class="slbl">ציון</span><span class="ssc" style="color:'+ac+'">'+as+'</span></div><div class="sbar"><div class="sbarfill" style="width:'+as+'%"></div></div><div class="stxt">'+(r.agentSummary||'')+'</div></div>' +
-    '<div class="scard cu"><div class="stit">🙋 הלקוח</div><div class="srow"><span class="slbl">שביעות רצון</span><span class="ssc" style="color:'+cc+'">'+cs+'</span></div><div class="sbar"><div class="sbarfill" style="width:'+cs+'%"></div></div><div class="stxt">'+(r.customerSummary||'')+'</div>'+closingHtml+'</div>';
+    '<div class="scard ag"><div class="stit">👤 ' + agent + ' — נציג</div><div class="srow"><span class="slbl">ציון</span><span class="ssc" style="color:' + ac + '">' + as + '</span></div><div class="sbar"><div class="sbf" style="width:' + as + '%"></div></div><div class="stxt">' + (r.agentSummary || '') + '</div></div>' +
+    '<div class="scard cu"><div class="stit">🙋 הלקוח</div><div class="srow"><span class="slbl">שביעות רצון</span><span class="ssc" style="color:' + cc + '">' + cs + '</span></div><div class="sbar"><div class="sbf" style="background:#3b82f6;width:' + cs + '%"></div></div><div class="stxt">' + (r.customerSummary || '') + '</div>' + closHtml + '</div>';
 
-  document.getElementById('rCats').innerHTML = (r.categories||[]).map(function(c) {
-    var lv = c.score>=80?'hi':c.score>=55?'md':'lo';
-    return '<div class="ccard"><div class="chead"><span class="cname">'+c.name+'</span><span class="cscore '+lv+'">'+c.score+'</span></div><div class="bbar"><div class="bfill b'+lv+'" style="width:'+c.score+'%"></div></div><div class="cnote">👤 '+(c.agentNote||'')+'</div><div class="cnote2">🙋 '+(c.customerNote||'')+'</div></div>';
-  }).join('');
+  var catsHtml = '';
+  var cats = r.categories || [];
+  for (var ci = 0; ci < cats.length; ci++) {
+    var c = cats[ci];
+    var lv = c.score >= 80 ? 'hi' : c.score >= 55 ? 'md' : 'lo';
+    var sc = c.score >= 80 ? 'shi' : c.score >= 55 ? 'smd' : 'slo';
+    catsHtml += '<div class="ccard"><div class="chead"><span class="cname">' + c.name + '</span><span class="cscore ' + sc + '">' + c.score + '</span></div><div class="bbar"><div class="bf b' + lv + '" style="width:' + c.score + '%"></div></div><div class="cnote">👤 ' + (c.agentNote || '') + '</div><div class="cnote2">🙋 ' + (c.customerNote || '') + '</div></div>';
+  }
+  document.getElementById('rCats').innerHTML = catsHtml;
 
-  var titleMap = {'Opening':'פתיח','Body':'גוף השיחה','Call Body':'גוף השיחה','Solution':'פתרון ללקוח','Customer Satisfaction':'שביעות רצון','Satisfaction':'שביעות רצון','Closing':'סיום שיחה','Atmosphere':'תחושה כללית','General Atmosphere':'תחושה כללית'};
-  document.getElementById('rSecs').innerHTML = Object.values(r.sections||{}).map(function(s) {
-    var title = titleMap[s.title] || s.title;
-    return '<div class="seccard"><div class="sectit"><span class="secdot"></span>'+title+'</div><div class="sectxt">'+s.text+'</div></div>';
-  }).join('');
+  var secsTitles = {opening:'פתיח', body:'גוף השיחה', solution:'פתרון ללקוח', satisfaction:'שביעות רצון', closing:'סיום שיחה', atmosphere:'תחושה כללית'};
+  var secsHtml = '';
+  var secs = r.sections || {};
+  var secKeys = Object.keys(secs);
+  for (var si = 0; si < secKeys.length; si++) {
+    var s = secs[secKeys[si]];
+    var title = secsTitles[secKeys[si]] || s.title || secKeys[si];
+    secsHtml += '<div class="seccard"><div class="sectit"><span class="secdot"></span>' + title + '</div><div class="sectxt">' + (s.text || '') + '</div></div>';
+  }
+  document.getElementById('rSecs').innerHTML = secsHtml;
 
-  document.getElementById('rRecs').innerHTML = '<h3>✦ המלצות לנציג</h3>' + (r.recommendations||[]).map(function(rec,i) {
-    return '<div class="rrow"><div class="rnum">'+(i+1)+'</div><div class="rtxt">'+rec+'</div></div>';
-  }).join('');
+  var recsHtml = '<h3>✦ המלצות לנציג</h3>';
+  var recs = r.recommendations || [];
+  for (var ri = 0; ri < recs.length; ri++) {
+    recsHtml += '<div class="rrow"><div class="rnum">' + (ri+1) + '</div><div class="rtxt">' + recs[ri] + '</div></div>';
+  }
+  document.getElementById('rRecs').innerHTML = recsHtml;
 }
 
+// RENDER GENERAL
 function renderGeneral(r, id) {
   document.getElementById('resDiv').style.display = 'block';
-  if (selectedFile && document.getElementById('resultPlayerWrap')) {
-    document.getElementById('resultPlayerWrap').style.display = 'block';
-  }
   document.getElementById('agPill').textContent = 'שיחה כללית · ' + id;
   document.getElementById('rScore').textContent = '💬';
   document.getElementById('rGrade').textContent = r.relationship || 'שיחה כללית';
   document.getElementById('rGradeText').textContent = r.summary || '';
-  document.getElementById('rMood').textContent = (r.moodEmoji||'') + ' ' + (r.mood||'');
+  document.getElementById('rMood').textContent = (r.moodEmoji || '') + ' ' + (r.mood || '');
   document.getElementById('rSides').innerHTML = '';
   document.getElementById('rCats').innerHTML = '';
   document.getElementById('rSecs').innerHTML = '';
   document.getElementById('rRecs').innerHTML = '';
 
-  var speakers = (r.speakers||[]).map(function(s) {
-    return '<div style="display:inline-flex;align-items:center;gap:6px;background:#f5f4ff;border:1px solid #ddd8ff;border-radius:20px;padding:5px 14px;font-size:13px;margin-left:8px;margin-bottom:6px"><strong style="color:#4f46e5">'+s.name+'</strong><span style="color:#9098b1">'+s.role+'</span></div>';
-  }).join('');
+  var spkHtml = '';
+  var spks = r.speakers || [];
+  for (var i = 0; i < spks.length; i++) {
+    spkHtml += '<div style="display:inline-flex;align-items:center;gap:6px;background:#f5f4ff;border:1px solid #ddd8ff;border-radius:20px;padding:5px 14px;font-size:13px;margin-left:8px;margin-bottom:6px"><strong style="color:#4f46e5">' + spks[i].name + '</strong><span style="color:#9098b1">' + spks[i].role + '</span></div>';
+  }
 
-  var pts = (r.mainPoints||[]).map(function(p,i){return '<div class="rrow"><div class="rnum">'+(i+1)+'</div><div class="rtxt">'+p+'</div></div>';}).join('');
-  var moms = (r.keyMoments||[]).map(function(m,i){return '<div class="rrow"><div class="rnum" style="background:#f59e0b">⚡</div><div class="rtxt">'+m+'</div></div>';}).join('');
+  function secBlock(icon, title, text, color) {
+    if (!text) return '';
+    return '<div class="gcard"><div class="sectit" style="color:' + color + '"><span class="secdot" style="background:' + color + '"></span>' + icon + ' ' + title + '</div><div class="sectxt">' + text + '</div></div>';
+  }
 
-  var secHtml = function(icon, title, text, color) {
-    return text ? '<div class="gcard"><div class="sectit" style="color:'+color+'"><span class="secdot" style="background:'+color+'"></span>'+icon+' '+title+'</div><div class="sectxt">'+text+'</div></div>' : '';
-  };
+  var ptsHtml = '';
+  var pts = r.mainPoints || [];
+  for (var pi = 0; pi < pts.length; pi++) {
+    ptsHtml += '<div class="rrow"><div class="rnum">' + (pi+1) + '</div><div class="rtxt">' + pts[pi] + '</div></div>';
+  }
+
+  var momsHtml = '';
+  var moms = r.keyMoments || [];
+  for (var ki = 0; ki < moms.length; ki++) {
+    momsHtml += '<div class="rrow"><div class="rnum" style="background:#f59e0b">⚡</div><div class="rtxt">' + moms[ki] + '</div></div>';
+  }
 
   var g = document.getElementById('rGeneral');
   g.style.display = 'block';
   g.innerHTML =
-    (speakers ? '<div class="gcard"><div class="ctitle">👥 דוברים</div><div>'+speakers+'</div></div>' : '') +
-    secHtml('🎯','מטרת השיחה', r.purpose, '#4f46e5') +
-    secHtml('🌡️','אווירה', r.atmosphere, '#0891b2') +
-    secHtml('🏁','סיום', r.closing, '#16a34a') +
-    (pts ? '<div class="recs" style="margin-bottom:16px"><h3>📌 דברים עיקריים</h3>'+pts+'</div>' : '') +
-    (moms ? '<div class="recs" style="background:#fffbeb;border-color:#fde68a;margin-bottom:16px"><h3 style="color:#d97706">⚡ רגעים משמעותיים</h3>'+moms+'</div>' : '') +
-    (r.transcript ? '<div class="gcard"><div class="ctitle">📝 תמלול</div><div style="font-size:13px;color:#5a6282;line-height:1.9;white-space:pre-wrap;max-height:400px;overflow-y:auto;padding-top:8px;border-top:1px solid #f0f1f5">'+r.transcript+'</div></div>' : '');
+    (spkHtml ? '<div class="gcard"><div class="ctitle">👥 דוברים</div>' + spkHtml + '</div>' : '') +
+    secBlock('🎯', 'מטרת השיחה', r.purpose, '#4f46e5') +
+    secBlock('🌡️', 'אווירה', r.atmosphere, '#0891b2') +
+    secBlock('🏁', 'סיום', r.closing, '#16a34a') +
+    (ptsHtml ? '<div class="recs" style="margin-bottom:16px"><h3>📌 דברים עיקריים</h3>' + ptsHtml + '</div>' : '') +
+    (momsHtml ? '<div class="recs" style="background:#fffbeb;border-color:#fde68a;margin-bottom:16px"><h3 style="color:#d97706">⚡ רגעים משמעותיים</h3>' + momsHtml + '</div>' : '') +
+    (r.transcript ? '<div class="gcard"><div class="ctitle">📝 תמלול</div><div style="font-size:13px;color:#5a6282;line-height:1.9;white-space:pre-wrap;max-height:400px;overflow-y:auto;padding-top:8px;border-top:1px solid #f0f1f5">' + r.transcript + '</div></div>' : '');
 }
 
-// ── CHAT ──────────────────────────────────────────────
+// CHAT
 async function sendChat() {
-  var input = document.getElementById('chatIn');
-  var q = input.value.trim();
-  if (!q || !currentAnalysis) return;
+  var inp = document.getElementById('chatIn');
+  var q = inp.value.trim();
+  if (!q || !curAnalysis) return;
   if (!getKeys().length) return;
 
   var msgs = document.getElementById('chatMsgs');
-  input.value = '';
+  inp.value = '';
   document.getElementById('chatBtn').disabled = true;
-  msgs.innerHTML += '<div class="cmsg cuser">'+q+'</div><div class="cmsg cload" id="cload">חושב...</div>';
+  msgs.innerHTML += '<div class="cmsg cuser">' + q + '</div><div class="cmsg cai" id="cld" style="color:#9098b1;font-style:italic">חושב...</div>';
   msgs.scrollTop = msgs.scrollHeight;
 
   try {
-    var ca = currentAnalysis;
-    var fullTranscript = ca.transcript || ca.result.transcript || '';
+    var ca = curAnalysis;
+    var tr = ca.transcript || ca.result.transcript || '';
     var ctx = 'אתה סוכן AI שמנתח שיחות מוקד. ענה בעברית בלבד, קצר וממוקד.\n' +
-      'חשוב: אם שואלים על פרט מהשיחה (שם, מה נאמר) — חפש רק בתמלול המלא למטה.\n' +
-      'אל תמציא מידע שלא מופיע בתמלול.\n\n' +
-      '=== ניתוח ===\nסוג: '+ca.typeLabel+'\n'+
-      (ca.result.totalScore ? 'ציון: '+ca.result.totalScore+'/100 ('+ca.result.grade+')\n' : '') +
-      (ca.result.agentSummary ? 'ביצועי נציג: '+ca.result.agentSummary+'\n' : '') +
-      (ca.result.customerSummary ? 'תגובת לקוח: '+ca.result.customerSummary+'\n' : '') +
-      (ca.result.recommendations ? 'המלצות: '+(ca.result.recommendations||[]).join(' | ')+'\n' : '') +
-      '\n=== תמלול מלא של השיחה (המקור היחיד לעובדות) ===\n' +
-      (fullTranscript || '(תמלול לא זמין)');
+      'אם שואלים על פרט מהשיחה — חפש רק בתמלול. אל תמציא מידע.\n\n' +
+      '=== ניתוח ===\nסוג: ' + ca.typeLabel + '\n' +
+      (ca.result.totalScore ? 'ציון: ' + ca.result.totalScore + '/100 (' + ca.result.grade + ')\n' : '') +
+      (ca.result.agentSummary ? 'נציג: ' + ca.result.agentSummary + '\n' : '') +
+      (ca.result.customerSummary ? 'לקוח: ' + ca.result.customerSummary + '\n' : '') +
+      '\n=== תמלול (המקור היחיד לעובדות) ===\n' + (tr || '(לא זמין)');
 
     var data = await callGemini([{text: ctx + '\n\nשאלה: ' + q}], 1024, false);
-    var answer = data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0] && data.candidates[0].content.parts[0].text || 'לא הצלחתי לענות.';
-    var ld = document.getElementById('cload');
+    var answer = data.candidates[0].content.parts[0].text || 'לא הצלחתי לענות.';
+    var ld = document.getElementById('cld');
     if (ld) ld.remove();
-    msgs.innerHTML += '<div class="cmsg cai">'+answer+'</div>';
+    msgs.innerHTML += '<div class="cmsg cai">' + answer + '</div>';
   } catch(err) {
-    var ld2 = document.getElementById('cload');
+    var ld2 = document.getElementById('cld');
     if (ld2) ld2.remove();
-    msgs.innerHTML += '<div class="cmsg cai" style="color:#dc2626">שגיאה: '+err.message+'</div>';
+    msgs.innerHTML += '<div class="cmsg cai" style="color:#dc2626">שגיאה: ' + err.message + '</div>';
   }
   document.getElementById('chatBtn').disabled = false;
   msgs.scrollTop = msgs.scrollHeight;
 }
 
-// ── HISTORY ───────────────────────────────────────────
+// HISTORY
 function saveHist(r, agent, id) {
   hist.unshift({id:id, agent:agent, type:callType, score:r.totalScore||0, grade:r.grade||'', mood:r.mood||'', moodEmoji:r.moodEmoji||'', date:new Date().toLocaleDateString('he-IL'), data:r});
-  if (hist.length > 50) hist = hist.slice(0,50);
+  if (hist.length > 50) hist = hist.slice(0, 50);
   localStorage.setItem('cqHist', JSON.stringify(hist));
 }
+
 function renderHist() {
-  var avg = hist.length ? Math.round(hist.reduce(function(s,h){return s+h.score;},0)/hist.length) : 0;
-  var best = hist.length ? Math.max.apply(null, hist.map(function(h){return h.score;})) : 0;
+  var avg = hist.length ? Math.round(hist.reduce(function(s,h) { return s + h.score; }, 0) / hist.length) : 0;
+  var best = hist.length ? Math.max.apply(null, hist.map(function(h) { return h.score; })) : 0;
   document.getElementById('statsRow').innerHTML =
-    '<div class="stcard"><div class="stlbl">סה"כ שיחות</div><div class="stval">'+hist.length+'</div></div>' +
-    '<div class="stcard"><div class="stlbl">ממוצע ציון</div><div class="stval" style="color:#4f46e5">'+avg+'</div></div>' +
-    '<div class="stcard"><div class="stlbl">ציון שיא</div><div class="stval" style="color:#16a34a">'+best+'</div></div>';
+    '<div class="stcard"><div class="stlbl">סה"כ שיחות</div><div class="stval">' + hist.length + '</div></div>' +
+    '<div class="stcard"><div class="stlbl">ממוצע ציון</div><div class="stval" style="color:#4f46e5">' + avg + '</div></div>' +
+    '<div class="stcard"><div class="stlbl">ציון שיא</div><div class="stval" style="color:#16a34a">' + best + '</div></div>';
   var el = document.getElementById('histList');
   if (!hist.length) { el.innerHTML = '<div class="hempty">עדיין אין שיחות בהיסטוריה</div>'; return; }
-  el.innerHTML = hist.map(function(h,i) {
-    var cls = h.score>=80?'hi':h.score>=55?'md':'lo';
-    return '<div class="hitem" onclick="viewHist('+i+')"><div><div class="hname">'+h.agent+' <span style="color:#c0c6d9;font-weight:400">· '+h.id+'</span></div><div class="hmeta">'+(h.type==='sales'?'מכירה':h.type==='service'?'שירות':'כללי')+' · '+h.date+' · '+(h.moodEmoji||'')+' '+(h.mood||'')+'</div></div><div class="hscore '+cls+'">'+h.score+'</div></div>';
-  }).join('');
+  var html = '';
+  for (var i = 0; i < hist.length; i++) {
+    var h = hist[i];
+    var sc = h.score >= 80 ? 'shi' : h.score >= 55 ? 'smd' : 'slo';
+    html += '<div class="hitem" onclick="viewHist(' + i + ')"><div><div class="hname">' + h.agent + ' <span style="color:#c0c6d9;font-weight:400">· ' + h.id + '</span></div><div class="hmeta">' + (h.type==='sales'?'מכירה':h.type==='service'?'שירות':'כללי') + ' · ' + h.date + ' · ' + (h.moodEmoji||'') + ' ' + (h.mood||'') + '</div></div><div class="hscore ' + sc + '">' + h.score + '</div></div>';
+  }
+  el.innerHTML = html;
 }
+
 function viewHist(i) {
   var e = hist[i];
-  navTo('analyze', document.querySelector('.nav-btn'));
-  document.getElementById('analyzeForm').style.display = 'none';
-  currentAnalysis = {result:e.data, agentName:e.agent, callId:e.id, typeLabel:e.type==='sales'?'מכירה':e.type==='service'?'שירות':'כללי', transcript:e.data.transcript||''};
+  navTo('analyze', document.querySelector('.nb'));
+  document.getElementById('aForm').style.display = 'none';
+  curAnalysis = {result:e.data, agentName:e.agent, callId:e.id, typeLabel:e.type==='sales'?'מכירה':e.type==='service'?'שירות':'כללי', transcript:e.data.transcript||''};
   if (e.type === 'general') renderGeneral(e.data, e.id);
   else renderResult(e.data, e.agent, e.id);
-  document.getElementById('chatMsgs').innerHTML = '<div class="cmsg cai">שלום! שאל אותי על השיחה של <strong>'+e.agent+'</strong> 💬</div>';
-  window.scrollTo(0,0);
+  document.getElementById('chatMsgs').innerHTML = '<div class="cmsg cai">שלום! שאל אותי על השיחה של <strong>' + e.agent + '</strong> 💬</div>';
+  window.scrollTo(0, 0);
 }
+
 function clearHist() {
   if (!confirm('למחוק את כל ההיסטוריה?')) return;
   hist = []; localStorage.removeItem('cqHist'); renderHist();
 }
+
 function resetForm() {
   document.getElementById('resDiv').style.display = 'none';
-  document.getElementById('analyzeForm').style.display = 'block';
+  document.getElementById('aForm').style.display = 'block';
   document.getElementById('audioInput').value = '';
   document.getElementById('manualText').value = '';
   document.getElementById('fchip').style.display = 'none';
+  document.getElementById('playerWrap').style.display = 'none';
+  document.getElementById('resultPlayerWrap').style.display = 'none';
   document.getElementById('errBox').style.display = 'none';
-  selectedFile = null; currentAnalysis = null;
-  var rp = document.getElementById('resultPlayerWrap');
-  if (rp) rp.style.display = 'none';
-  var ap = document.getElementById('audioPlayerWrap');
-  if (ap) ap.style.display = 'none';
+  selFile = null; curAnalysis = null;
 }
 
-// ── PDF ───────────────────────────────────────────────
-function downloadPDF() {
-  if (!currentAnalysis || !window.jspdf) return;
+// PDF
+function dlPDF() {
+  if (!curAnalysis || !window.jspdf) return;
   var doc = new window.jspdf.jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
-  var r = currentAnalysis.result;
-  var agent = currentAnalysis.agentName;
-  var id = currentAnalysis.callId;
+  var r = curAnalysis.result, agent = curAnalysis.agentName, id = curAnalysis.callId;
   doc.setR2L(true);
   var y = 20, m = 15, pw = 210, mw = pw - m*2;
-  var line = function(txt, sz, bold, col) {
+  function line(txt, sz, bold, col) {
     if (y > 270) { doc.addPage(); y = 20; }
     doc.setFontSize(sz||11); doc.setFont('helvetica', bold?'bold':'normal');
     doc.setTextColor.apply(doc, col||[30,29,46]);
     doc.text(txt||'', pw-m, y, {align:'right'}); y += 7;
-  };
-  var block = function(title, text, tc) {
+  }
+  function block(title, text, tc) {
     line(title, 11, true, tc||[108,99,255]);
-    if (text) { var ls = doc.splitTextToSize(text, mw); ls.forEach(function(l){if(y>270){doc.addPage();y=20;} doc.setFontSize(10);doc.setFont('helvetica','normal');doc.setTextColor(90,98,130);doc.text(l,pw-m,y,{align:'right'});y+=6;}); }
+    if (text) {
+      var ls = doc.splitTextToSize(text, mw);
+      for (var i = 0; i < ls.length; i++) {
+        if (y > 270) { doc.addPage(); y = 20; }
+        doc.setFontSize(10); doc.setFont('helvetica','normal'); doc.setTextColor(90,98,130);
+        doc.text(ls[i], pw-m, y, {align:'right'}); y += 6;
+      }
+    }
     y += 2;
-  };
+  }
   doc.setFillColor(108,99,255); doc.rect(0,0,210,30,'F');
-  doc.setFontSize(16);doc.setFont('helvetica','bold');doc.setTextColor(255,255,255);
+  doc.setFontSize(16); doc.setFont('helvetica','bold'); doc.setTextColor(255,255,255);
   doc.text('Call Quality Report', pw-m, 13, {align:'right'});
-  doc.setFontSize(10);doc.setFont('helvetica','normal');
-  doc.text(agent+' | '+id, pw-m, 22, {align:'right'});
+  doc.setFontSize(10); doc.setFont('helvetica','normal');
+  doc.text(agent + ' | ' + id, pw-m, 22, {align:'right'});
   doc.text(new Date().toLocaleDateString('he-IL'), m, 22);
   y = 40;
   if (r.totalScore) {
-    line('ציון כולל: '+r.totalScore+'/100 — '+r.grade, 13, true);
+    line('ציון: ' + r.totalScore + '/100 — ' + (r.grade||''), 13, true);
     block('סיכום:', r.gradeText);
     block('נציג:', r.agentSummary);
     block('לקוח:', r.customerSummary);
-    (r.categories||[]).forEach(function(c){line('• '+c.name+' — '+c.score, 10, false,[60,68,102]);});
-    y+=4;
-    (r.recommendations||[]).forEach(function(rec,i){block((i+1)+'.', rec);});
+    var cats = r.categories || [];
+    for (var ci = 0; ci < cats.length; ci++) line('• ' + cats[ci].name + ' — ' + cats[ci].score, 10, false, [60,68,102]);
+    y += 4;
+    var recs = r.recommendations || [];
+    for (var ri = 0; ri < recs.length; ri++) block((ri+1)+'.', recs[ri]);
   } else {
     block('קשר:', r.relationship);
     block('מטרה:', r.purpose);
@@ -827,12 +1129,16 @@ function downloadPDF() {
     block('סיום:', r.closing);
     block('סיכום:', r.summary);
   }
-  if (currentAnalysis.transcript) {
-    y+=4; line('תמלול:', 12, true);
-    var tls = doc.splitTextToSize(currentAnalysis.transcript, mw);
-    tls.forEach(function(l){if(y>270){doc.addPage();y=20;} doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(90,98,130);doc.text(l,pw-m,y,{align:'right'});y+=5.5;});
+  if (curAnalysis.transcript) {
+    y += 4; line('תמלול:', 12, true);
+    var tls = doc.splitTextToSize(curAnalysis.transcript, mw);
+    for (var ti = 0; ti < tls.length; ti++) {
+      if (y > 270) { doc.addPage(); y = 20; }
+      doc.setFontSize(9); doc.setFont('helvetica','normal'); doc.setTextColor(90,98,130);
+      doc.text(tls[ti], pw-m, y, {align:'right'}); y += 5.5;
+    }
   }
-  doc.save('call_'+agent+'_'+id+'.pdf');
+  doc.save('call_' + agent + '_' + id + '.pdf');
 }
 </script>
 </body>
