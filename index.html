@@ -364,14 +364,21 @@ var DEF_SERVICE = [
 function getCrit(type) {
   try {
     var s = localStorage.getItem('crit_' + type);
+    // אם נמחק localStorage — חזור לברירת מחדל
     return s ? JSON.parse(s) : (type === 'sales' ? DEF_SALES : DEF_SERVICE);
   } catch(e) {
     return type === 'sales' ? DEF_SALES : DEF_SERVICE;
   }
 }
 
+// הוראות ברירת מחדל — ישמרו תמיד גם אחרי ניקוי cache
+var DEFAULT_INST_SALES = 'בדוק האם הנציג הציע מספר חבילות. בדוק האם הנציג שאל שאלות כלליות מקדימות כמו איפה אתה גר? האם אתה מתאמן? כמה פעמים אתה מתאמן בשבוע?';
+var DEFAULT_INST_SERVICE = 'האם הנציג הציג את שמו האישי ומאיפה הוא (כללית אקטיב, עובדים בריא, מעוף לעמית, לאומית פיט)? מה הסיבה שהלקוח פנה אלינו? האם הנציג נתן ללקוח פתרון? האם הנציג שאל בסוף השיחה האם יש משהו נוסף שהוא יכול לעזור בו?';
+
 function getInst(type) {
-  return localStorage.getItem('inst_' + type) || '';
+  var saved = localStorage.getItem('inst_' + type);
+  if (saved !== null) return saved;
+  return type === 'sales' ? DEFAULT_INST_SALES : DEFAULT_INST_SERVICE;
 }
 
 // INIT
@@ -422,10 +429,10 @@ function setType(t, btn) {
 // KEYS
 // הכנס כאן את המפתחות שלך — יהיו זמינים לכולם
 var DEFAULT_KEYS = [
-  'AIzaSyDNZKAwMR6oY0kcbzOjkWhakXsslQsFwHU',
-  'AIzaSyA0olQBrQImwwEs1I08j0fXNS0-gzCJm5U',
-  'AIzaSyCxdE1XSp6-kwLhe2ekiJCael8oo3xF1zs',
-  'AIzaSyDvxIRZrB2GEhhUMz54KafV3zUrUUVUdEY'
+  'AIzaSyA--noH9mNmjupOrUyB9haT1Mfhii0ePbo',
+  'AIzaSyD9Mkt73OsnVSDQWCRMbvIBEf8XD6funVM',
+  'AIzaSyDC78-q9ThKYrgbidMP-IOGY4uR6HznaMg',
+  'AIzaSyA7P8_7ldr8Yj5nXH9bhnMbf88wTbPra3c'
 ];
 
 function getKeys() {
