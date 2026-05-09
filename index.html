@@ -359,8 +359,8 @@ textarea.ta::placeholder{color:#c0c6d9;}
     <div class="fi" style="margin-bottom:12px">
       <label>מודל פעיל</label>
       <select id="modelSel">
-        <option value="gemini-2.5-flash">Gemini 2.5 Flash — מומלץ לאודיו</option>
-        <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash Lite — מהיר יותר</option>
+        <option value="gemini-2.5-flash">Gemini 2.5 Flash — מומלץ (10 RPM)</option>
+        <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash Lite — מהיר יותר (30 RPM)</option>
         <option value="gemini-2.5-pro">Gemini 2.5 Pro — הכי מדויק</option>
       </select>
     </div>
@@ -669,7 +669,7 @@ async function callGroq(prompt, jsonMode) {
   if (!key) throw new Error('אין מפתח Groq');
 
   var body = {
-    model: 'llama-3.3-70b-versatile',
+    model: 'gemma2-9b-it',
     messages: [{role: 'user', content: prompt}],
     temperature: 0.3,
     max_tokens: 8192
@@ -1341,6 +1341,12 @@ async function runAnalysis() {
 
       // STEP 2: Analyze with Groq (fast, no quota issues) or Gemini fallback
       setMsg('שלב 2/2: מנתח עם Groq...');
+      // Groq has 12K TPM limit - truncate transcript if needed
+      var maxTranscriptChars = 5000;
+      var transcriptForAnalysis = transcriptText.length > maxTranscriptChars
+        ? transcriptText.slice(0, maxTranscriptChars) + '\n... [קוצר לאורך]'
+        : transcriptText;
+
       var analysisPrompt = 'ענה בעברית בלבד.\n' +
         'נתח שיחת ' + typeLabel + ' בין ' + agentRole + ' (' + agentName + ') ללקוח.\n' +
         (callType === 'sales' ? 'דגש: זיהוי צרכים, הצגת מוצר, טיפול בהתנגדויות, סגירה.' : 'דגש: הבנת הבעיה, אמפתיה, פתרון מלא, שביעות רצון.') +
@@ -1350,7 +1356,7 @@ async function runAnalysis() {
         'sections (opening/body/solution/satisfaction/closing/atmosphere — כל אחד: title,text), ' +
         'recommendations (מערך 3), ' +
         (callType === 'sales' ? 'closing (בוליאן), closingNote' : 'resolved (בוליאן), resolvedNote') + '.\n\n' +
-        'תמלול השיחה:\n' + transcriptText;
+        'תמלול השיחה:\n' + transcriptForAnalysis;
 
       var sData;
       if (getGroqKey()) {
