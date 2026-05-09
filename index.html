@@ -324,6 +324,21 @@ textarea.ta::placeholder{color:#c0c6d9;}
   </div>
 
   <div class="card">
+    <div style="font-size:14px;font-weight:600;margin-bottom:10px">⚡ Groq — ניתוח וצ'אט מהיר</div>
+    <p style="font-size:12px;color:#9098b1;margin-bottom:10px">Gemini מתמלל את השמע → Groq מנתח ועונה על שאלות. 14,400 בקשות חינמיות ביום!</p>
+    <div class="fi"><label>מפתח Groq</label><input type="password" id="groqKeyInput" placeholder="gsk_..."></div>
+    <div style="margin-top:12px"><button class="btn-save" onclick="saveGroqKey()">שמור</button></div>
+    <div class="snote" id="groqSaved">✓ נשמר!</div>
+    <div class="ibox" style="background:#f0fdf4;border-color:#86efac;color:#166534">
+      <strong>קבלת מפתח Groq חינמי:</strong><br>
+      1. כנס ל: <a href="https://console.groq.com/keys" target="_blank">console.groq.com/keys</a><br>
+      2. הירשם ← Create API Key<br>
+      3. הדבק כאן ← שמור<br><br>
+      <strong>✓ חינמי לחלוטין · 14,400 בקשות ביום · מהיר פי 10</strong>
+    </div>
+  </div>
+
+  <div class="card">
     <div style="font-size:14px;font-weight:600;margin-bottom:10px">⚡ OpenRouter — גיבוי חינמי לתמלולים</div>
     <p style="font-size:12px;color:#9098b1;margin-bottom:14px">משמש כגיבוי כש-Gemini מגיע למגבלה</p>
     <div class="fi"><label>מפתח OpenRouter</label><input type="password" id="orKeyInput" placeholder="sk-or-v1-..."></div>
@@ -457,6 +472,8 @@ window.addEventListener('DOMContentLoaded', function() {
   loadKeysList();
   var orInput = document.getElementById('orKeyInput');
   if (orInput) orInput.value = localStorage.getItem('orKey') || '';
+  var groqInput = document.getElementById('groqKeyInput');
+  if (groqInput) groqInput.value = localStorage.getItem('groqKey') || DEFAULT_GROQ_KEY || '';
   var cuInput = document.getElementById('converterUrlInput');
   if (cuInput) cuInput.value = localStorage.getItem('converterUrl') || CONVERTER_URL || '';
   var ai = document.getElementById('audioInput');
@@ -626,6 +643,58 @@ function saveOrKey() {
   var n = document.getElementById('orSaved');
   n.style.display = 'flex';
   setTimeout(function() { n.style.display = 'none'; }, 3000);
+}
+
+// ┌─────────────────────────────────────────────────────────────┐
+// │  ★★★ הדבק כאן את מפתח Groq שלך — בין הגרשיים ★★★          │
+// │  למשל: var DEFAULT_GROQ_KEY = 'gsk_abc123...';              │
+// └─────────────────────────────────────────────────────────────┘
+var DEFAULT_GROQ_KEY = '';
+
+function getGroqKey() {
+  return localStorage.getItem('groqKey') || DEFAULT_GROQ_KEY || '';
+}
+
+function saveGroqKey() {
+  var v = document.getElementById('groqKeyInput').value.trim();
+  localStorage.setItem('groqKey', v);
+  var n = document.getElementById('groqSaved');
+  n.style.display = 'flex';
+  setTimeout(function() { n.style.display = 'none'; }, 3000);
+}
+
+// Call Groq API (text only - fast analysis)
+async function callGroq(prompt, jsonMode) {
+  var key = getGroqKey();
+  if (!key) throw new Error('אין מפתח Groq');
+
+  var body = {
+    model: 'llama-3.3-70b-versatile',
+    messages: [{role: 'user', content: prompt}],
+    temperature: 0.3,
+    max_tokens: 8192
+  };
+  if (jsonMode) {
+    body.response_format = {type: 'json_object'};
+  }
+
+  var res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': 'Bearer ' + key,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(body)
+  });
+
+  var d = await res.json();
+  if (d.error) throw new Error('Groq: ' + (d.error.message || JSON.stringify(d.error)));
+
+  var text = d.choices && d.choices[0] && d.choices[0].message && d.choices[0].message.content || '';
+  if (!text) throw new Error('Groq: תשובה ריקה');
+
+  // Return Gemini-compatible format
+  return {candidates: [{content: {parts: [{text: text}]}}]};
 }
 
 // Call OpenRouter as fallback (text-only)
@@ -1252,38 +1321,53 @@ async function runAnalysis() {
     } else {
       var critPrompt = buildCritPrompt(callType);
       var catNames = getCrit(callType).map(function(c) { return c.name; }).join('/');
-      var audioNote = selFile ? 'IMPORTANT: Listen carefully. Base analysis ONLY on what you actually hear. Do NOT hallucinate.\n' : '';
-      var sPrompt = audioNote + 'ענה בעברית בלבד.\n' +
+
+      // STEP 1: Transcribe with Gemini (audio support)
+      if (selFile) {
+        setMsg('שלב 1/2: מתמלל עם Gemini...');
+        var tParts = [];
+        if (fileUri) {
+          var tp = fileUri.fallback
+            ? {inline_data: {mime_type: fileUri.mime, data: fileUri.b64}}
+            : {file_data: {mime_type: fileUri.mime, file_uri: fileUri.uri}};
+          tParts = [tp, {text: 'תמלל את השיחה בעברית בדיוק. כתוב כל שורה: שם: טקסט. אם מילה לא ברורה כתוב [לא ברור]. החזר רק את התמלול ללא הסברים.'}];
+        }
+        var tData = await callGemini(tParts, 4096, false);
+        transcriptText = tData.candidates[0].content.parts[0].text || '';
+        console.log('[Analysis] transcribed:', transcriptText.length, 'chars');
+      } else {
+        transcriptText = manual;
+      }
+
+      // STEP 2: Analyze with Groq (fast, no quota issues) or Gemini fallback
+      setMsg('שלב 2/2: מנתח עם Groq...');
+      var analysisPrompt = 'ענה בעברית בלבד.\n' +
         'נתח שיחת ' + typeLabel + ' בין ' + agentRole + ' (' + agentName + ') ללקוח.\n' +
         (callType === 'sales' ? 'דגש: זיהוי צרכים, הצגת מוצר, טיפול בהתנגדויות, סגירה.' : 'דגש: הבנת הבעיה, אמפתיה, פתרון מלא, שביעות רצון.') +
         critPrompt + '\n' +
-        'החזר JSON תקני בלבד עם: totalScore, grade, gradeText, mood, moodEmoji, agentScore, agentSummary, customerScore, customerSummary, ' +
+        'החזר JSON תקני בלבד עם: totalScore, grade (מצוין/טוב/בינוני/טעון שיפור), gradeText, mood, moodEmoji, agentScore, agentSummary, customerScore, customerSummary, ' +
         'categories (מערך לפי הקריטריונים: ' + catNames + ' — כל אחד: name, score (0-100), weight, agentNote, customerNote), ' +
         'sections (opening/body/solution/satisfaction/closing/atmosphere — כל אחד: title,text), ' +
         'recommendations (מערך 3), ' +
-        (callType === 'sales' ? 'closing (בוליאן), closingNote,' : 'resolved (בוליאן), resolvedNote,') +
-        ' transcript (מחרוזת התמלול המלא שורה שורה).';
+        (callType === 'sales' ? 'closing (בוליאן), closingNote' : 'resolved (בוליאן), resolvedNote') + '.\n\n' +
+        'תמלול השיחה:\n' + transcriptText;
 
-      if (!selFile) {
-        parts = [{text: 'תמלול:\n' + manual + '\n\n' + sPrompt}];
-      } else if (fileUri) {
-        var sp = fileUri.fallback
-          ? {inline_data: {mime_type: fileUri.mime, data: fileUri.b64}}
-          : {file_data: {mime_type: fileUri.mime, file_uri: fileUri.uri}};
-        parts = [sp, {text: sPrompt}];
+      var sData;
+      if (getGroqKey()) {
+        try {
+          sData = await callGroq(analysisPrompt, true);
+          console.log('[Analysis] Groq analysis OK');
+        } catch(groqErr) {
+          console.warn('[Analysis] Groq failed, falling back to Gemini:', groqErr.message);
+          sData = await callGemini([{text: analysisPrompt}], 8192, true);
+        }
       } else {
-        parts.push({text: sPrompt});
+        sData = await callGemini([{text: analysisPrompt}], 8192, true);
       }
 
-      console.log('[Analysis] sending '+callType.toUpperCase()+' request, parts:', parts.length, 'audio:', parts.some(function(p){return p.inline_data || p.file_data;}));
-      setMsg('מנתח שיחה...');
-      var sData = await callGemini(parts, 8192, false); // false = allow TRANSCRIPT: format
-      var sCand = sData.candidates[0];
-      raw = sCand.content.parts[0].text || '';
+      raw = sData.candidates[0].content.parts[0].text || '';
       if (!raw.trim()) throw new Error('תשובה ריקה');
       result = parseResp(raw);
-      // transcript can come from TRANSCRIPT: section (via parseResp) or from JSON field
-      transcriptText = result.transcript || manual || transcriptText || '';
       result.transcript = transcriptText;
       console.log('[Analysis] transcript length:', transcriptText.length, 'chars');
     }
@@ -1450,8 +1534,18 @@ async function sendChat() {
       (ca.result.customerSummary ? 'לקוח: ' + ca.result.customerSummary + '\n' : '') +
       '\n=== תמלול (המקור היחיד לעובדות) ===\n' + (tr || '(לא זמין)');
 
-    var data = await callGemini([{text: ctx + '\n\nשאלה: ' + q}], 1024, false);
-    var answer = data.candidates[0].content.parts[0].text || 'לא הצלחתי לענות.';
+    var chatData;
+    if (getGroqKey()) {
+      try {
+        chatData = await callGroq(ctx + '\n\nשאלה: ' + q, false);
+      } catch(ge) {
+        console.warn('[Chat] Groq failed, trying Gemini:', ge.message);
+        chatData = await callGemini([{text: ctx + '\n\nשאלה: ' + q}], 1024, false);
+      }
+    } else {
+      chatData = await callGemini([{text: ctx + '\n\nשאלה: ' + q}], 1024, false);
+    }
+    var answer = chatData.candidates[0].content.parts[0].text || 'לא הצלחתי לענות.';
     var ld = document.getElementById('cld');
     if (ld) ld.remove();
     msgs.innerHTML += '<div class="cmsg cai">' + answer + '</div>';
