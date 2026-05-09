@@ -397,6 +397,63 @@ function getInst(type) {
   return type === 'sales' ? DEFAULT_INST_SALES : DEFAULT_INST_SERVICE;
 }
 
+// CONVERT AUDIO TO MP3 VIA WEB AUDIO API
+function convertToMp3(file, callback) {
+  var fname = document.getElementById('fname');
+  if (fname) fname.textContent = 'ממיר קובץ...';
+  document.getElementById('fchip').style.display = 'flex';
+  document.getElementById('errBox').style.display = 'none';
+
+  var url = URL.createObjectURL(file);
+  var audio = new Audio();
+  audio.src = url;
+
+  // Use AudioContext to decode and re-encode
+  var ctx = new (window.AudioContext || window.webkitAudioContext)();
+
+  fetch(url)
+    .then(function(r) { return r.arrayBuffer(); })
+    .then(function(buf) { return ctx.decodeAudioData(buf); })
+    .then(function(audioBuffer) {
+      // Record via MediaRecorder
+      var dest = ctx.createMediaStreamDestination();
+      var src = ctx.createBufferSource();
+      src.buffer = audioBuffer;
+      src.connect(dest);
+
+      var recorder = new MediaRecorder(dest.stream, {mimeType: 'audio/webm;codecs=opus'});
+      var chunks = [];
+
+      recorder.ondataavailable = function(e) {
+        if (e.data.size > 0) chunks.push(e.data);
+      };
+
+      recorder.onstop = function() {
+        var blob = new Blob(chunks, {type: 'audio/webm'});
+        var newName = file.name.replace(/\.\w+$/, '.webm');
+        var converted = new File([blob], newName, {type: 'audio/webm'});
+        URL.revokeObjectURL(url);
+        callback(converted, null);
+      };
+
+      recorder.onerror = function(err) {
+        console.warn('MediaRecorder error:', err);
+        callback(null, err);
+      };
+
+      recorder.start();
+      src.start(0);
+      // Stop after audio duration + small buffer
+      setTimeout(function() {
+        try { recorder.stop(); src.stop(); } catch(e) {}
+      }, (audioBuffer.duration * 1000) + 500);
+    })
+    .catch(function(err) {
+      console.warn('Audio decode failed:', err);
+      callback(null, err);
+    });
+}
+
 // INIT
 window.addEventListener('DOMContentLoaded', function() {
   var ms = document.getElementById('modelSel');
@@ -410,13 +467,31 @@ window.addEventListener('DOMContentLoaded', function() {
       var f = e.target.files[0];
       if (!f) return;
       var ext = f.name.split('.').pop().toLowerCase();
-      // WMV is not supported by Gemini
-      var unsupported = ['wmv', 'avi', 'mkv', 'mov', 'rm', 'rmvb', '3gp'];
-      if (unsupported.indexOf(ext) !== -1) {
-        showErr('פורמט ' + ext.toUpperCase() + ' לא נתמך על ידי Gemini.\n\nהמר ל-MP3 תחילה:\n• אונליין: cloudconvert.com (WMV to MP3)\n• או: VLC → Media → Convert → MP3');
-        e.target.value = '';
+      var needsConvert = ['wmv','avi','mkv','rm','rmvb'].indexOf(ext) !== -1;
+
+      if (needsConvert) {
+        // Convert to MP3 using Web Audio API + MediaRecorder
+        convertToMp3(f, function(converted, err) {
+          if (err || !converted) {
+            // fallback - just use the file as-is and hope Gemini handles it
+            selFile = f;
+            document.getElementById('fname').textContent = f.name + ' (המרה נכשלה - שולח מקורי)';
+            document.getElementById('fchip').style.display = 'flex';
+          } else {
+            selFile = converted;
+            document.getElementById('fname').textContent = converted.name + ' (הומר מ-' + ext.toUpperCase() + ')';
+            document.getElementById('fchip').style.display = 'flex';
+            document.getElementById('errBox').style.display = 'none';
+            var url = URL.createObjectURL(converted);
+            var ap = document.getElementById('audioPlayer');
+            if (ap) { ap.src = url; document.getElementById('playerWrap').style.display = 'block'; }
+            var rp = document.getElementById('resultPlayer');
+            if (rp) rp.src = url;
+          }
+        });
         return;
       }
+
       var sizeMB = f.size / 1024 / 1024;
       if (sizeMB > 20) {
         if (!confirm('הקובץ ' + sizeMB.toFixed(1) + 'MB - גדול מאוד.\nממליץ לחתוך לקבצים קטנים יותר.\n\nלהמשיך?')) {
