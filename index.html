@@ -594,8 +594,8 @@ var DEFAULT_KEYS = [
 function getKeys() {
   try {
     var saved = JSON.parse(localStorage.getItem('geminiKeys') || '[]').filter(function(k) { return k.trim(); });
-    if (saved.length) return saved; // מפתחות שהמשתמש הזין בהגדרות — עדיפות
-    return DEFAULT_KEYS.filter(function(k) { return k && k !== 'AIzaSyB_DPGvYsAhgqLQbqLuiZ1gh57SQeJQT0o' && k !== 'AIzaSyCvXfeAnp-GOz5kuD--8D86Sobdy6r72CU' && k !== 'AIzaSyCxRM9tIfcDoTOP6YBY2RvL3MNgbjxq1TY' && k !== 'AIzaSyAffpdcEV9xa6EEjbl_w9uYlOafuU6cC8s'; });
+    if (saved.length) return saved;
+    return DEFAULT_KEYS.filter(function(k) { return k && k.length > 10; });
   }
   catch(e) { return []; }
 }
