@@ -697,7 +697,9 @@ async function uploadToFiles(file, apiKey) {
     if (!initRes.ok) {
       var errText = await initRes.text();
       console.warn('[Upload] init failed:', initRes.status, errText.slice(0,200));
-      throw new Error('init failed: ' + initRes.status);
+      // Mark whether this is a key issue vs other error
+      var isKeyErr = errText.indexOf('expired') !== -1 || errText.indexOf('API key not valid') !== -1 || errText.indexOf('INVALID_ARGUMENT') !== -1;
+      throw new Error(isKeyErr ? 'KEY_EXPIRED' : 'init failed: ' + initRes.status);
     }
 
     var uploadUrl = initRes.headers.get('X-Goog-Upload-URL') || initRes.headers.get('x-goog-upload-url');
@@ -801,6 +803,8 @@ async function callGemini(parts, maxTok, jsonMode) {
 
     var em = (d.error && d.error.message) || '';
     var isQ = res.status === 429 || em.indexOf('quota') !== -1 || em.indexOf('RESOURCE_EXHAUSTED') !== -1;
+    var isExpired = em.indexOf('expired') !== -1 || em.indexOf('INVALID_ARGUMENT') !== -1 || em.indexOf('API key not valid') !== -1;
+    if (isExpired) { console.warn('[Gemini] Key '+(ki+1)+' expired/invalid, trying next...'); continue; }
     var isO = res.status === 503 || em.indexOf('high demand') !== -1 || em.indexOf('overloaded') !== -1;
 
     if (isQ) {
@@ -934,12 +938,26 @@ async function runAnalysis() {
     if (selFile) {
       var uploadKeys = getKeys();
       if (!uploadKeys.length) throw new Error('נא לשמור מפתח Gemini בהגדרות');
-      var uploadKey = uploadKeys[parseInt(localStorage.getItem('geminiKeyIdx')||'0') % uploadKeys.length];
-      fileUri = await uploadToFiles(selFile, uploadKey);
-      console.log('[Analysis] upload result:', fileUri.fallback ? 'BASE64 fallback' : 'Files API URI');
-      if (fileUri.fallback) {
-        console.warn('[Analysis] WARNING: using base64 - will use ~10x more tokens than Files API');
+      // Try each key for upload until one works
+      for (var ui = 0; ui < uploadKeys.length; ui++) {
+        var uIdx = (parseInt(localStorage.getItem('geminiKeyIdx')||'0') + ui) % uploadKeys.length;
+        try {
+          fileUri = await uploadToFiles(selFile, uploadKeys[uIdx]);
+          if (!fileUri.fallback) {
+            localStorage.setItem('geminiKeyIdx', String(uIdx));
+            break;
+          }
+          // base64 fallback - try next key for upload (maybe key issue)
+          if (ui < uploadKeys.length - 1) {
+            console.log('[Analysis] trying next key for upload...');
+            continue;
+          }
+        } catch(uErr) {
+          console.warn('[Analysis] upload key '+(uIdx+1)+' failed:', uErr.message);
+          if (ui === uploadKeys.length - 1) throw uErr;
+        }
       }
+      console.log('[Analysis] upload result:', fileUri.fallback ? 'BASE64 fallback' : 'Files API URI');
     }
 
     var result, raw;
