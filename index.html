@@ -983,7 +983,8 @@ async function callGemini(parts, maxTok, jsonMode) {
     var isO = res.status === 503 || em.indexOf('high demand') !== -1 || em.indexOf('overloaded') !== -1;
 
     if (isQ) {
-      console.warn('[Gemini] Key '+(ki+1)+' quota exhausted, trying next...');
+      console.warn('[Gemini] Key '+(ki+1)+' quota exhausted, waiting 3s then trying next...');
+      await new Promise(function(r){setTimeout(r,3000);});
       continue;
     }
     if (isO) throw new Error('השרת עמוס. נסה שוב בעוד 30 שניות.');
@@ -1179,30 +1180,29 @@ async function runAnalysis() {
 
     var fileUri = null;
     if (selFile) {
-      var uploadKeys = getKeys();
-      if (!uploadKeys.length && !getOrKey()) throw new Error('נא לשמור מפתח Gemini או OpenRouter בהגדרות');
-      // Try Files API first if we have Gemini keys
-      if (uploadKeys.length) {
-        for (var ui = 0; ui < uploadKeys.length; ui++) {
-          var uIdx = (parseInt(localStorage.getItem('geminiKeyIdx')||'0') + ui) % uploadKeys.length;
-          try {
-            fileUri = await uploadToFiles(selFile, uploadKeys[uIdx]);
-            if (!fileUri.fallback) {
-              localStorage.setItem('geminiKeyIdx', String(uIdx));
-              break;
-            }
-          } catch(uErr) {
-            console.warn('[Analysis] upload key '+(uIdx+1)+' failed:', uErr.message);
-          }
+      var sizeMB = selFile.size / 1024 / 1024;
+      // Files over 5MB cause 429 quota issues with base64
+      // Try Files API first for large files
+      if (sizeMB > 2) {
+        setMsg('מעלה קובץ לשרת Gemini...');
+        var uploadKey = getKeys()[parseInt(localStorage.getItem('geminiKeyIdx')||'0') % getKeys().length];
+        try {
+          fileUri = await uploadToFiles(selFile, uploadKey);
+          console.log('[Analysis] Files API result:', fileUri.fallback ? 'fallback to base64' : 'URI ok');
+        } catch(uErr) {
+          console.warn('[Analysis] Files API failed:', uErr.message);
         }
       }
-      // If no fileUri yet, force base64 fallback
-      if (!fileUri) {
-        console.warn('[Analysis] All Gemini keys failed, using base64');
+      // For small files or if Files API failed, use base64
+      if (!fileUri || fileUri.fallback) {
+        setMsg('ממיר קובץ...');
         var b64 = await fileToB64(selFile);
         fileUri = {fallback: true, b64: b64, mime: getMime(selFile)};
+        console.log('[Analysis] using base64, size:', sizeMB.toFixed(2)+'MB');
+        if (sizeMB > 3) {
+          console.warn('[Analysis] WARNING: large file as base64 may hit quota. File size:', sizeMB.toFixed(2)+'MB');
+        }
       }
-      console.log('[Analysis] final upload state:', fileUri.fallback ? 'BASE64 (will use OpenRouter if Gemini fails)' : 'Files API URI');
     }
 
     var result, raw;
