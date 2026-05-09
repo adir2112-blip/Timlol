@@ -1245,6 +1245,7 @@ async function runAnalysis() {
       if (!raw.trim()) throw new Error('תשובה ריקה');
       result = parseResp(raw);
       transcriptText = result.transcript || '';
+      console.log('[General] transcript length:', transcriptText.length);
 
     } else {
       var critPrompt = buildCritPrompt(callType);
@@ -1279,11 +1280,16 @@ async function runAnalysis() {
       raw = sCand.content.parts[0].text || '';
       if (!raw.trim()) throw new Error('תשובה ריקה');
       result = parseResp(raw);
-      transcriptText = manual || result.transcript || '';
+      transcriptText = manual || result.transcript || transcriptText || '';
       result.transcript = transcriptText;
+      console.log('[Analysis] transcript length:', transcriptText.length, 'chars');
     }
 
-    curAnalysis = {result: result, agentName: agentName, callId: callId, typeLabel: typeLabel, agentRole: agentRole, transcript: result.transcript || transcriptText};
+    // Make sure transcript is always in curAnalysis
+    var finalTranscript = result.transcript || transcriptText || '';
+    console.log('[Analysis] finalTranscript length:', finalTranscript.length);
+    curAnalysis = {result: result, agentName: agentName, callId: callId, typeLabel: typeLabel, agentRole: agentRole, transcript: finalTranscript};
+    result.transcript = finalTranscript;
 
     document.getElementById('loadDiv').style.display = 'none';
 
@@ -1431,7 +1437,8 @@ async function sendChat() {
 
   try {
     var ca = curAnalysis;
-    var tr = ca.transcript || ca.result.transcript || '';
+    var tr = ca.transcript || (ca.result && ca.result.transcript) || '';
+    console.log('[Chat] using transcript length:', tr.length);
     var ctx = 'אתה סוכן AI שמנתח שיחות מוקד. ענה בעברית בלבד, קצר וממוקד.\n' +
       'אם שואלים על פרט מהשיחה — חפש רק בתמלול. אל תמציא מידע.\n\n' +
       '=== ניתוח ===\nסוג: ' + ca.typeLabel + '\n' +
