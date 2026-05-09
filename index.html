@@ -308,11 +308,27 @@ textarea.ta::placeholder{color:#c0c6d9;}
     <div style="margin-top:12px"><button class="btn-save" onclick="saveKeys()">שמור מפתחות</button></div>
     <div class="snote" id="keysSaved">✓ נשמר!</div>
     <div class="ibox">
-      <strong>קבלת מפתח חינמי:</strong><br>
+      <strong>קבלת מפתח Gemini חינמי:</strong><br>
       1. כנס ל: <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com/app/apikey</a><br>
       2. לחץ <strong>Create API key in new project</strong> (כל פרויקט = מגבלה נפרדת)<br>
-      3. חזור ולחץ שוב לקבלת מפתח נוסף<br><br>
-      <strong>✓ חינמי · ללא כרטיס אשראי</strong>
+      3. חזור ולחץ שוב לקבלת מפתח נוסף
+    </div>
+  </div>
+
+  <div class="card">
+    <div style="font-size:14px;font-weight:600;margin-bottom:10px">⚡ OpenRouter — גיבוי חינמי לתמלולים</div>
+    <p style="font-size:12px;color:#9098b1;margin-bottom:14px">משמש כגיבוי כש-Gemini מגיע למגבלה</p>
+    <div class="fi"><label>מפתח OpenRouter</label><input type="password" id="orKeyInput" placeholder="sk-or-v1-..."></div>
+    <div style="margin-top:12px"><button class="btn-save" onclick="saveOrKey()">שמור</button></div>
+    <div class="snote" id="orSaved">✓ נשמר!</div>
+    <div class="ibox" style="background:#fef3c7;border-color:#fde68a;color:#78350f">
+      <strong>⚠️ חשוב:</strong> OpenRouter תומך ב-<strong>טקסט בלבד</strong>, לא באודיו.<br>
+      הוא ישמש לניתוח תמלולים שתדביק ידנית כשGemini לא זמין.<br><br>
+      <strong>קבלת מפתח חינמי:</strong><br>
+      1. כנס ל: <a href="https://openrouter.ai/keys" target="_blank">openrouter.ai/keys</a><br>
+      2. הירשם עם Google ← Create Key<br>
+      3. הדבק כאן ← שמור<br><br>
+      <strong>✓ 200 בקשות חינמיות ביום · ללא כרטיס אשראי</strong>
     </div>
   </div>
   <div class="card">
@@ -386,6 +402,8 @@ window.addEventListener('DOMContentLoaded', function() {
   var ms = document.getElementById('modelSel');
   if (ms) ms.value = localStorage.getItem('geminiModel') || 'gemini-2.5-flash';
   loadKeysList();
+  var orInput = document.getElementById('orKeyInput');
+  if (orInput) orInput.value = localStorage.getItem('orKey') || '';
   var ai = document.getElementById('audioInput');
   if (ai) {
     ai.addEventListener('change', function(e) {
@@ -494,6 +512,68 @@ function saveKeys() {
   n.textContent = '✓ ' + keys.length + ' מפתח' + (keys.length === 1 ? '' : 'ות') + ' נשמרו';
   n.style.display = 'flex';
   setTimeout(function() { n.style.display = 'none'; }, 3000);
+}
+
+// OpenRouter key management
+// ┌─────────────────────────────────────────────────────────────┐
+// │  ★★★ הדבק כאן את מפתח OpenRouter שלך — בין הגרשיים ★★★    │
+// │  למשל: var DEFAULT_OR_KEY = 'sk-or-v1-abc123def456';        │
+// └─────────────────────────────────────────────────────────────┘
+var DEFAULT_OR_KEY = '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';
+
+function getOrKey() {
+  return localStorage.getItem('orKey') || DEFAULT_OR_KEY || '';
+}
+
+function saveOrKey() {
+  var v = document.getElementById('orKeyInput').value.trim();
+  localStorage.setItem('orKey', v);
+  var n = document.getElementById('orSaved');
+  n.style.display = 'flex';
+  setTimeout(function() { n.style.display = 'none'; }, 3000);
+}
+
+// Call OpenRouter as fallback (text-only)
+async function callOpenRouter(textPrompt, jsonMode) {
+  var orKey = getOrKey();
+  if (!orKey) throw new Error('אין מפתח OpenRouter — הוסף בהגדרות');
+
+  console.log('[OpenRouter] using as fallback');
+  var body = {
+    model: 'google/gemini-2.0-flash-exp:free',
+    messages: [{role: 'user', content: textPrompt}],
+    temperature: 0.3
+  };
+  if (jsonMode) body.response_format = {type: 'json_object'};
+
+  var res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': 'Bearer ' + orKey,
+      'Content-Type': 'application/json',
+      'HTTP-Referer': window.location.href,
+      'X-Title': 'Call Quality Analyzer'
+    },
+    body: JSON.stringify(body)
+  });
+  var d = await res.json();
+
+  if (d.error) {
+    console.error('[OpenRouter] error:', d.error);
+    throw new Error('OpenRouter: ' + (d.error.message || JSON.stringify(d.error)));
+  }
+
+  var text = d.choices && d.choices[0] && d.choices[0].message && d.choices[0].message.content || '';
+  if (!text) throw new Error('OpenRouter: תשובה ריקה');
+
+  // Convert to Gemini-like response format for compatibility
+  return {
+    candidates: [{
+      content: {
+        parts: [{text: text}]
+      }
+    }]
+  };
 }
 
 function saveModel() {
@@ -816,9 +896,29 @@ async function callGemini(parts, maxTok, jsonMode) {
     throw new Error(em || 'תשובה לא תקינה מהשרת');
   }
 
-  console.error('[Gemini] All '+keys.length+' keys exhausted');
+  console.warn('[Gemini] All '+keys.length+' keys exhausted, trying OpenRouter fallback...');
+
+  // Try OpenRouter as fallback (text-only)
+  if (getOrKey()) {
+    // Extract text from parts (skip audio/image)
+    var textOnly = '';
+    for (var pi = 0; pi < parts.length; pi++) {
+      if (parts[pi].text) textOnly += parts[pi].text + '\n\n';
+    }
+    if (textOnly.trim()) {
+      try {
+        setMsg('עובר ל-OpenRouter (גיבוי חינמי)...');
+        return await callOpenRouter(textOnly.trim(), jsonMode);
+      } catch(orErr) {
+        console.error('[OpenRouter] also failed:', orErr.message);
+      }
+    } else {
+      console.warn('[OpenRouter] no text content - audio cannot be processed via OpenRouter');
+    }
+  }
+
   startTimer(65);
-  throw new Error('כל '+keys.length+' המפתחות הגיעו למגבלה. סיבות אפשריות:\n1. הקובץ גדול מדי ושולח כ-base64\n2. ניסית כמה פעמים בדקה האחרונה\n3. המפתחות נחשפו ונחסמו\n\nהמתן 60 שניות.');
+  throw new Error('כל המפתחות הגיעו למגבלה.\n\nאם יש לך תמלול ידני - הדבק אותו במקום קובץ שמע, וזה יעבוד דרך OpenRouter.\n\nאחרת המתן 60 שניות.');
 }
 
 // PARSE JSON
