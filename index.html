@@ -976,7 +976,54 @@ function parseResp(raw) {
   if (si === -1 || ei === -1) throw new Error('לא נמצא JSON בתשובה');
   clean = clean.slice(si, ei + 1);
 
-  var result = JSON.parse(clean);
+  // Try parsing - if it fails, attempt recovery
+  var result;
+  try {
+    result = JSON.parse(clean);
+  } catch(parseErr) {
+    console.warn('[parseResp] First parse failed:', parseErr.message);
+    console.log('[parseResp] Attempting recovery on first 500 chars:', clean.slice(0, 500));
+
+    // Recovery 1: Fix invalid escapes inside strings
+    var recovered = clean
+      .replace(/\\\'/g, "'")  // Escaped single quotes
+      .replace(/\n/g, ' ')      // Literal \n breaks
+      .replace(/\t/g, ' ');     // Literal \t breaks
+
+    try {
+      result = JSON.parse(recovered);
+    } catch(e2) {
+      // Recovery 2: Try truncating at the error position
+      var posMatch = parseErr.message.match(/position (\d+)/);
+      if (posMatch) {
+        var pos = parseInt(posMatch[1]);
+        // Try to find the nearest valid closing brace before the error
+        var truncated = clean.slice(0, pos);
+        // Close any open structures
+        var openBraces = (truncated.match(/{/g) || []).length;
+        var closeBraces = (truncated.match(/}/g) || []).length;
+        var openBrackets = (truncated.match(/\[/g) || []).length;
+        var closeBrackets = (truncated.match(/]/g) || []).length;
+
+        // Strip trailing comma/incomplete value
+        truncated = truncated.replace(/,\s*$/, '').replace(/:\s*"[^"]*$/, ':""').replace(/:\s*$/, ':null');
+
+        // Add closing brackets
+        for (var bb = 0; bb < openBrackets - closeBrackets; bb++) truncated += ']';
+        for (var bb = 0; bb < openBraces - closeBraces; bb++) truncated += '}';
+
+        try {
+          result = JSON.parse(truncated);
+          console.log('[parseResp] Recovery succeeded by truncation');
+        } catch(e3) {
+          console.error('[parseResp] All recovery attempts failed');
+          throw new Error('שגיאת פיענוח: ' + parseErr.message + '\n\nGemini החזיר JSON שבור. נסה שוב או החלף מודל בהגדרות.');
+        }
+      } else {
+        throw parseErr;
+      }
+    }
+  }
 
   if (transcript) {
     result.transcript = transcript;
