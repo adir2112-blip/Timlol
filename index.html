@@ -391,8 +391,16 @@ window.addEventListener('DOMContentLoaded', function() {
     ai.addEventListener('change', function(e) {
       var f = e.target.files[0];
       if (!f) return;
+      // Warn if file is too large
+      var sizeMB = f.size / 1024 / 1024;
+      if (sizeMB > 20) {
+        if (!confirm('הקובץ ' + sizeMB.toFixed(1) + 'MB - גדול מאוד ועלול לחרוג ממכסת ה-API.\nממליץ לחתוך לקבצים קטנים יותר.\n\nלהמשיך?')) {
+          e.target.value = '';
+          return;
+        }
+      }
       selFile = f;
-      document.getElementById('fname').textContent = f.name + ' (' + (f.size/1024/1024).toFixed(1) + ' MB)';
+      document.getElementById('fname').textContent = f.name + ' (' + sizeMB.toFixed(1) + ' MB)';
       document.getElementById('fchip').style.display = 'flex';
       try {
         var url = URL.createObjectURL(f);
@@ -664,75 +672,97 @@ function getMime(file) {
 
 // UPLOAD FILE TO GEMINI FILES API
 async function uploadToFiles(file, apiKey) {
-  setMsg('מעלה קובץ לשרת...');
   var mime = getMime(file);
+  var sizeMB = (file.size/1024/1024).toFixed(2);
+  console.log('[Upload] starting:', file.name, sizeMB+'MB', mime);
+  setMsg('מעלה קובץ ('+sizeMB+' MB)...');
 
-  // Step 1: initiate upload
-  var initRes = await fetch(
-    'https://generativelanguage.googleapis.com/upload/v1beta/files?key=' + apiKey,
-    {
+  try {
+    // Step 1: init resumable upload
+    var initRes = await fetch(
+      'https://generativelanguage.googleapis.com/upload/v1beta/files?key=' + apiKey,
+      {
+        method: 'POST',
+        headers: {
+          'X-Goog-Upload-Protocol': 'resumable',
+          'X-Goog-Upload-Command': 'start',
+          'X-Goog-Upload-Header-Content-Length': String(file.size),
+          'X-Goog-Upload-Header-Content-Type': mime,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({file: {display_name: file.name}})
+      }
+    );
+
+    if (!initRes.ok) {
+      var errText = await initRes.text();
+      console.warn('[Upload] init failed:', initRes.status, errText.slice(0,200));
+      throw new Error('init failed: ' + initRes.status);
+    }
+
+    var uploadUrl = initRes.headers.get('X-Goog-Upload-URL') || initRes.headers.get('x-goog-upload-url');
+    if (!uploadUrl) {
+      console.warn('[Upload] no upload URL in headers');
+      throw new Error('no upload url');
+    }
+    console.log('[Upload] init OK, got upload URL');
+
+    // Step 2: upload bytes
+    setMsg('מעלה קובץ '+sizeMB+'MB...');
+    var upRes = await fetch(uploadUrl, {
       method: 'POST',
       headers: {
-        'X-Goog-Upload-Protocol': 'resumable',
-        'X-Goog-Upload-Command': 'start',
-        'X-Goog-Upload-Header-Content-Length': String(file.size),
-        'X-Goog-Upload-Header-Content-Type': mime,
-        'Content-Type': 'application/json'
+        'Content-Length': String(file.size),
+        'X-Goog-Upload-Offset': '0',
+        'X-Goog-Upload-Command': 'upload, finalize'
       },
-      body: JSON.stringify({file: {display_name: file.name}})
+      body: file
+    });
+
+    if (!upRes.ok) {
+      var upErr = await upRes.text();
+      console.warn('[Upload] upload failed:', upRes.status, upErr.slice(0,200));
+      throw new Error('upload failed: ' + upRes.status);
     }
-  );
-  if (!initRes.ok) {
-    // Files API failed (CORS on localhost) - fallback to base64
-    setMsg('עובר לשיטת גיבוי...');
-    var b64 = await fileToB64(file);
-    return {fallback: true, b64: b64, mime: mime};
-  }
 
-  var uploadUrl = initRes.headers.get('X-Goog-Upload-URL');
-  if (!uploadUrl) {
-    var b64 = await fileToB64(file);
-    return {fallback: true, b64: b64, mime: mime};
-  }
+    var upData = await upRes.json();
+    console.log('[Upload] upload response:', upData);
+    var uri = upData && upData.file && upData.file.uri;
+    var fname = upData && upData.file && upData.file.name;
+    if (!uri) throw new Error('no uri in response');
 
-  // Step 2: upload bytes
-  setMsg('מעלה קובץ... (' + (file.size/1024/1024).toFixed(1) + ' MB)');
-  var upRes = await fetch(uploadUrl, {
-    method: 'POST',
-    headers: {
-      'Content-Length': String(file.size),
-      'X-Goog-Upload-Offset': '0',
-      'X-Goog-Upload-Command': 'upload, finalize',
-      'Content-Type': mime
-    },
-    body: file
-  });
-  if (!upRes.ok) {
-    var b64 = await fileToB64(file);
-    return {fallback: true, b64: b64, mime: mime};
-  }
-  var upData = await upRes.json();
-  var uri = upData && upData.file && upData.file.uri;
-  if (!uri) {
-    var b64 = await fileToB64(file);
-    return {fallback: true, b64: b64, mime: mime};
-  }
+    // Step 3: poll until ACTIVE (audio needs processing)
+    var state = (upData.file && upData.file.state) || 'PROCESSING';
+    var tries = 0;
+    while (state === 'PROCESSING' && tries < 30) {
+      await new Promise(function(r) { setTimeout(r, 2000); });
+      tries++;
+      setMsg('מעבד קובץ שמע ('+tries+'/30)...');
+      try {
+        var stRes = await fetch('https://generativelanguage.googleapis.com/v1beta/' + fname + '?key=' + apiKey);
+        var stData = await stRes.json();
+        state = (stData.state) || (stData.file && stData.file.state) || 'ACTIVE';
+        console.log('[Upload] state poll '+tries+':', state);
+      } catch(pollErr) {
+        console.warn('[Upload] poll error:', pollErr);
+        state = 'ACTIVE';
+      }
+    }
 
-  // Step 3: wait for processing
-  var fname = upData.file.name;
-  var state = upData.file.state || 'PROCESSING';
-  var tries = 0;
-  while (state === 'PROCESSING' && tries < 20) {
-    await new Promise(function(r) { setTimeout(r, 2000); });
-    tries++;
-    setMsg('מעבד קובץ שמע...');
-    try {
-      var stRes = await fetch('https://generativelanguage.googleapis.com/v1beta/' + fname + '?key=' + apiKey);
-      var stData = await stRes.json();
-      state = (stData.file && stData.file.state) || stData.state || 'ACTIVE';
-    } catch(e) { state = 'ACTIVE'; }
+    if (state !== 'ACTIVE') {
+      console.warn('[Upload] file never became ACTIVE, state:', state);
+      throw new Error('file processing timeout');
+    }
+
+    console.log('[Upload] SUCCESS! URI:', uri);
+    return {uri: uri, mime: mime, fallback: false};
+
+  } catch(err) {
+    console.warn('[Upload] FAILED, falling back to base64:', err.message);
+    setMsg('נכשל - עובר ל-base64...');
+    var b64 = await fileToB64(file);
+    return {fallback: true, b64: b64, mime: mime};
   }
-  return {uri: uri, mime: mime, fallback: false};
 }
 
 // GEMINI API
@@ -773,13 +803,18 @@ async function callGemini(parts, maxTok, jsonMode) {
     var isQ = res.status === 429 || em.indexOf('quota') !== -1 || em.indexOf('RESOURCE_EXHAUSTED') !== -1;
     var isO = res.status === 503 || em.indexOf('high demand') !== -1 || em.indexOf('overloaded') !== -1;
 
-    if (isQ) { continue; }
+    if (isQ) {
+      console.warn('[Gemini] Key '+(ki+1)+' quota exhausted, trying next...');
+      continue;
+    }
     if (isO) throw new Error('השרת עמוס. נסה שוב בעוד 30 שניות.');
+    console.error('[Gemini] error:', em);
     throw new Error(em || 'תשובה לא תקינה מהשרת');
   }
 
+  console.error('[Gemini] All '+keys.length+' keys exhausted');
   startTimer(65);
-  throw new Error('כל המפתחות הגיעו למגבלה. הטיימר יתריע כשאפשר לנסות שוב.');
+  throw new Error('כל '+keys.length+' המפתחות הגיעו למגבלה. סיבות אפשריות:\n1. הקובץ גדול מדי ושולח כ-base64\n2. ניסית כמה פעמים בדקה האחרונה\n3. המפתחות נחשפו ונחסמו\n\nהמתן 60 שניות.');
 }
 
 // PARSE JSON
@@ -893,12 +928,18 @@ async function runAnalysis() {
     var parts = [];
     var transcriptText = manual;
 
+    console.log('[Analysis] type:', callType, '| file:', selFile ? selFile.name : 'none', '| keys:', getKeys().length);
+
     var fileUri = null;
     if (selFile) {
       var uploadKeys = getKeys();
       if (!uploadKeys.length) throw new Error('נא לשמור מפתח Gemini בהגדרות');
       var uploadKey = uploadKeys[parseInt(localStorage.getItem('geminiKeyIdx')||'0') % uploadKeys.length];
       fileUri = await uploadToFiles(selFile, uploadKey);
+      console.log('[Analysis] upload result:', fileUri.fallback ? 'BASE64 fallback' : 'Files API URI');
+      if (fileUri.fallback) {
+        console.warn('[Analysis] WARNING: using base64 - will use ~10x more tokens than Files API');
+      }
     }
 
     var result, raw;
@@ -929,6 +970,7 @@ async function runAnalysis() {
           : {file_data: {mime_type: fileUri.mime, file_uri: fileUri.uri}};
         parts = [audioPart, {text: parts[parts.length-1] && parts[parts.length-1].text || ''}];
       }
+      console.log('[Analysis] sending GENERAL request, parts:', parts.length, 'audio:', parts.some(function(p){return p.inline_data || p.file_data;}));
       var gData = await callGemini(parts, 8192, true);
       var gCand = gData.candidates[0];
       raw = gCand.content.parts[0].text || '';
@@ -962,6 +1004,7 @@ async function runAnalysis() {
         parts.push({text: sPrompt});
       }
 
+      console.log('[Analysis] sending '+callType.toUpperCase()+' request, parts:', parts.length, 'audio:', parts.some(function(p){return p.inline_data || p.file_data;}));
       setMsg('מנתח שיחה...');
       var sData = await callGemini(parts, 8192, false);
       var sCand = sData.candidates[0];
@@ -1196,65 +1239,92 @@ function resetForm() {
   selFile = null; curAnalysis = null;
 }
 
-// PDF
+// PDF - uses HTML export to handle Hebrew properly
 function dlPDF() {
-  if (!curAnalysis || !window.jspdf) return;
-  var doc = new window.jspdf.jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
-  var r = curAnalysis.result, agent = curAnalysis.agentName, id = curAnalysis.callId;
-  doc.setR2L(true);
-  var y = 20, m = 15, pw = 210, mw = pw - m*2;
-  function line(txt, sz, bold, col) {
-    if (y > 270) { doc.addPage(); y = 20; }
-    doc.setFontSize(sz||11); doc.setFont('helvetica', bold?'bold':'normal');
-    doc.setTextColor.apply(doc, col||[30,29,46]);
-    doc.text(txt||'', pw-m, y, {align:'right'}); y += 7;
+  if (!curAnalysis) return;
+  var r = curAnalysis.result;
+  var agent = curAnalysis.agentName;
+  var id = curAnalysis.callId;
+  var tr = curAnalysis.transcript || '';
+  var date = new Date().toLocaleDateString('he-IL');
+
+  function esc(s) {
+    return (s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   }
-  function block(title, text, tc) {
-    line(title, 11, true, tc||[108,99,255]);
-    if (text) {
-      var ls = doc.splitTextToSize(text, mw);
-      for (var i = 0; i < ls.length; i++) {
-        if (y > 270) { doc.addPage(); y = 20; }
-        doc.setFontSize(10); doc.setFont('helvetica','normal'); doc.setTextColor(90,98,130);
-        doc.text(ls[i], pw-m, y, {align:'right'}); y += 6;
-      }
-    }
-    y += 2;
+
+  var cats = (r.categories||[]).map(function(c) {
+    var pct = c.score || 0;
+    var col = pct>=80?'#16a34a':pct>=55?'#d97706':'#dc2626';
+    return '<tr><td style="padding:6px 10px;border-bottom:1px solid #f0f1f5;font-size:12px">'+esc(c.name)+'</td>' +
+      '<td style="padding:6px 10px;border-bottom:1px solid #f0f1f5;font-size:12px;text-align:center;color:'+col+';font-weight:600">'+pct+'</td>' +
+      '<td style="padding:6px 10px;border-bottom:1px solid #f0f1f5;font-size:11px;color:#5a6282">'+esc(c.agentNote)+'</td></tr>';
+  }).join('');
+
+  var secs = Object.values(r.sections||{}).map(function(s) {
+    return '<div style="margin-bottom:12px"><div style="font-size:11px;font-weight:600;color:#6c63ff;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">'+esc(s.title)+'</div>' +
+      '<div style="font-size:12px;color:#5a6282;line-height:1.6">'+esc(s.text)+'</div></div>';
+  }).join('');
+
+  var recs = (r.recommendations||[]).map(function(rec,i) {
+    return '<div style="display:flex;gap:8px;margin-bottom:6px;align-items:flex-start">' +
+      '<span style="min-width:20px;height:20px;border-radius:50%;background:#6c63ff;color:#fff;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">'+(i+1)+'</span>' +
+      '<span style="font-size:12px;color:#5a6282;line-height:1.6">'+esc(rec)+'</span></div>';
+  }).join('');
+
+  var closingHtml = '';
+  if (r.resolved !== undefined) {
+    closingHtml = '<div style="margin-top:8px;font-size:12px;font-weight:600;color:'+(r.resolved?'#16a34a':'#dc2626')+'">'+(r.resolved?'✓ הבעיה נפתרה':'✗ הבעיה לא נפתרה')+'</div>';
+  } else if (typeof r.closing === 'boolean') {
+    closingHtml = '<div style="margin-top:8px;font-size:12px;font-weight:600;color:'+(r.closing?'#16a34a':'#dc2626')+'">'+(r.closing?'✓ נסגרה עסקה':'✗ לא נסגרה עסקה')+'</div>';
   }
-  doc.setFillColor(108,99,255); doc.rect(0,0,210,30,'F');
-  doc.setFontSize(16); doc.setFont('helvetica','bold'); doc.setTextColor(255,255,255);
-  doc.text('Call Quality Report', pw-m, 13, {align:'right'});
-  doc.setFontSize(10); doc.setFont('helvetica','normal');
-  doc.text(agent + ' | ' + id, pw-m, 22, {align:'right'});
-  doc.text(new Date().toLocaleDateString('he-IL'), m, 22);
-  y = 40;
-  if (r.totalScore) {
-    line('ציון: ' + r.totalScore + '/100 — ' + (r.grade||''), 13, true);
-    block('סיכום:', r.gradeText);
-    block('נציג:', r.agentSummary);
-    block('לקוח:', r.customerSummary);
-    var cats = r.categories || [];
-    for (var ci = 0; ci < cats.length; ci++) line('• ' + cats[ci].name + ' — ' + cats[ci].score, 10, false, [60,68,102]);
-    y += 4;
-    var recs = r.recommendations || [];
-    for (var ri = 0; ri < recs.length; ri++) block((ri+1)+'.', recs[ri]);
+
+  var transcriptHtml = tr ? '<div style="page-break-before:always"><div style="font-size:14px;font-weight:600;color:#4f46e5;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid #6c63ff">📝 תמלול השיחה</div>' +
+    '<div style="font-size:11px;color:#5a6282;line-height:1.9;white-space:pre-wrap">'+esc(tr)+'</div></div>' : '';
+
+  var html = '<!DOCTYPE html><html dir="rtl" lang="he"><head><meta charset="UTF-8">' +
+    '<style>body{font-family:Arial,sans-serif;direction:rtl;margin:0;padding:0;color:#1a1d2e;}' +
+    '@page{margin:20mm 15mm;} @media print{.no-print{display:none}}</style></head><body>' +
+    '<div style="background:linear-gradient(135deg,#6c63ff,#4f46e5);padding:24px 28px;color:#fff;margin-bottom:24px;border-radius:8px">' +
+    '<div style="font-size:20px;font-weight:700;margin-bottom:4px">דוח ביקורת שיחה</div>' +
+    '<div style="font-size:13px;opacity:.85">'+esc(agent)+' · '+esc(id)+' · '+date+'</div></div>' +
+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">' +
+    '<div style="background:#f5f4ff;border-radius:8px;padding:16px;text-align:center">' +
+    '<div style="font-size:36px;font-weight:700;color:#4f46e5">'+(r.totalScore||'-')+'</div>' +
+    '<div style="font-size:12px;color:#9098b1">ציון כולל / 100</div>' +
+    '<div style="font-size:14px;font-weight:600;margin-top:4px">'+(r.grade||'')+'</div></div>' +
+    '<div style="background:#f0fdf4;border-radius:8px;padding:16px">' +
+    '<div style="font-size:12px;font-weight:600;color:#166534;margin-bottom:6px">👤 '+esc(agent)+'</div>' +
+    '<div style="font-size:28px;font-weight:700;color:#16a34a">'+(r.agentScore||0)+'</div>' +
+    '<div style="font-size:11px;color:#5a6282;margin-top:4px">'+esc(r.agentSummary||'')+'</div>'+closingHtml+'</div></div>' +
+
+    (cats ? '<div style="margin-bottom:20px"><div style="font-size:14px;font-weight:600;color:#4f46e5;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid #6c63ff">📊 קטגוריות</div>' +
+    '<table style="width:100%;border-collapse:collapse"><tr style="background:#f5f4ff">' +
+    '<th style="padding:8px 10px;text-align:right;font-size:12px">קטגוריה</th>' +
+    '<th style="padding:8px 10px;text-align:center;font-size:12px">ציון</th>' +
+    '<th style="padding:8px 10px;text-align:right;font-size:12px">הערה</th></tr>'+cats+'</table></div>' : '') +
+
+    (secs ? '<div style="margin-bottom:20px"><div style="font-size:14px;font-weight:600;color:#4f46e5;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid #6c63ff">📋 ניתוח מפורט</div>'+secs+'</div>' : '') +
+
+    (recs ? '<div style="margin-bottom:20px"><div style="font-size:14px;font-weight:600;color:#4f46e5;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid #6c63ff">✦ המלצות לנציג</div>'+recs+'</div>' : '') +
+
+    transcriptHtml +
+    '<div style="margin-top:24px;padding-top:12px;border-top:1px solid #e8eaf0;font-size:11px;color:#c0c6d9;text-align:center">© כל הזכויות שמורות לאדיר לוי</div>' +
+    '<script>window.onload=function(){window.print();}<\/script>' +
+    '</body></html>';
+
+  var win = window.open('', '_blank');
+  if (win) {
+    win.document.write(html);
+    win.document.close();
   } else {
-    block('קשר:', r.relationship);
-    block('מטרה:', r.purpose);
-    block('אווירה:', r.atmosphere);
-    block('סיום:', r.closing);
-    block('סיכום:', r.summary);
+    // fallback - download as html
+    var blob = new Blob([html], {type:'text/html;charset=utf-8'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'call_'+agent+'_'+id+'.html';
+    a.click();
   }
-  if (curAnalysis.transcript) {
-    y += 4; line('תמלול:', 12, true);
-    var tls = doc.splitTextToSize(curAnalysis.transcript, mw);
-    for (var ti = 0; ti < tls.length; ti++) {
-      if (y > 270) { doc.addPage(); y = 20; }
-      doc.setFontSize(9); doc.setFont('helvetica','normal'); doc.setTextColor(90,98,130);
-      doc.text(tls[ti], pw-m, y, {align:'right'}); y += 5.5;
-    }
-  }
-  doc.save('call_' + agent + '_' + id + '.pdf');
 }
 </script>
 </body>
