@@ -374,8 +374,9 @@ textarea.ta::placeholder{color:#c0c6d9;}
     <div class="fi" style="margin-bottom:12px">
       <label>מודל פעיל</label>
       <select id="modelSel">
-        <option value="gemini-2.5-flash">Gemini 2.5 Flash — מומלץ (10 RPM)</option>
-        <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash Lite — מהיר יותר (30 RPM)</option>
+        <option value="gemini-2.0-flash">Gemini 2.0 Flash — מומלץ (15 RPM חינמי)</option>
+        <option value="gemini-2.5-flash">Gemini 2.5 Flash — מדויק יותר (10 RPM)</option>
+        <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash Lite — הכי מהיר (30 RPM)</option>
         <option value="gemini-2.5-pro">Gemini 2.5 Pro — הכי מדויק</option>
       </select>
     </div>
@@ -484,7 +485,7 @@ async function convertToMp3Async(file) {
 // INIT
 window.addEventListener('DOMContentLoaded', function() {
   var ms = document.getElementById('modelSel');
-  if (ms) ms.value = localStorage.getItem('geminiModel') || 'gemini-2.5-flash';
+  if (ms) ms.value = localStorage.getItem('geminiModel') || 'gemini-2.0-flash';
   loadKeysList();
   var orInput = document.getElementById('orKeyInput');
   if (orInput) orInput.value = localStorage.getItem('orKey') || '';
@@ -583,10 +584,11 @@ function setType(t, btn) {
 // │  ★★★ הכנס כאן את המפתחות שלך ★★★                        │
 // └──────────────────────────────────────────────────────────┘
 var DEFAULT_KEYS = [
-  '',
-  '',
-  '',
-  ''
+  'AIzaSyB_DPGvYsAhgqLQbqLuiZ1gh57SQeJQT0o',
+  'AIzaSyCvXfeAnp-GOz5kuD--8D86Sobdy6r72CU',
+  'AIzaSyCxRM9tIfcDoTOP6YBY2RvL3MNgbjxq1TY',
+  'AIzaSyAffpdcEV9xa6EEjbl_w9uYlOafuU6cC8s',
+  'AIzaSyBF8X3Ns9BTgPBxSjPhm5o3rRem2yI5i3U'
 ];
 
 function getKeys() {
@@ -651,9 +653,9 @@ var DEFAULT_OR_KEY = '';
 
 // ┌─────────────────────────────────────────────────────────────┐
 // │  ★★★ הדבק כאן את כתובת שרת ההמרה שלך ★★★                  │
-// │  למשל: var CONVERTER_URL = 'https://xxx.railway.app';       │
+// │  למשל: var CONVERTER_URL = 'https://web-production-df69e.up.railway.app';       │
 // └─────────────────────────────────────────────────────────────┘
-var CONVERTER_URL = '';
+var CONVERTER_URL = 'https://web-production-df69e.up.railway.app';
 
 function getOrKey() {
   return localStorage.getItem('orKey') || DEFAULT_OR_KEY || '';
@@ -677,15 +679,15 @@ function saveOrKey() {
 
 // ┌─────────────────────────────────────────────────────────────┐
 // │  ★★★ הדבק כאן את מפתח Groq שלך — בין הגרשיים ★★★          │
-// │  למשל: var DEFAULT_GROQ_KEY = 'gsk_abc123...';              │
+// │  למשל: var DEFAULT_GROQ_KEY = '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';              │
 // └─────────────────────────────────────────────────────────────┘
-var DEFAULT_GROQ_KEY = '';
+var DEFAULT_GROQ_KEY = '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';
 
 // ┌─────────────────────────────────────────────────────────────┐
 // │  ★★★ הדבק כאן את כתובת שרת ההמרה שלך ★★★                  │
-// │  למשל: var DEFAULT_CONVERTER = 'https://xxx.railway.app';   │
+// │  למשל: var DEFAULT_CONVERTER = 'https://web-production-df69e.up.railway.app';   │
 // └─────────────────────────────────────────────────────────────┘
-var DEFAULT_CONVERTER = '';
+var DEFAULT_CONVERTER = 'https://web-production-df69e.up.railway.app';
 
 function getGroqKey() {
   return localStorage.getItem('groqKey') || DEFAULT_GROQ_KEY || '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';
@@ -705,7 +707,7 @@ async function callGroq(prompt, jsonMode) {
   if (!key) throw new Error('אין מפתח Groq');
 
   var body = {
-    model: 'gemma2-9b-it',
+    model: 'llama-3.1-8b-instant',
     messages: [{role: 'user', content: prompt}],
     temperature: 0.3,
     max_tokens: 8192
@@ -1079,7 +1081,7 @@ async function uploadToFiles(file, apiKey) {
 async function callGemini(parts, maxTok, jsonMode) {
   maxTok = maxTok || 8192;
   jsonMode = (jsonMode !== false);
-  var model = localStorage.getItem('geminiModel') || 'gemini-2.5-flash';
+  var model = localStorage.getItem('geminiModel') || 'gemini-2.0-flash';
   var keys = getKeys();
   if (!keys.length) throw new Error('נא לשמור מפתח Gemini בהגדרות');
 
@@ -1428,8 +1430,20 @@ async function runAnalysis() {
           sData = await callGroq(analysisPrompt, true);
           console.log('[Analysis] Groq analysis OK');
         } catch(groqErr) {
-          console.warn('[Analysis] Groq failed, falling back to Gemini:', groqErr.message);
-          sData = await callGemini([{text: analysisPrompt}], 8192, true);
+          console.warn('[Analysis] Groq failed:', groqErr.message);
+          // If too large, try with shorter transcript
+          if (groqErr.message.indexOf('too large') !== -1 || groqErr.message.indexOf('tokens') !== -1) {
+            var shortPrompt = analysisPrompt.slice(0, analysisPrompt.indexOf('תמלול השיחה:') + 14) +
+              transcriptText.slice(0, 3000) + '\n... [קוצר]';
+            try {
+              sData = await callGroq(shortPrompt, true);
+              console.log('[Analysis] Groq OK with shorter prompt');
+            } catch(e2) {
+              sData = await callGemini([{text: analysisPrompt}], 8192, true);
+            }
+          } else {
+            sData = await callGemini([{text: analysisPrompt}], 8192, true);
+          }
         }
       } else {
         sData = await callGemini([{text: analysisPrompt}], 8192, true);
