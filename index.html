@@ -348,6 +348,8 @@ textarea.ta::placeholder{color:#c0c6d9;}
 
 </main>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.6/dist/umd/ffmpeg.js"></script>
+<script src="https://unpkg.com/@ffmpeg/util@0.12.1/dist/umd/index.js"></script>
 <script>
 // STATE
 var callType = 'sales';
@@ -397,61 +399,65 @@ function getInst(type) {
   return type === 'sales' ? DEFAULT_INST_SALES : DEFAULT_INST_SERVICE;
 }
 
-// CONVERT AUDIO TO MP3 VIA WEB AUDIO API
-function convertToMp3(file, callback) {
-  var fname = document.getElementById('fname');
-  if (fname) fname.textContent = 'ממיר קובץ...';
+// CONVERT ANY FORMAT TO MP3 VIA FFMPEG.WASM
+var ffmpegInstance = null;
+
+async function getFFmpeg() {
+  if (ffmpegInstance) return ffmpegInstance;
+  var FFmpeg = window.FFmpegWASM && window.FFmpegWASM.FFmpeg;
+  if (!FFmpeg) {
+    // Try alternate global
+    FFmpeg = window.FFmpeg && window.FFmpeg.FFmpeg;
+  }
+  if (!FFmpeg) throw new Error('FFmpeg לא נטען');
+  ffmpegInstance = new FFmpeg();
+  ffmpegInstance.on('log', function(e) { console.log('[FFmpeg]', e.message); });
+  ffmpegInstance.on('progress', function(e) {
+    setMsg('ממיר קובץ... ' + Math.round((e.progress||0)*100) + '%');
+  });
+  await ffmpegInstance.load({
+    coreURL: 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd/ffmpeg-core.js',
+    wasmURL: 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd/ffmpeg-core.wasm'
+  });
+  return ffmpegInstance;
+}
+
+async function convertToMp3Async(file) {
+  setMsg('טוען ממיר...');
   document.getElementById('fchip').style.display = 'flex';
-  document.getElementById('errBox').style.display = 'none';
+  document.getElementById('fname').textContent = 'ממיר קובץ...';
 
-  var url = URL.createObjectURL(file);
-  var audio = new Audio();
-  audio.src = url;
+  try {
+    var ffmpeg = await getFFmpeg();
+    var fetchUtil = window.FFmpegUtil || {};
+    var fetchFile = fetchUtil.fetchFile;
 
-  // Use AudioContext to decode and re-encode
-  var ctx = new (window.AudioContext || window.webkitAudioContext)();
+    // Write input file
+    var inName = 'input.' + file.name.split('.').pop().toLowerCase();
+    var outName = 'output.mp3';
 
-  fetch(url)
-    .then(function(r) { return r.arrayBuffer(); })
-    .then(function(buf) { return ctx.decodeAudioData(buf); })
-    .then(function(audioBuffer) {
-      // Record via MediaRecorder
-      var dest = ctx.createMediaStreamDestination();
-      var src = ctx.createBufferSource();
-      src.buffer = audioBuffer;
-      src.connect(dest);
+    var fileData = await file.arrayBuffer();
+    await ffmpeg.writeFile(inName, new Uint8Array(fileData));
 
-      var recorder = new MediaRecorder(dest.stream, {mimeType: 'audio/webm;codecs=opus'});
-      var chunks = [];
+    // Convert to MP3
+    await ffmpeg.exec(['-i', inName, '-vn', '-ar', '16000', '-ac', '1', '-ab', '64k', outName]);
 
-      recorder.ondataavailable = function(e) {
-        if (e.data.size > 0) chunks.push(e.data);
-      };
+    // Read output
+    var data = await ffmpeg.readFile(outName);
+    var mp3Blob = new Blob([data.buffer], {type: 'audio/mpeg'});
+    var newName = file.name.replace(/\.\w+$/, '.mp3');
+    var converted = new File([mp3Blob], newName, {type: 'audio/mpeg'});
 
-      recorder.onstop = function() {
-        var blob = new Blob(chunks, {type: 'audio/webm'});
-        var newName = file.name.replace(/\.\w+$/, '.webm');
-        var converted = new File([blob], newName, {type: 'audio/webm'});
-        URL.revokeObjectURL(url);
-        callback(converted, null);
-      };
+    // Cleanup
+    try { await ffmpeg.deleteFile(inName); await ffmpeg.deleteFile(outName); } catch(e) {}
 
-      recorder.onerror = function(err) {
-        console.warn('MediaRecorder error:', err);
-        callback(null, err);
-      };
+    console.log('[Convert] Success! Original:', (file.size/1024/1024).toFixed(2)+'MB → MP3:', (converted.size/1024/1024).toFixed(2)+'MB');
+    return converted;
 
-      recorder.start();
-      src.start(0);
-      // Stop after audio duration + small buffer
-      setTimeout(function() {
-        try { recorder.stop(); src.stop(); } catch(e) {}
-      }, (audioBuffer.duration * 1000) + 500);
-    })
-    .catch(function(err) {
-      console.warn('Audio decode failed:', err);
-      callback(null, err);
-    });
+  } catch(err) {
+    console.error('[Convert] FFmpeg failed:', err);
+    throw err;
+  }
 }
 
 // INIT
@@ -470,24 +476,23 @@ window.addEventListener('DOMContentLoaded', function() {
       var needsConvert = ['wmv','avi','mkv','rm','rmvb'].indexOf(ext) !== -1;
 
       if (needsConvert) {
-        // Convert to MP3 using Web Audio API + MediaRecorder
-        convertToMp3(f, function(converted, err) {
-          if (err || !converted) {
-            // fallback - just use the file as-is and hope Gemini handles it
-            selFile = f;
-            document.getElementById('fname').textContent = f.name + ' (המרה נכשלה - שולח מקורי)';
-            document.getElementById('fchip').style.display = 'flex';
-          } else {
-            selFile = converted;
-            document.getElementById('fname').textContent = converted.name + ' (הומר מ-' + ext.toUpperCase() + ')';
-            document.getElementById('fchip').style.display = 'flex';
-            document.getElementById('errBox').style.display = 'none';
+        // Convert using FFmpeg.wasm
+        convertToMp3Async(f).then(function(converted) {
+          selFile = converted;
+          var sizeMB = (converted.size/1024/1024).toFixed(1);
+          document.getElementById('fname').textContent = converted.name + ' (הומר מ-' + ext.toUpperCase() + ', ' + sizeMB + 'MB)';
+          document.getElementById('fchip').style.display = 'flex';
+          document.getElementById('errBox').style.display = 'none';
+          try {
             var url = URL.createObjectURL(converted);
             var ap = document.getElementById('audioPlayer');
             if (ap) { ap.src = url; document.getElementById('playerWrap').style.display = 'block'; }
             var rp = document.getElementById('resultPlayer');
             if (rp) rp.src = url;
-          }
+          } catch(e) {}
+        }).catch(function(err) {
+          showErr('המרה נכשלה: ' + err.message + '\n\nנסה להמיר ידנית ב-cloudconvert.com');
+          e.target.value = '';
         });
         return;
       }
