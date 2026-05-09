@@ -316,6 +316,14 @@ textarea.ta::placeholder{color:#c0c6d9;}
   </div>
 
   <div class="card">
+    <div style="font-size:14px;font-weight:600;margin-bottom:10px">🔄 שרת המרת WMV</div>
+    <p style="font-size:12px;color:#9098b1;margin-bottom:10px">כתובת שרת ההמרה שהגדרת ב-Railway</p>
+    <div class="fi"><label>כתובת שרת</label><input type="text" id="converterUrlInput" placeholder="https://xxx.railway.app"></div>
+    <div style="margin-top:12px"><button class="btn-save" onclick="saveConverterUrl()">שמור</button></div>
+    <div class="snote" id="converterSaved">✓ נשמר!</div>
+  </div>
+
+  <div class="card">
     <div style="font-size:14px;font-weight:600;margin-bottom:10px">⚡ OpenRouter — גיבוי חינמי לתמלולים</div>
     <p style="font-size:12px;color:#9098b1;margin-bottom:14px">משמש כגיבוי כש-Gemini מגיע למגבלה</p>
     <div class="fi"><label>מפתח OpenRouter</label><input type="password" id="orKeyInput" placeholder="sk-or-v1-..."></div>
@@ -348,8 +356,7 @@ textarea.ta::placeholder{color:#c0c6d9;}
 
 </main>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.6/dist/umd/ffmpeg.js"></script>
-<script src="https://unpkg.com/@ffmpeg/util@0.12.1/dist/umd/index.js"></script>
+
 <script>
 // STATE
 var callType = 'sales';
@@ -399,63 +406,46 @@ function getInst(type) {
   return type === 'sales' ? DEFAULT_INST_SALES : DEFAULT_INST_SERVICE;
 }
 
-// CONVERT ANY FORMAT TO MP3 VIA FFMPEG.WASM
-var ffmpegInstance = null;
-
-async function getFFmpeg() {
-  if (ffmpegInstance) return ffmpegInstance;
-  var FFmpeg = window.FFmpegWASM && window.FFmpegWASM.FFmpeg;
-  if (!FFmpeg) {
-    // Try alternate global
-    FFmpeg = window.FFmpeg && window.FFmpeg.FFmpeg;
-  }
-  if (!FFmpeg) throw new Error('FFmpeg לא נטען');
-  ffmpegInstance = new FFmpeg();
-  ffmpegInstance.on('log', function(e) { console.log('[FFmpeg]', e.message); });
-  ffmpegInstance.on('progress', function(e) {
-    setMsg('ממיר קובץ... ' + Math.round((e.progress||0)*100) + '%');
-  });
-  await ffmpegInstance.load({
-    coreURL: 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd/ffmpeg-core.js',
-    wasmURL: 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd/ffmpeg-core.wasm'
-  });
-  return ffmpegInstance;
-}
-
+// CONVERT WMV TO MP3 VIA CONVERSION SERVER
 async function convertToMp3Async(file) {
-  setMsg('טוען ממיר...');
+  var ext = file.name.split('.').pop().toUpperCase();
+  var serverUrl = localStorage.getItem('converterUrl') || CONVERTER_URL;
+
+  if (!serverUrl) {
+    throw new Error('שרת המרה לא הוגדר.\n\nהדבק את כתובת שרת ההמרה בקוד (CONVERTER_URL) או בהגדרות.');
+  }
+
+  setMsg('מעלה לשרת המרה...');
   document.getElementById('fchip').style.display = 'flex';
-  document.getElementById('fname').textContent = 'ממיר קובץ...';
+  document.getElementById('fname').textContent = 'ממיר ' + file.name + '...';
+  document.getElementById('errBox').style.display = 'none';
+
+  var formData = new FormData();
+  formData.append('file', file, file.name);
 
   try {
-    var ffmpeg = await getFFmpeg();
-    var fetchUtil = window.FFmpegUtil || {};
-    var fetchFile = fetchUtil.fetchFile;
+    var res = await fetch(serverUrl.replace(/\/+$/, '') + '/convert', {
+      method: 'POST',
+      body: formData
+    });
 
-    // Write input file
-    var inName = 'input.' + file.name.split('.').pop().toLowerCase();
-    var outName = 'output.mp3';
+    if (!res.ok) {
+      var errData = await res.json().catch(function() { return {}; });
+      throw new Error('שגיאת שרת: ' + (errData.error || res.status));
+    }
 
-    var fileData = await file.arrayBuffer();
-    await ffmpeg.writeFile(inName, new Uint8Array(fileData));
+    var blob = await res.blob();
+    if (blob.size < 1000) throw new Error('קובץ ריק התקבל מהשרת');
 
-    // Convert to MP3
-    await ffmpeg.exec(['-i', inName, '-vn', '-ar', '16000', '-ac', '1', '-ab', '64k', outName]);
-
-    // Read output
-    var data = await ffmpeg.readFile(outName);
-    var mp3Blob = new Blob([data.buffer], {type: 'audio/mpeg'});
-    var newName = file.name.replace(/\.\w+$/, '.mp3');
-    var converted = new File([mp3Blob], newName, {type: 'audio/mpeg'});
-
-    // Cleanup
-    try { await ffmpeg.deleteFile(inName); await ffmpeg.deleteFile(outName); } catch(e) {}
-
-    console.log('[Convert] Success! Original:', (file.size/1024/1024).toFixed(2)+'MB → MP3:', (converted.size/1024/1024).toFixed(2)+'MB');
+    var newName = file.name.replace(/\.[^.]+$/, '.mp3');
+    var converted = new File([blob], newName, {type: 'audio/mpeg'});
+    console.log('[Convert] Server success:', (converted.size/1024/1024).toFixed(2) + 'MB');
     return converted;
 
   } catch(err) {
-    console.error('[Convert] FFmpeg failed:', err);
+    if (err.message.includes('fetch') || err.message.includes('network') || err.message.includes('Failed')) {
+      throw new Error('לא ניתן להתחבר לשרת ההמרה.\nוודא שהשרת פעיל: ' + serverUrl);
+    }
     throw err;
   }
 }
@@ -467,6 +457,8 @@ window.addEventListener('DOMContentLoaded', function() {
   loadKeysList();
   var orInput = document.getElementById('orKeyInput');
   if (orInput) orInput.value = localStorage.getItem('orKey') || '';
+  var cuInput = document.getElementById('converterUrlInput');
+  if (cuInput) cuInput.value = localStorage.getItem('converterUrl') || CONVERTER_URL || '';
   var ai = document.getElementById('audioInput');
   if (ai) {
     ai.addEventListener('change', function(e) {
@@ -608,8 +600,22 @@ function saveKeys() {
 // └─────────────────────────────────────────────────────────────┘
 var DEFAULT_OR_KEY = '';
 
+// ┌─────────────────────────────────────────────────────────────┐
+// │  ★★★ הדבק כאן את כתובת שרת ההמרה שלך ★★★                  │
+// │  למשל: var CONVERTER_URL = 'https://xxx.railway.app';       │
+// └─────────────────────────────────────────────────────────────┘
+var CONVERTER_URL = '';
+
 function getOrKey() {
   return localStorage.getItem('orKey') || DEFAULT_OR_KEY || '';
+}
+
+function saveConverterUrl() {
+  var v = document.getElementById('converterUrlInput').value.trim();
+  localStorage.setItem('converterUrl', v);
+  var n = document.getElementById('converterSaved');
+  n.style.display = 'flex';
+  setTimeout(function() { n.style.display = 'none'; }, 3000);
 }
 
 function saveOrKey() {
