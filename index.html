@@ -187,7 +187,7 @@ textarea.ta::placeholder{color:#c0c6d9;}
         <input type="file" id="audioInput" accept="audio/*,video/*,.mp3,.wav,.m4a,.mp4,.wmv,.aac,.ogg,.flac,.wma,.amr">
         <div class="uic">🎙️</div>
         <h3>גרור קובץ שמע לכאן</h3>
-        <p>MP3, WAV, WMV, MP4, M4A, AAC, AMR ועוד</p>
+        <p>MP3, WAV, M4A, MP4, AAC, OGG, FLAC — לא WMV/AVI</p>
       </div>
       <div class="fchip" id="fchip">✓ <span id="fname"></span></div>
       <div id="playerWrap" style="display:none;margin-top:10px">
@@ -409,10 +409,17 @@ window.addEventListener('DOMContentLoaded', function() {
     ai.addEventListener('change', function(e) {
       var f = e.target.files[0];
       if (!f) return;
-      // Warn if file is too large
+      var ext = f.name.split('.').pop().toLowerCase();
+      // WMV is not supported by Gemini
+      var unsupported = ['wmv', 'avi', 'mkv', 'mov', 'rm', 'rmvb', '3gp'];
+      if (unsupported.indexOf(ext) !== -1) {
+        showErr('פורמט ' + ext.toUpperCase() + ' לא נתמך על ידי Gemini.\n\nהמר ל-MP3 תחילה:\n• אונליין: cloudconvert.com (WMV to MP3)\n• או: VLC → Media → Convert → MP3');
+        e.target.value = '';
+        return;
+      }
       var sizeMB = f.size / 1024 / 1024;
       if (sizeMB > 20) {
-        if (!confirm('הקובץ ' + sizeMB.toFixed(1) + 'MB - גדול מאוד ועלול לחרוג ממכסת ה-API.\nממליץ לחתוך לקבצים קטנים יותר.\n\nלהמשיך?')) {
+        if (!confirm('הקובץ ' + sizeMB.toFixed(1) + 'MB - גדול מאוד.\nממליץ לחתוך לקבצים קטנים יותר.\n\nלהמשיך?')) {
           e.target.value = '';
           return;
         }
