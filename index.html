@@ -1438,7 +1438,7 @@ async function runAnalysis() {
       // STEP 2: Analyze with Groq (fast, no quota issues) or Gemini fallback
       setMsg('שלב 2/2: מנתח עם Groq...');
       // Groq has 12K TPM limit - truncate transcript if needed
-      var maxTranscriptChars = 6000;
+      var maxTranscriptChars = 8000;
       var transcriptForAnalysis = transcriptText.length > maxTranscriptChars
         ? transcriptText.slice(0, maxTranscriptChars) + '\n... [קוצר לאורך]'
         : transcriptText;
@@ -1456,6 +1456,7 @@ async function runAnalysis() {
         'קריטריונים:\n' + critLines + '\n\n' +
         'החזר JSON תקני בלבד:\n' +
         '{"totalScore":0-100,"grade":"מצוין/טוב/בינוני/טעון שיפור","gradeText":"הסבר עם דוגמאות","mood":"","moodEmoji":"","agentScore":0-100,"agentSummary":"תיאור מפורט של ביצועי הנציג עם דוגמאות","customerScore":0-100,"customerSummary":"תיאור מפורט","categories":[{"name":"","score":0-100,"weight":0,"agentNote":"ציטוט/דוגמה מהשיחה","customerNote":"תגובת לקוח"}],"sections":{"opening":{"title":"פתיח","text":"ניתוח מפורט עם דוגמאות"},"body":{"title":"גוף השיחה","text":""},"solution":{"title":"פתרון","text":""},"satisfaction":{"title":"שביעות רצון","text":""},"closing":{"title":"סיום","text":""},"atmosphere":{"title":"אווירה","text":""}},"recommendations":["המלצה 1 ספציפית","המלצה 2","המלצה 3"],' + closingField + '}\n\n' +
+        'חשוב: שים לב במיוחד לתחילת השיחה — שם הנציג מציג את עצמו.\n' +
         'תמלול השיחה לניתוח:\n' + transcriptForAnalysis;
 
       var sData;
