@@ -734,7 +734,7 @@ async function callGroq(prompt, jsonMode) {
   if (!key) throw new Error('אין מפתח Groq');
 
   var body = {
-    model: 'llama-3.1-8b-instant',
+    model: 'llama-3.3-70b-versatile',
     messages: [{role: 'user', content: prompt}],
     temperature: 0.3,
     max_tokens: 8192
@@ -1438,7 +1438,7 @@ async function runAnalysis() {
       // STEP 2: Analyze with Groq (fast, no quota issues) or Gemini fallback
       setMsg('שלב 2/2: מנתח עם Groq...');
       // Groq has 12K TPM limit - truncate transcript if needed
-      var maxTranscriptChars = 5000;
+      var maxTranscriptChars = 3000;
       var transcriptForAnalysis = transcriptText.length > maxTranscriptChars
         ? transcriptText.slice(0, maxTranscriptChars) + '\n... [קוצר לאורך]'
         : transcriptText;
@@ -1640,13 +1640,15 @@ async function sendChat() {
     var ca = curAnalysis;
     var tr = ca.transcript || (ca.result && ca.result.transcript) || '';
     console.log('[Chat] using transcript length:', tr.length);
+    // Limit transcript for chat to avoid TPM limits
+    var trForChat = tr.length > 2000 ? tr.slice(0, 2000) + '\n...[קוצר]' : tr;
     var ctx = 'אתה סוכן AI שמנתח שיחות מוקד. ענה בעברית בלבד, קצר וממוקד.\n' +
       'אם שואלים על פרט מהשיחה — חפש רק בתמלול. אל תמציא מידע.\n\n' +
       '=== ניתוח ===\nסוג: ' + ca.typeLabel + '\n' +
       (ca.result.totalScore ? 'ציון: ' + ca.result.totalScore + '/100 (' + ca.result.grade + ')\n' : '') +
       (ca.result.agentSummary ? 'נציג: ' + ca.result.agentSummary + '\n' : '') +
       (ca.result.customerSummary ? 'לקוח: ' + ca.result.customerSummary + '\n' : '') +
-      '\n=== תמלול (המקור היחיד לעובדות) ===\n' + (tr || '(לא זמין)');
+      '\n=== תמלול ===\n' + (trForChat || '(לא זמין)');
 
     var chatData;
     if (getGroqKey()) {
