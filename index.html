@@ -155,6 +155,7 @@ textarea.ta::placeholder{color:#c0c6d9;}
     <button class="nb on" onclick="navTo('analyze',this)"><span class="ic">🎙️</span>תמלול וניתוח</button>
     <button class="nb" onclick="navTo('history',this)"><span class="ic">📋</span>היסטוריה</button>
     <div class="nav-lbl" style="margin-top:10px">מערכת</div>
+    <button class="nb" onclick="navTo('insights',this)"><span class="ic">💡</span>תובנות מנהל</button>
     <button class="nb" onclick="navTo('criteria',this)"><span class="ic">🎯</span>קריטריונים</button>
     <button class="nb" onclick="navTo('settings',this)"><span class="ic">⚙️</span>הגדרות</button>
   </div>
@@ -248,6 +249,24 @@ textarea.ta::placeholder{color:#c0c6d9;}
   <div class="stats" id="statsRow"></div>
   <div id="histList"></div>
   <div style="margin-top:12px"><button class="btn-s" onclick="clearHist()" style="color:#dc2626;border-color:#fecaca;font-size:12px">🗑 נקה היסטוריה</button></div>
+  <div class="pfooter">© כל הזכויות שמורות ל<span>אדיר לוי</span></div>
+</div>
+
+<!-- INSIGHTS -->
+<div class="pg" id="pg-insights">
+  <div class="ph"><h1>💡 תובנות מנהל</h1><p>ניתוח AI של שיחות — דפוסים, חולשות ושאלות למשוב</p></div>
+  <div id="insNoHist" style="display:none"><div class="hempty">נתח לפחות 2 שיחות כדי לקבל תובנות.</div></div>
+  <div id="insMain" style="display:none">
+    <div class="card">
+      <div class="ctitle">👤 בחר נציג</div>
+      <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap">
+        <div class="fi" style="flex:.4;min-width:180px"><select id="insAgent" style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid #e8eaf0;background:#fafbff;font-size:13px;font-family:Heebo,sans-serif;outline:none"><option value="">כל הנציגים</option></select></div>
+        <button class="btn-p" style="width:auto;padding:10px 24px;margin-top:0" onclick="genInsights()">⚡ צור תובנות</button>
+      </div>
+    </div>
+    <div id="insLoad" style="display:none;text-align:center;padding:40px"><div class="spin"></div><p style="font-size:14px;color:#9098b1;margin-top:12px">מנתח שיחות...</p></div>
+    <div id="insOut"></div>
+  </div>
   <div class="pfooter">© כל הזכויות שמורות ל<span>אדיר לוי</span></div>
 </div>
 
@@ -551,6 +570,122 @@ window.addEventListener('DOMContentLoaded', function() {
   renderHist();
 });
 
+// INSIGHTS
+function initInsightsPage() {
+  var agents = {};
+  for (var i = 0; i < hist.length; i++) { if (hist[i].agent) agents[hist[i].agent] = true; }
+  var sel = document.getElementById('insAgent');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">כל הנציגים</option>';
+  var agentList = Object.keys(agents);
+  for (var j = 0; j < agentList.length; j++) {
+    var opt = document.createElement('option');
+    opt.value = agentList[j]; opt.textContent = agentList[j];
+    sel.appendChild(opt);
+  }
+  if (hist.length < 2) {
+    document.getElementById('insNoHist').style.display = 'block';
+    document.getElementById('insMain').style.display = 'none';
+  } else {
+    document.getElementById('insNoHist').style.display = 'none';
+    document.getElementById('insMain').style.display = 'block';
+  }
+}
+
+async function genInsights() {
+  if (!getGroqKey()) { alert('נדרש מפתח Groq בהגדרות'); return; }
+  var agentFilter = document.getElementById('insAgent').value;
+  var filtered = agentFilter ? hist.filter(function(h){ return h.agent === agentFilter; }) : hist.slice(0, 15);
+  if (!filtered.length) { alert('אין שיחות'); return; }
+  document.getElementById('insLoad').style.display = 'block';
+  document.getElementById('insOut').innerHTML = '';
+
+  var lines = [];
+  for (var i = 0; i < filtered.length; i++) {
+    var h = filtered[i];
+    var cats = (h.data.categories || []).map(function(c){ return c.name + ':' + c.score; }).join(', ');
+    var recs = (h.data.recommendations || []).join('; ');
+    lines.push('שיחה ' + (i+1) + ' | ' + h.date + ' | נציג:' + h.agent + ' | ציון:' + h.score + ' | ' + cats + (recs ? ' | המלצות:' + recs.slice(0, 80) : ''));
+  }
+  var summary = lines.join('\n');
+
+  var p1 = 'אתה יועץ ניהולי מנוסה למוקדי שירות ומכירות. ענה בעברית בלבד.';
+  var p2 = 'נתח ' + filtered.length + ' שיחות של ' + (agentFilter || 'הנציגים') + '.';
+  var p3 = 'נתונים:\n' + summary;
+  var p4 = 'ספק: 1) דפוסים חוזרים 2) 3 חולשות מרכזיות עם דוגמאות 3) חוזקות 4) 5 שאלות למשוב 5) 3 פעולות לשיפור 6) מגמה';
+  var p5 = 'JSON: {"overallInsight":"","trend":"משתפר/יציב/יורד","trendNote":"","strengths":["",""],"weaknesses":["","",""],"mainWeaknesses":[{"title":"","description":"","priority":"גבוהה/בינונית"}],"feedbackQuestions":["","","","",""],"improvementPlan":[{"action":"","howTo":"","timeframe":""}]}';
+  var prompt = p1 + '\n\n' + p2 + '\n' + p3 + '\n\n' + p4 + '\n\n' + p5;
+
+    try {
+    var data = await callGroq(prompt, true);
+    var raw = data.candidates[0].content.parts[0].text || '';
+    raw = raw.replace(/^```json\s*/, '').replace(/\s*```$/, '');
+    var r = JSON.parse(raw);
+    renderInsights(r, agentFilter || 'כל הנציגים', filtered.length);
+  } catch(err) {
+    document.getElementById('insLoad').style.display = 'none';
+    alert('שגיאה: ' + err.message);
+  }
+}
+
+function renderInsights(r, agentName, count) {
+  document.getElementById('insLoad').style.display = 'none';
+  var tcolor = r.trend === 'משתפר' ? '#16a34a' : r.trend === 'יורד' ? '#dc2626' : '#d97706';
+  var ticon = r.trend === 'משתפר' ? '📈' : r.trend === 'יורד' ? '📉' : '➡️';
+
+  var strHtml = '';
+  for (var i = 0; i < (r.strengths||[]).length; i++) {
+    strHtml += '<div style="display:flex;gap:8px;margin-bottom:6px"><span style="color:#16a34a">✓</span><span style="font-size:13px;color:#3d4466">' + r.strengths[i] + '</span></div>';
+  }
+  var weakHtml = '';
+  for (var i = 0; i < (r.weaknesses||[]).length; i++) {
+    weakHtml += '<div style="display:flex;gap:8px;margin-bottom:6px"><span style="color:#dc2626">✗</span><span style="font-size:13px;color:#3d4466">' + r.weaknesses[i] + '</span></div>';
+  }
+  var mainWHtml = '';
+  for (var i = 0; i < (r.mainWeaknesses||[]).length; i++) {
+    var w = r.mainWeaknesses[i];
+    var pc = w.priority === 'גבוהה' ? '#dc2626' : '#d97706';
+    mainWHtml += '<div style="background:#fff;border:1px solid #e8eaf0;border-radius:12px;padding:16px;margin-bottom:10px">' +
+      '<div style="display:flex;justify-content:space-between;margin-bottom:8px">' +
+      '<span style="font-size:14px;font-weight:600">' + (i+1) + '. ' + w.title + '</span>' +
+      '<span style="font-size:11px;color:' + pc + ';background:' + pc + '18;padding:3px 10px;border-radius:10px">' + w.priority + '</span></div>' +
+      '<div style="font-size:13px;color:#5a6282;line-height:1.6">' + w.description + '</div></div>';
+  }
+  var questHtml = '';
+  for (var i = 0; i < (r.feedbackQuestions||[]).length; i++) {
+    questHtml += '<div style="display:flex;gap:10px;margin-bottom:10px;align-items:flex-start">' +
+      '<div style="min-width:24px;height:24px;border-radius:50%;background:#4f46e5;color:#fff;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0">' + (i+1) + '</div>' +
+      '<div style="font-size:13px;color:#3d4466;line-height:1.6;padding-top:2px">' + r.feedbackQuestions[i] + '</div></div>';
+  }
+  var planHtml = '';
+  for (var i = 0; i < (r.improvementPlan||[]).length; i++) {
+    var p = r.improvementPlan[i];
+    planHtml += '<div style="background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:14px;margin-bottom:8px">' +
+      '<div style="font-size:13px;font-weight:600;color:#166534;margin-bottom:4px">✓ ' + p.action + '</div>' +
+      '<div style="font-size:12px;color:#4b5563">' + p.howTo + '</div>' +
+      '<div style="font-size:11px;color:#6b7280;margin-top:4px">⏰ ' + p.timeframe + '</div></div>';
+  }
+
+  document.getElementById('insOut').innerHTML =
+    '<div style="background:linear-gradient(135deg,#6c63ff,#4f46e5);border-radius:16px;padding:20px 24px;color:#fff;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center">' +
+    '<div><div style="font-size:18px;font-weight:700;margin-bottom:4px">' + agentName + '</div><div style="opacity:.8;font-size:13px">ניתוח ' + count + ' שיחות</div></div>' +
+    '<div style="text-align:center"><div style="font-size:26px">' + ticon + '</div><div style="font-size:13px;font-weight:600;background:#fff;color:' + tcolor + ';padding:4px 12px;border-radius:10px;margin-top:4px">' + r.trend + '</div></div></div>' +
+
+    '<div class="card" style="margin-bottom:16px"><div class="ctitle">💡 תובנה כללית</div>' +
+    '<div style="font-size:14px;color:#3d4466;line-height:1.7">' + r.overallInsight + '</div>' +
+    '<div style="margin-top:8px;font-size:12px;color:#9098b1">' + r.trendNote + '</div></div>' +
+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">' +
+    '<div class="card"><div class="ctitle" style="color:#16a34a">💪 חוזקות</div>' + strHtml + '</div>' +
+    '<div class="card"><div class="ctitle" style="color:#dc2626">⚠️ חולשות</div>' + weakHtml + '</div></div>' +
+
+    '<div class="card" style="margin-bottom:16px"><div class="ctitle">🎯 חולשות מרכזיות לדיון</div>' + mainWHtml + '</div>' +
+
+    '<div class="recs" style="margin-bottom:16px"><h3>❓ שאלות לשיחת משוב עם הנציג</h3>' + questHtml + '</div>' +
+
+    '<div class="card"><div class="ctitle">📋 תכנית שיפור — פעולות לשבוע הקרוב</div>' + planHtml + '</div>';
+}
+
 // NAV
 function navTo(pg, btn) {
   document.querySelectorAll('.pg').forEach(function(p) { p.classList.remove('on'); });
@@ -559,6 +694,7 @@ function navTo(pg, btn) {
   btn.classList.add('on');
   if (pg === 'history') renderHist();
   if (pg === 'criteria') initCritPage();
+  if (pg === 'insights') initInsightsPage();
   if (pg === 'settings') {
     // Check if already unlocked this session
     if (sessionStorage.getItem('settingsUnlocked') === '1') {
