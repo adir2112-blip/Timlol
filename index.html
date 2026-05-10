@@ -738,7 +738,7 @@ async function callGroq(prompt, jsonMode) {
   if (!key) throw new Error('אין מפתח Groq');
 
   var body = {
-    model: 'mixtral-8x7b-32768',
+    model: 'meta-llama/llama-4-scout-17b-16e-instruct',
     messages: [{role: 'user', content: prompt}],
     temperature: 0.3,
     max_tokens: 8192
