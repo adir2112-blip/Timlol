@@ -1443,18 +1443,20 @@ async function runAnalysis() {
         ? transcriptText.slice(0, maxTranscriptChars) + '\n... [קוצר לאורך]'
         : transcriptText;
 
-      // Build concise prompt to save tokens for transcript
-      var closingField = callType === 'sales' ? 'closing (בוליאן האם נסגרה עסקה), closingNote' : 'resolved (בוליאן האם נפתרה הבעיה), resolvedNote';
-      var analysisPrompt = 'נתח שיחת ' + typeLabel + ' בעברית. נציג: ' + agentName + '.\n' +
-        (callType === 'sales' ? 'בדוק: זיהוי צרכים, הצגת מוצר, סגירה.' : 'בדוק: הבנת הבעיה, פתרון, שביעות רצון.') + '\n' +
-        getInst(callType) + '\n\n' +
-        'קריטריונים: ' + getCrit(callType).map(function(c){return c.name+'('+c.w+'%)';}).join(', ') + '\n\n' +
-        'החזר JSON בלבד:\n' +
-        '{totalScore, grade(מצוין/טוב/בינוני/טעון שיפור), gradeText, mood, moodEmoji, agentScore, agentSummary, customerScore, customerSummary,' +
-        'categories:[{name,score(0-100),weight,agentNote,customerNote}],' +
-        'sections:{opening,body,solution,satisfaction,closing,atmosphere}(כל אחד:{title,text}),' +
-        'recommendations:[3 המלצות],' + closingField + '}\n\n' +
-        'תמלול:\n' + transcriptForAnalysis;
+      var closingField = callType === 'sales' ? 'closing (בוליאן), closingNote' : 'resolved (בוליאן), resolvedNote';
+      var critLines = getCrit(callType).map(function(c){return c.name+'('+c.w+'%)'+(c.desc?': '+c.desc:'');}).join('\n');
+      var analysisPrompt = 'ענה בעברית בלבד.\n' +
+        'נתח את תמלול השיחה הבא בפירוט. שיחת ' + typeLabel + ', נציג: ' + agentName + '.\n\n' +
+        'הוראות חשובות:\n' +
+        '- בסס את כל ההערות על מה שנאמר בפועל בתמלול\n' +
+        '- ציין דוגמאות ספציפיות מהשיחה בכל קטגוריה\n' +
+        '- agentNote ו-customerNote חייבים להכיל פרטים מהשיחה עצמה\n' +
+        '- gradeText יסביר את הציון עם דוגמאות קונקרטיות\n\n' +
+        'הוראות נוספות:\n' + getInst(callType) + '\n\n' +
+        'קריטריונים:\n' + critLines + '\n\n' +
+        'החזר JSON תקני בלבד:\n' +
+        '{"totalScore":0-100,"grade":"מצוין/טוב/בינוני/טעון שיפור","gradeText":"הסבר עם דוגמאות","mood":"","moodEmoji":"","agentScore":0-100,"agentSummary":"תיאור מפורט של ביצועי הנציג עם דוגמאות","customerScore":0-100,"customerSummary":"תיאור מפורט","categories":[{"name":"","score":0-100,"weight":0,"agentNote":"ציטוט/דוגמה מהשיחה","customerNote":"תגובת לקוח"}],"sections":{"opening":{"title":"פתיח","text":"ניתוח מפורט עם דוגמאות"},"body":{"title":"גוף השיחה","text":""},"solution":{"title":"פתרון","text":""},"satisfaction":{"title":"שביעות רצון","text":""},"closing":{"title":"סיום","text":""},"atmosphere":{"title":"אווירה","text":""}},"recommendations":["המלצה 1 ספציפית","המלצה 2","המלצה 3"],' + closingField + '}\n\n' +
+        'תמלול השיחה לניתוח:\n' + transcriptForAnalysis;
 
       var sData;
       if (getGroqKey()) {
@@ -1657,8 +1659,17 @@ async function sendChat() {
       try {
         chatData = await callGroq(ctx + '\n\nשאלה: ' + q, false);
       } catch(ge) {
-        console.warn('[Chat] Groq failed, trying Gemini:', ge.message);
-        chatData = await callGemini([{text: ctx + '\n\nשאלה: ' + q}], 1024, false);
+        console.warn('[Chat] Groq failed:', ge.message);
+        // If too large, try with even shorter context
+        if (ge.message.indexOf('too large') !== -1 || ge.message.indexOf('tokens') !== -1) {
+          var shortCtx = 'אתה סוכן AI. ענה בעברית קצר.\n\nניתוח: ציון ' +
+            (ca.result.totalScore||'') + ', ' + (ca.result.grade||'') + '\n' +
+            'נציג: ' + (ca.result.agentSummary||'').slice(0,200) + '\n' +
+            'תמלול: ' + trForChat.slice(0,1500);
+          chatData = await callGroq(shortCtx + '\n\nשאלה: ' + q, false);
+        } else {
+          chatData = await callGemini([{text: ctx + '\n\nשאלה: ' + q}], 1024, false);
+        }
       }
     } else {
       chatData = await callGemini([{text: ctx + '\n\nשאלה: ' + q}], 1024, false);
