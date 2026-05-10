@@ -584,11 +584,11 @@ function setType(t, btn) {
 // │  ★★★ הכנס כאן את המפתחות שלך ★★★                        │
 // └──────────────────────────────────────────────────────────┘
 var DEFAULT_KEYS = [
-  'AIzaSyB_DPGvYsAhgqLQbqLuiZ1gh57SQeJQT0o',
-  'AIzaSyCvXfeAnp-GOz5kuD--8D86Sobdy6r72CU',
-  'AIzaSyCxRM9tIfcDoTOP6YBY2RvL3MNgbjxq1TY',
-  'AIzaSyAffpdcEV9xa6EEjbl_w9uYlOafuU6cC8s',
-  'AIzaSyBF8X3Ns9BTgPBxSjPhm5o3rRem2yI5i3U'
+  'AIzaSyB5pnp4dGtWjW_F3BGe-lsp4OI8h3ISKWI',
+  'AIzaSyDG9zovXYCXKK0hN02HsH1uDyYGilvf6LA',
+  'AIzaSyBpnRqmBSA7rhaGyt6W2ySrRxQehrLvCKs',
+  'AIzaSyA2w02uq5b9Sy84i6c5XT7oqX8QbEa1NPU',
+  'AIzaSyB1R8oALGz695Z0ZbsrlktGZ2pQ8ziVlLc'
 ];
 
 function getKeys() {
@@ -1316,9 +1316,8 @@ async function runAnalysis() {
     var fileUri = null;
     if (selFile) {
       var sizeMB = selFile.size / 1024 / 1024;
-      // Files over 5MB cause 429 quota issues with base64
-      // Try Files API first for large files
-      if (sizeMB > 2) {
+      // Always use Files API - avoids token quota issues
+      if (true || sizeMB > 0) {
         setMsg('מעלה קובץ לשרת Gemini...');
         var uploadKey = getKeys()[parseInt(localStorage.getItem('geminiKeyIdx')||'0') % getKeys().length];
         try {
@@ -1396,11 +1395,16 @@ async function runAnalysis() {
           var tp = fileUri.fallback
             ? {inline_data: {mime_type: fileUri.mime, data: fileUri.b64}}
             : {file_data: {mime_type: fileUri.mime, file_uri: fileUri.uri}};
-          tParts = [tp, {text: 'תמלל את השיחה בעברית בדיוק. כתוב כל שורה: שם: טקסט. אם מילה לא ברורה כתוב [לא ברור]. החזר רק את התמלול ללא הסברים.'}];
+          tParts = [tp, {text: 'תמלל את השיחה בעברית בדיוק. כתוב כל שורה בפורמט "שם: טקסט". אם מילה לא ברורה כתוב [לא ברור]. החזר רק את התמלול ללא כל הסברים נוספים.'}];
         }
+        // Save key index before transcription to rotate for analysis
+        var preTranscribeIdx = parseInt(localStorage.getItem('geminiKeyIdx')||'0');
         var tData = await callGemini(tParts, 4096, false);
         transcriptText = tData.candidates[0].content.parts[0].text || '';
         console.log('[Analysis] transcribed:', transcriptText.length, 'chars');
+        // Rotate to next key for analysis step
+        var keys = getKeys();
+        localStorage.setItem('geminiKeyIdx', String((preTranscribeIdx + 1) % keys.length));
       } else {
         transcriptText = manual;
       }
