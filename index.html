@@ -1422,8 +1422,25 @@ async function runAnalysis() {
       if (selFile) {
         setMsg('שלב 1/2: מתמלל עם Groq Whisper...');
         try {
-          transcriptText = await transcribeWithGroq(selFile);
-          console.log('[Analysis] Groq Whisper transcribed:', transcriptText.length, 'chars');
+          var rawTranscript = await transcribeWithGroq(selFile);
+          console.log('[Analysis] Groq Whisper transcribed:', rawTranscript.length, 'chars');
+          // Ask Groq to identify speakers and format the transcript
+          setMsg('מזהה דוברים...');
+          var speakerPrompt = 'להלן תמלול של שיחת טלפון בין נציג שירות/מכירות ולקוח.\n' +
+            'זהה מי הנציג ומי הלקוח לפי ההקשר:\n' +
+            '- הנציג בדרך כלל מציג את עצמו בתחילה, שואל שאלות ומציע פתרונות\n' +
+            '- הלקוח בדרך כלל מתקשר עם בקשה או שאלה\n' +
+            '- אם הנציג אמר את שמו — ציין אותו\n\n' +
+            'פרמט את התמלול כך שכל שורה תתחיל ב"נציג: " או "לקוח: "\n' +
+            'החזר רק את התמלול המפורמט, ללא הסברים.\n\n' +
+            'תמלול גולמי:\n' + rawTranscript;
+          try {
+            var spData = await callGroq(speakerPrompt, false);
+            transcriptText = spData.candidates[0].content.parts[0].text || rawTranscript;
+          } catch(spErr) {
+            transcriptText = rawTranscript; // fallback to raw
+          }
+          console.log('[Analysis] transcript with speakers:', transcriptText.length, 'chars');
         } catch(whisperErr) {
           console.warn('[Analysis] Groq Whisper failed, trying Gemini:', whisperErr.message);
           // Fallback to Gemini
