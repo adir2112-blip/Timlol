@@ -1447,24 +1447,31 @@ async function runAnalysis() {
         ? transcriptText.slice(0, maxTranscriptChars) + '\n... [קוצר לאורך]'
         : transcriptText;
 
-      var closingField = callType === 'sales' ? 'closing (בוליאן), closingNote' : 'resolved (בוליאן), resolvedNote';
+      var closingField = callType === 'sales' ? 'closing (בוליאן האם נסגרה עסקה), closingNote' : 'resolved (בוליאן האם הבעיה נפתרה), resolvedNote';
       var critLines = getCrit(callType).map(function(c){return c.name+'('+c.w+'%)'+(c.desc?': '+c.desc:'');}).join('\n');
-      var analysisPrompt = 'ענה בעברית בלבד.\n' +
-        'נתח את תמלול השיחה הבא בפירוט. שיחת ' + typeLabel + ', נציג: ' + agentName + '.\n\n' +
-        'הוראות חשובות:\n' +
-        '- בסס את כל ההערות על מה שנאמר בפועל בתמלול\n' +
-        '- ציין דוגמאות ספציפיות מהשיחה בכל קטגוריה\n' +
-        '- agentNote ו-customerNote חייבים להכיל פרטים מהשיחה עצמה\n' +
-        '- gradeText יסביר את הציון עם דוגמאות קונקרטיות\n\n' +
-        'הוראות נוספות:\n' + getInst(callType) + '\n\n' +
+      var analysisPrompt =
+        'ענה בעברית בלבד. כל הערות חייבות להיות ספציפיות לשיחה זו בלבד.\n' +
+        'נתח שיחת ' + typeLabel + ', נציג: ' + agentName + '.\n\n' +
+        'כללים מחייבים:\n' +
+        '1. כל agentNote ו-customerNote חייב להכיל ציטוט או דוגמה ספציפית מהתמלול — לא משפטים כלליים.\n' +
+        '2. gradeText: 2-3 משפטים עם דוגמאות קונקרטיות מהשיחה.\n' +
+        '3. כל section.text: פסקה מפורטת עם מה שקרה בפועל.\n' +
+        '4. המלצות: ספציפיות לשיחה זו, לא כלליות.\n' +
+        '5. שם הנציג: חפש בתחילת התמלול. גם אם הכתיב מדובר — זהה ורשום.\n\n' +
+        'הוראות: ' + getInst(callType) + '\n\n' +
         'קריטריונים:\n' + critLines + '\n\n' +
-        'החזר JSON תקני בלבד:\n' +
-        '{"totalScore":0-100,"grade":"מצוין/טוב/בינוני/טעון שיפור","gradeText":"הסבר עם דוגמאות","mood":"","moodEmoji":"","agentScore":0-100,"agentSummary":"תיאור מפורט של ביצועי הנציג עם דוגמאות","customerScore":0-100,"customerSummary":"תיאור מפורט","categories":[{"name":"","score":0-100,"weight":0,"agentNote":"ציטוט/דוגמה מהשיחה","customerNote":"תגובת לקוח"}],"sections":{"opening":{"title":"פתיח","text":"ניתוח מפורט עם דוגמאות"},"body":{"title":"גוף השיחה","text":""},"solution":{"title":"פתרון","text":""},"satisfaction":{"title":"שביעות רצון","text":""},"closing":{"title":"סיום","text":""},"atmosphere":{"title":"אווירה","text":""}},"recommendations":["המלצה 1 ספציפית","המלצה 2","המלצה 3"],' + closingField + '}\n\n' +
-        'חשוב מאוד:\n' +
-        '1. שם הנציג: חפש בתמלול מתי הנציג אמר את שמו. בשיחות טלפון נציגים אומרים שמם בתחילה (לדוגמה: "שלום מדברת X", "אני X"). זהה זאת ורשום.\n' +
-        '2. אל תסמן "לא הציג את שמו" אם בתמלול יש הצגה עצמית — גם אם הכתיב לא מושלם.\n' +
-        '3. בסס כל הערה על ציטוט מדויק מהתמלול.\n' +
-        'תמלול השיחה לניתוח:\n' + transcriptForAnalysis;
+        'JSON בלבד:\n' +
+        '{"totalScore":75,"grade":"טוב","gradeText":"הנציג [שם] פתח ב... אולם לא...","mood":"","moodEmoji":"","agentScore":75,"agentSummary":"הנציג אמר [X], ביצע [Y] אך לא ביצע [Z]","customerScore":70,"customerSummary":"הלקוח הגיב ב..., ביקש...",'+
+        '"categories":[{"name":"","score":75,"weight":0,"agentNote":"ציטוט מדויק: הנציג אמר X / עשה Y","customerNote":"הלקוח אמר / הגיב"}],' +
+        '"sections":{"opening":{"title":"פתיח","text":"הנציג פתח ב... [ציטוט]. הלקוח..."},' +
+        '"body":{"title":"גוף השיחה","text":"הלקוח פנה בגלל... הנציג..."},' +
+        '"solution":{"title":"פתרון","text":"הנציג הציע... הלקוח..."},' +
+        '"satisfaction":{"title":"שביעות רצון","text":"הלקוח הביע..."},' +
+        '"closing":{"title":"סיום","text":"השיחה הסתיימה ב..."},' +
+        '"atmosphere":{"title":"אווירה","text":"האווירה הייתה... כי..."}},' +
+        '"recommendations":["על הנציג לשפר X כי בשיחה זו...","בפעם הבאה...",""],' +
+        closingField + '}\n\n' +
+        'תמלול:\n' + transcriptForAnalysis;
 
       var sData;
       if (getGroqKey()) {
