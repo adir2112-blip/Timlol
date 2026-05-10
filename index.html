@@ -738,7 +738,7 @@ async function callGroq(prompt, jsonMode) {
   if (!key) throw new Error('אין מפתח Groq');
 
   var body = {
-    model: 'llama-3.3-70b-versatile',
+    model: 'mixtral-8x7b-32768',
     messages: [{role: 'user', content: prompt}],
     temperature: 0.3,
     max_tokens: 8192
@@ -1442,7 +1442,7 @@ async function runAnalysis() {
       // STEP 2: Analyze with Groq (fast, no quota issues) or Gemini fallback
       setMsg('שלב 2/2: מנתח עם Groq...');
       // Groq has 12K TPM limit - truncate transcript if needed
-      var maxTranscriptChars = 3500;
+      var maxTranscriptChars = 6000;
       var transcriptForAnalysis = transcriptText.length > maxTranscriptChars
         ? transcriptText.slice(0, maxTranscriptChars) + '\n... [קוצר לאורך]'
         : transcriptText;
