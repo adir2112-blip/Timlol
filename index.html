@@ -1442,7 +1442,7 @@ async function runAnalysis() {
       // STEP 2: Analyze with Groq (fast, no quota issues) or Gemini fallback
       setMsg('שלב 2/2: מנתח עם Groq...');
       // Groq has 12K TPM limit - truncate transcript if needed
-      var maxTranscriptChars = 8000;
+      var maxTranscriptChars = 3500;
       var transcriptForAnalysis = transcriptText.length > maxTranscriptChars
         ? transcriptText.slice(0, maxTranscriptChars) + '\n... [קוצר לאורך]'
         : transcriptText;
@@ -1474,17 +1474,22 @@ async function runAnalysis() {
         } catch(groqErr) {
           console.warn('[Analysis] Groq failed:', groqErr.message);
           // If too large, try with shorter transcript
-          if (groqErr.message.indexOf('too large') !== -1 || groqErr.message.indexOf('tokens') !== -1) {
-            var shortPrompt = analysisPrompt.slice(0, analysisPrompt.indexOf('תמלול השיחה:') + 14) +
-              transcriptText.slice(0, 3000) + '\n... [קוצר]';
-            try {
-              sData = await callGroq(shortPrompt, true);
-              console.log('[Analysis] Groq OK with shorter prompt');
-            } catch(e2) {
-              sData = await callGemini([{text: analysisPrompt}], 8192, true);
-            }
-          } else {
-            sData = await callGemini([{text: analysisPrompt}], 8192, true);
+          // Retry with minimal prompt + 2000 chars transcript
+          console.warn('[Analysis] Groq too large, retrying with minimal prompt');
+          var shortTranscript = transcriptForAnalysis.slice(0, 2000);
+          var minPrompt = 'ענה בעברית. נתח שיחת ' + typeLabel + ' של ' + agentName + '.\n' +
+            getInst(callType) + '\n' +
+            'קריטריונים: ' + getCrit(callType).map(function(c){return c.name+'('+c.w+'%)';}).join(', ') + '\n' +
+            'JSON בלבד: {totalScore,grade,gradeText,mood,moodEmoji,agentScore,agentSummary,customerScore,customerSummary,' +
+            'categories:[{name,score,weight,agentNote,customerNote}],' +
+            'sections:{opening:{title,text},body:{title,text},solution:{title,text},satisfaction:{title,text},closing:{title,text},atmosphere:{title,text}},' +
+            'recommendations:[],resolved}\n\nתמלול:\n' + shortTranscript;
+          try {
+            sData = await callGroq(minPrompt, true);
+            console.log('[Analysis] Groq OK with minimal prompt');
+          } catch(e2) {
+            console.warn('[Analysis] Groq failed again, using Gemini');
+            sData = await callGemini([{text: minPrompt}], 4096, true);
           }
         }
       } else {
